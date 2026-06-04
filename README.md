@@ -123,14 +123,18 @@ vercel --prod --yes
 - [x] Domain registered (inksent.co via Cloudflare, $26/yr)
 - [x] DNS → Vercel
 - [x] Resend domain verified
-- [ ] **Twilio webhooks updated to inksent.co** (currently using .vercel.app URL)
-- [ ] **Twilio trial upgraded** (add credit card — needed to SMS non-verified numbers)
-- [ ] **Google Workspace** — orders@inksent.co inbox ($6/mo)
-- [ ] **DMARC record** added in Cloudflare DNS
-- [ ] **Supabase auth URL** updated to https://inksent.co
+- [x] Twilio trial upgraded (credit card added)
+- [x] inksent.co DNS propagated ✅
+- [ ] **Twilio webhooks** — set in Twilio Console → Phone Numbers → (619) 949-3361 → Voice + SMS to inksent.co URLs
+- [ ] **A2P 10DLC brand** — needs EIN (irs.gov/ein, available 7am ET) → resubmit brand → wait 24-48hrs
+- [ ] **A2P Campaign** — register after brand approved
+- [ ] **Google Workspace** — orders@inksent.co inbox ($6/mo, connecting to Cloudflare)
+- [ ] **DMARC record** — Cloudflare DNS: TXT `_dmarc` → `v=DMARC1; p=quarantine; rua=mailto:orders@inksent.co`
+- [ ] **Supabase auth URL** — set to https://inksent.co + redirect https://inksent.co/portal
+- [ ] Test call forwarding — call (619) 949-3361, should ring (760) 504-5984
 - [ ] Test SMS dispatch end-to-end
 - [ ] Test invoice email
-- [ ] Test call forwarding (call 619-949-3361, should ring your cell)
-- [ ] Add first real notary at /notaries
-- [ ] LLC filed (CA SOS — $70)
-- [ ] E&O insurance (Next Insurance — ~$500/yr)
+- [ ] Add first real notary at inksent.co/notaries
+- [ ] EIN — irs.gov/ein tomorrow 7am ET
+- [ ] LLC — consult CPA (CA vs TN), no rush until revenue
+- [ ] E&O insurance — Next Insurance (~$500/yr), get before marketing to title companies
