@@ -1,36 +1,136 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Inksent Signing Services
 
-## Getting Started
+Notary signing agent dispatch platform for title companies, escrow officers, and lenders.
 
-First, run the development server:
+## Live URLs
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+| URL | What it is |
+|-----|-----------|
+| https://inksent.co | Public website |
+| https://inksent.co/order | Client order form |
+| https://inksent.co/dashboard | Admin dashboard |
+| https://inksent.co/orders | All orders |
+| https://inksent.co/notaries | Notary network |
+| https://inksent.co/setup | Integrations setup + SMS test |
+| https://inksent.co/portal | Client portal (magic link login) |
+| https://notary-dispatch.vercel.app | Vercel alias (always works) |
+
+## Business Phone & Email
+
+| | |
+|-|-|
+| **Business phone** | (619) 949-3361 — Twilio, forwards calls/texts to (760) 504-5984 |
+| **Business email** | orders@inksent.co — Google Workspace (pending setup) |
+| **Personal cell** | (760) 504-5984 — receives forwarded calls, dispatch alerts |
+
+## Services & Where to Find Them
+
+### Supabase (Database)
+- Dashboard: https://supabase.com/dashboard/project/ajkhzvjxvpuoxfthrkkc
+- Tables: `orders`, `notaries`
+
+### Twilio (SMS dispatch + call/text forwarding)
+- Console: https://console.twilio.com
+- Business number: +1 (619) 949-3361
+- **Webhook URLs** — set these in Twilio Console → Phone Numbers → (619) 949-3361:
+  - Voice: `https://inksent.co/api/twilio/voice`
+  - SMS: `https://inksent.co/api/twilio/sms`
+
+### Resend (Outbound invoice email)
+- Dashboard: https://resend.com
+- Sending domain: inksent.co (verified)
+- Sends from: `invoices@inksent.co`
+
+### Vercel (Hosting)
+- Dashboard: https://vercel.com/clayton-rehm-s-projects/notary-dispatch
+- Deploy: `cd ~/notary-dispatch && vercel --prod --yes`
+- GitHub: https://github.com/claytonrehm/inksent
+
+### Cloudflare (Domain + DNS)
+- Domain: inksent.co
+- DNS records:
+  - `A` @ → `76.76.21.21` (Vercel, proxied) ✅
+  - `CNAME` www → `cns.vercel-dns.com` (DNS only) ✅
+  - Resend SPF + DKIM (auto-configured) ✅
+  - MX records → Google Workspace ⏳ pending
+  - DMARC TXT record ⏳ pending
+
+### Google Workspace (Inbound email)
+- $6/month at workspace.google.com
+- Gives you orders@inksent.co inbox
+- Requires MX records in Cloudflare (Google provides during setup)
+
+## Environment Variables
+
+Stored in `.env.local` locally and Vercel dashboard in production.
+**Never commit `.env.local` to git.**
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://ajkhzvjxvpuoxfthrkkc.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+TWILIO_ACCOUNT_SID=...
+TWILIO_AUTH_TOKEN=...
+TWILIO_FROM_NUMBER=+16199493361
+RESEND_API_KEY=...
+ADMIN_PHONE=+17605045984
+NEXT_PUBLIC_BASE_URL=https://inksent.co
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Run Locally
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cd ~/notary-dispatch
+npm run dev
+# → http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deploy to Production
 
-## Learn More
+```bash
+cd ~/notary-dispatch
+vercel --prod --yes
+```
 
-To learn more about Next.js, take a look at the following resources:
+## How an Order Works (End-to-End)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Client submits order at `/order`
+2. Order appears in admin at `/dashboard`
+3. Admin opens order → picks notary → clicks **Dispatch via SMS**
+4. Notary gets SMS with job details + one-tap accept link
+5. Notary taps link → accepts
+6. Admin gets SMS confirmation on (760) 504-5984
+7. Admin marks order Completed
+8. Invoice auto-emails to client
+9. Invoice viewable/printable at `/invoices/[id]`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Pricing
 
-## Deploy on Vercel
+| | |
+|-|-|
+| Charge clients | $195/signing |
+| Pay notaries | $100/signing |
+| Your spread | **$95/signing** |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Pre-Launch Checklist
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [x] Website live at inksent.co
+- [x] Order form
+- [x] Admin dashboard
+- [x] Supabase database
+- [x] Twilio SMS configured — number (619) 949-3361
+- [x] Resend invoice email configured
+- [x] Domain registered (inksent.co via Cloudflare, $26/yr)
+- [x] DNS → Vercel
+- [x] Resend domain verified
+- [ ] **Twilio webhooks updated to inksent.co** (currently using .vercel.app URL)
+- [ ] **Twilio trial upgraded** (add credit card — needed to SMS non-verified numbers)
+- [ ] **Google Workspace** — orders@inksent.co inbox ($6/mo)
+- [ ] **DMARC record** added in Cloudflare DNS
+- [ ] **Supabase auth URL** updated to https://inksent.co
+- [ ] Test SMS dispatch end-to-end
+- [ ] Test invoice email
+- [ ] Test call forwarding (call 619-949-3361, should ring your cell)
+- [ ] Add first real notary at /notaries
+- [ ] LLC filed (CA SOS — $70)
+- [ ] E&O insurance (Next Insurance — ~$500/yr)
