@@ -13,7 +13,7 @@ Notary signing agent dispatch platform for title companies, escrow officers, and
 | https://inksent.co/notaries | Notary network |
 | https://inksent.co/setup | Integrations setup + SMS test |
 | https://inksent.co/portal | Client portal (magic link login) |
-| https://notary-dispatch.vercel.app | Vercel alias (always works) |
+| https://inksent.vercel.app | Vercel alias (always works) |
 
 ## Business Phone & Email
 
@@ -42,8 +42,8 @@ Notary signing agent dispatch platform for title companies, escrow officers, and
 - Sends from: `invoices@inksent.co`
 
 ### Vercel (Hosting)
-- Dashboard: https://vercel.com/clayton-rehm-s-projects/notary-dispatch
-- Deploy: `cd ~/notary-dispatch && vercel --prod --yes`
+- Dashboard: https://vercel.com/clayton-rehm-s-projects/inksent
+- Deploy: `cd ~/inksent && vercel --prod --yes`
 - GitHub: https://github.com/claytonrehm/inksent
 
 ### Cloudflare (Domain + DNS)
@@ -80,7 +80,7 @@ NEXT_PUBLIC_BASE_URL=https://inksent.co
 ## Run Locally
 
 ```bash
-cd ~/notary-dispatch
+cd ~/inksent
 npm run dev
 # → http://localhost:3000
 ```
@@ -88,7 +88,7 @@ npm run dev
 ## Deploy to Production
 
 ```bash
-cd ~/notary-dispatch
+cd ~/inksent
 vercel --prod --yes
 ```
 
