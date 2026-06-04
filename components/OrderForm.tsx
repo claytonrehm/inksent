@@ -1,0 +1,281 @@
+'use client'
+
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CheckCircle } from 'lucide-react'
+import { orderSchema, type OrderSchema } from '@/lib/validations'
+import { formatPhone } from '@/lib/utils'
+import { Input } from '@/components/ui/input'
+import { Select } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/ui/button'
+
+const SIGNING_TYPES = [
+  { value: 'purchase', label: 'Purchase' },
+  { value: 'refinance', label: 'Refinance' },
+  { value: 'heloc', label: 'HELOC' },
+  { value: 'reverse_mortgage', label: 'Reverse Mortgage' },
+  { value: 'loan_mod', label: 'Loan Modification' },
+  { value: 'other', label: 'Other' },
+]
+
+const STATES = [
+  { value: 'AL', label: 'Alabama' }, { value: 'AK', label: 'Alaska' }, { value: 'AZ', label: 'Arizona' },
+  { value: 'AR', label: 'Arkansas' }, { value: 'CA', label: 'California' }, { value: 'CO', label: 'Colorado' },
+  { value: 'CT', label: 'Connecticut' }, { value: 'DE', label: 'Delaware' }, { value: 'FL', label: 'Florida' },
+  { value: 'GA', label: 'Georgia' }, { value: 'HI', label: 'Hawaii' }, { value: 'ID', label: 'Idaho' },
+  { value: 'IL', label: 'Illinois' }, { value: 'IN', label: 'Indiana' }, { value: 'IA', label: 'Iowa' },
+  { value: 'KS', label: 'Kansas' }, { value: 'KY', label: 'Kentucky' }, { value: 'LA', label: 'Louisiana' },
+  { value: 'ME', label: 'Maine' }, { value: 'MD', label: 'Maryland' }, { value: 'MA', label: 'Massachusetts' },
+  { value: 'MI', label: 'Michigan' }, { value: 'MN', label: 'Minnesota' }, { value: 'MS', label: 'Mississippi' },
+  { value: 'MO', label: 'Missouri' }, { value: 'MT', label: 'Montana' }, { value: 'NE', label: 'Nebraska' },
+  { value: 'NV', label: 'Nevada' }, { value: 'NH', label: 'New Hampshire' }, { value: 'NJ', label: 'New Jersey' },
+  { value: 'NM', label: 'New Mexico' }, { value: 'NY', label: 'New York' }, { value: 'NC', label: 'North Carolina' },
+  { value: 'ND', label: 'North Dakota' }, { value: 'OH', label: 'Ohio' }, { value: 'OK', label: 'Oklahoma' },
+  { value: 'OR', label: 'Oregon' }, { value: 'PA', label: 'Pennsylvania' }, { value: 'RI', label: 'Rhode Island' },
+  { value: 'SC', label: 'South Carolina' }, { value: 'SD', label: 'South Dakota' }, { value: 'TN', label: 'Tennessee' },
+  { value: 'TX', label: 'Texas' }, { value: 'UT', label: 'Utah' }, { value: 'VT', label: 'Vermont' },
+  { value: 'VA', label: 'Virginia' }, { value: 'WA', label: 'Washington' }, { value: 'WV', label: 'West Virginia' },
+  { value: 'WI', label: 'Wisconsin' }, { value: 'WY', label: 'Wyoming' },
+]
+
+const TIME_SLOTS = Array.from({ length: 28 }, (_, i) => {
+  const totalMinutes = 8 * 60 + i * 30
+  const h = Math.floor(totalMinutes / 60)
+  const m = totalMinutes % 60
+  const label = `${h % 12 || 12}:${m.toString().padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`
+  const value = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`
+  return { value, label }
+})
+
+interface ConfirmationState {
+  id: string
+  confirmation_number: string
+}
+
+export default function OrderForm() {
+  const [confirmation, setConfirmation] = useState<ConfirmationState | null>(null)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<OrderSchema>({
+    resolver: zodResolver(orderSchema),
+    defaultValues: {},
+  })
+
+  const onSubmit = async (data: OrderSchema) => {
+    setSubmitError(null)
+    const res = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+
+    if (!res.ok) {
+      setSubmitError('Something went wrong. Please try again or call us.')
+      return
+    }
+
+    const result = await res.json()
+    setConfirmation(result)
+  }
+
+  if (confirmation) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center gap-4">
+        <div className="bg-green-50 rounded-full p-4">
+          <CheckCircle className="text-green-500 w-12 h-12" />
+        </div>
+        <h2 className="text-2xl font-bold text-gray-900">Order Received</h2>
+        <p className="text-gray-500 max-w-sm">
+          We&apos;ll assign a signing agent and confirm within 30 minutes.
+        </p>
+        <div className="mt-2 bg-gray-50 border border-gray-200 rounded-xl px-10 py-5">
+          <p className="text-xs text-gray-400 uppercase tracking-widest mb-1">Confirmation</p>
+          <p className="text-2xl font-mono font-bold text-gray-900">{confirmation.confirmation_number}</p>
+        </div>
+        <Button variant="secondary" className="mt-2" onClick={() => setConfirmation(null)}>
+          Place Another Order
+        </Button>
+      </div>
+    )
+  }
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+
+      {/* Signing Details */}
+      <section>
+        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">
+          Signing Details
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <Select
+            id="signing_type"
+            label="Signing Type *"
+            options={SIGNING_TYPES}
+            error={errors.signing_type?.message}
+            {...register('signing_type')}
+          />
+          <Input
+            id="signing_date"
+            label="Signing Date *"
+            type="date"
+            error={errors.signing_date?.message}
+            min={new Date().toISOString().split('T')[0]}
+            {...register('signing_date')}
+          />
+          <Select
+            id="signing_time"
+            label="Signing Time *"
+            options={TIME_SLOTS}
+            error={errors.signing_time?.message}
+            {...register('signing_time')}
+          />
+        </div>
+      </section>
+
+      {/* Property */}
+      <section>
+        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">
+          Property Address
+        </h2>
+        <div className="space-y-4">
+          <Input
+            id="property_address"
+            label="Street Address *"
+            placeholder="123 Main St"
+            error={errors.property_address?.message}
+            {...register('property_address')}
+          />
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="sm:col-span-2">
+              <Input
+                id="property_city"
+                label="City *"
+                placeholder="Phoenix"
+                error={errors.property_city?.message}
+                {...register('property_city')}
+              />
+            </div>
+            <Select
+              id="property_state"
+              label="State *"
+              options={STATES}
+              error={errors.property_state?.message}
+              {...register('property_state')}
+            />
+            <Input
+              id="property_zip"
+              label="ZIP *"
+              placeholder="85001"
+              maxLength={5}
+              error={errors.property_zip?.message}
+              {...register('property_zip')}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Signer */}
+      <section>
+        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">
+          Signer / Borrower
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <Input
+            id="signer_name"
+            label="Full Name *"
+            placeholder="Jane Doe"
+            error={errors.signer_name?.message}
+            {...register('signer_name')}
+          />
+          <Input
+            id="signer_phone"
+            label="Cell Phone *"
+            placeholder="(555) 555-0100"
+            error={errors.signer_phone?.message}
+            {...register('signer_phone', {
+              onChange: (e) => setValue('signer_phone', formatPhone(e.target.value)),
+            })}
+          />
+          <Input
+            id="signer_email"
+            label="Email (optional)"
+            type="email"
+            placeholder="jane@email.com"
+            error={errors.signer_email?.message}
+            {...register('signer_email')}
+          />
+        </div>
+      </section>
+
+      {/* Client */}
+      <section>
+        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">
+          Your Company / Contact
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input
+            id="client_company"
+            label="Company Name *"
+            placeholder="First American Title"
+            error={errors.client_company?.message}
+            {...register('client_company')}
+          />
+          <Input
+            id="client_name"
+            label="Your Name *"
+            placeholder="John Smith"
+            error={errors.client_name?.message}
+            {...register('client_name')}
+          />
+          <Input
+            id="client_email"
+            label="Your Email *"
+            type="email"
+            placeholder="john@firstam.com"
+            error={errors.client_email?.message}
+            {...register('client_email')}
+          />
+          <Input
+            id="client_phone"
+            label="Your Phone *"
+            placeholder="(555) 555-0200"
+            error={errors.client_phone?.message}
+            {...register('client_phone', {
+              onChange: (e) => setValue('client_phone', formatPhone(e.target.value)),
+            })}
+          />
+        </div>
+      </section>
+
+      {/* Special Instructions */}
+      <section>
+        <Textarea
+          id="special_instructions"
+          label="Special Instructions"
+          placeholder="Gate code, ID requirements, docs arriving separately, language needs, etc."
+          {...register('special_instructions')}
+        />
+      </section>
+
+      {submitError && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+          {submitError}
+        </p>
+      )}
+
+      <div className="flex justify-end pt-2">
+        <Button type="submit" size="lg" loading={isSubmitting}>
+          {isSubmitting ? 'Placing Order...' : 'Place Signing Order'}
+        </Button>
+      </div>
+    </form>
+  )
+}
