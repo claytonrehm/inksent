@@ -61,7 +61,7 @@ TWILIO_FROM_NUMBER=+1xxxxxxxxxx`}</pre>
           <p>Go to <strong>resend.com</strong> — free up to 3,000 emails/month. Sign up and create an API key.</p>
         </Step>
         <Step n={7} title="Add your domain">
-          <p>In Resend → Domains → Add Domain, enter <strong>inksent.com</strong>. Resend gives you DNS records to add in Cloudflare. Takes 5 minutes.</p>
+          <p>In Resend → Domains → Add Domain, enter <strong>inksent.co</strong>. Resend gives you DNS records to add in Cloudflare. Takes 5 minutes.</p>
           <p className="text-gray-500">Until the domain is verified, Resend can only send to your own email address (fine for testing).</p>
         </Step>
         <Step n={8} title="Add API key to .env.local">
@@ -74,7 +74,7 @@ TWILIO_FROM_NUMBER=+1xxxxxxxxxx`}</pre>
         </div>
         <Step n={9} title="Add env vars to Vercel">
           <p>Go to your Vercel project → Settings → Environment Variables. Add every value from your <Code>.env.local</Code> file. The app won&apos;t send SMS or email in production until these are set.</p>
-          <p className="mt-2">Also update: <Code>NEXT_PUBLIC_BASE_URL=https://inksent.com</Code></p>
+          <p className="mt-2">Also update: <Code>NEXT_PUBLIC_BASE_URL=https://inksent.co</Code></p>
         </Step>
       </div>
     </div>

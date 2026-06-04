@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   // Send auto-reply to the sender
   const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Message>Thanks for reaching out to Inksent Signing Services! We'll get back to you shortly. To place a signing order visit inksent.com or call (619) 949-3361.</Message>
+  <Message>Thanks for reaching out to Inksent Signing Services! We'll get back to you shortly. To place a signing order visit inksent.co or call (619) 949-3361.</Message>
 </Response>`
 
   return new NextResponse(twiml, {

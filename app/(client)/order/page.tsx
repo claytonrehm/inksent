@@ -33,7 +33,7 @@ export default function OrderPage() {
           Questions?{' '}
           <a href="tel:+16199493361" className="underline hover:text-gray-600">(619) 949-3361</a>
           {' '}or{' '}
-          <a href="mailto:orders@inksent.com" className="underline hover:text-gray-600">orders@inksent.com</a>
+          <a href="mailto:orders@inksent.co" className="underline hover:text-gray-600">orders@inksent.co</a>
         </p>
       </div>
     </main>

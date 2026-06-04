@@ -99,7 +99,7 @@ export function buildInvoiceHTML(order: {
       </div>
     </div>
     <div class="footer">
-      Inksent Signing Services · orders@inksent.com · (619) 949-3361<br/>
+      Inksent Signing Services · orders@inksent.co · (619) 949-3361<br/>
       Thank you for your business.
     </div>
   </div>
@@ -110,7 +110,7 @@ export function buildInvoiceHTML(order: {
 export async function sendInvoiceEmail(order: Parameters<typeof buildInvoiceHTML>[0]) {
   const html = buildInvoiceHTML(order)
   return getResend().emails.send({
-    from: 'Inksent <invoices@inksent.com>',
+    from: 'Inksent <invoices@inksent.co>',
     to: order.client_email,
     subject: `Invoice ${order.invoice_number} — ${order.signing_type.replace(/_/g, ' ')} signing on ${format(new Date(order.signing_date), 'MMM d')}`,
     html,
