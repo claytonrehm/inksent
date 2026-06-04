@@ -80,11 +80,11 @@ export default function Home() {
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </Link>
               <a
-                href="tel:+17605045984"
+                href="tel:+16199493361"
                 className="inline-flex items-center justify-center gap-2 border-2 border-gray-200 text-gray-700 px-8 py-4 rounded-xl font-bold text-lg hover:border-violet-300 hover:text-violet-700 transition-all"
               >
                 <Phone size={18} />
-                (760) 504-5984
+                (619) 949-3361
               </a>
             </div>
             <p className="text-gray-400 text-sm">No contracts · No minimums · 30-min confirmation</p>
@@ -249,7 +249,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
             <Image src="/inksent-logo.png" alt="Inksent" width={110} height={83} className="object-contain" />
             <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-gray-500">
-              <a href="tel:+17605045984" className="hover:text-gray-300 transition-colors flex items-center gap-1.5"><Phone size={13} />(760) 504-5984</a>
+              <a href="tel:+16199493361" className="hover:text-gray-300 transition-colors flex items-center gap-1.5"><Phone size={13} />(619) 949-3361</a>
               <span className="hidden sm:block">·</span>
               <a href="mailto:orders@inksent.com" className="hover:text-gray-300 transition-colors">orders@inksent.com</a>
             </div>

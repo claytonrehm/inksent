@@ -99,7 +99,7 @@ export function buildInvoiceHTML(order: {
       </div>
     </div>
     <div class="footer">
-      Inksent Signing Services · orders@inksent.com · (760) 504-5984<br/>
+      Inksent Signing Services · orders@inksent.com · (619) 949-3361<br/>
       Thank you for your business.
     </div>
   </div>

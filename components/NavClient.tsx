@@ -40,9 +40,9 @@ export default function NavClient() {
         </div>
 
         <div className="flex items-center gap-3">
-          <a href="tel:+17605045984" className="hidden sm:flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors font-medium">
+          <a href="tel:+16199493361" className="hidden sm:flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors font-medium">
             <Phone size={14} />
-            (760) 504-5984
+            (619) 949-3361
           </a>
           <Link href="/order" className="bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-violet-700 transition-colors shadow-sm">
             Place Order
