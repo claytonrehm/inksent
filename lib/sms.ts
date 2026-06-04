@@ -1,9 +1,11 @@
 import twilio from 'twilio'
 
-const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
+function getClient() {
+  return twilio(process.env.TWILIO_ACCOUNT_SID ?? 'ACplaceholder', process.env.TWILIO_AUTH_TOKEN ?? 'placeholder')
+}
 
 export async function sendSMS(to: string, body: string) {
-  return client.messages.create({
+  return getClient().messages.create({
     from: process.env.TWILIO_FROM_NUMBER!,
     to,
     body,

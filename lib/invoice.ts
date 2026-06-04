@@ -1,7 +1,9 @@
 import { Resend } from 'resend'
 import { format } from 'date-fns'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY ?? 're_placeholder')
+}
 
 export function generateInvoiceNumber(orderId: string) {
   return `INV-${Date.now().toString(36).toUpperCase()}`
@@ -107,7 +109,7 @@ export function buildInvoiceHTML(order: {
 
 export async function sendInvoiceEmail(order: Parameters<typeof buildInvoiceHTML>[0]) {
   const html = buildInvoiceHTML(order)
-  return resend.emails.send({
+  return getResend().emails.send({
     from: 'Inksent <invoices@inksent.com>',
     to: order.client_email,
     subject: `Invoice ${order.invoice_number} — ${order.signing_type.replace(/_/g, ' ')} signing on ${format(new Date(order.signing_date), 'MMM d')}`,
