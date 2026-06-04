@@ -125,13 +125,14 @@ vercel --prod --yes
 - [x] Resend domain verified
 - [x] Twilio trial upgraded (credit card added)
 - [x] inksent.co DNS propagated ✅
-- [ ] **Twilio webhooks** — set in Twilio Console → Phone Numbers → (619) 949-3361 → Voice + SMS to inksent.co URLs
-- [ ] **A2P 10DLC brand** — needs EIN (irs.gov/ein, available 7am ET) → resubmit brand → wait 24-48hrs
+- [x] **Twilio voice webhook** — (619) 949-3361 forwards calls to (760) 504-5984 ✅
+- [x] **Google Workspace** — orders@inksent.co working ✅
+- [x] **MX records** — configured in Cloudflare ✅
+- [ ] **Twilio SMS webhook** — blocked until A2P approved
+- [ ] **A2P 10DLC brand** — needs EIN (irs.gov/ein, 7am ET) → resubmit → wait 24-48hrs
 - [ ] **A2P Campaign** — register after brand approved
-- [ ] **Google Workspace** — orders@inksent.co inbox ($6/mo, connecting to Cloudflare)
 - [ ] **DMARC record** — Cloudflare DNS: TXT `_dmarc` → `v=DMARC1; p=quarantine; rua=mailto:orders@inksent.co`
 - [ ] **Supabase auth URL** — set to https://inksent.co + redirect https://inksent.co/portal
-- [ ] Test call forwarding — call (619) 949-3361, should ring (760) 504-5984
 - [ ] Test SMS dispatch end-to-end
 - [ ] Test invoice email
 - [ ] Add first real notary at inksent.co/notaries
