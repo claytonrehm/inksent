@@ -1,6 +1,6 @@
-import Image from 'next/image'
 import Link from 'next/link'
-import { CheckCircle, Clock, DollarSign, MapPin, Phone, Shield, ArrowRight, Star } from 'lucide-react'
+import { CheckCircle, Clock, DollarSign, MapPin, Phone, Shield, ArrowRight } from 'lucide-react'
+import InksentLogo from '@/components/InksentLogo'
 import HeroStats from '@/components/HeroStats'
 import StatesGrid from '@/components/StatesGrid'
 import ScrollReveal from '@/components/ScrollReveal'
@@ -16,7 +16,7 @@ const FEATURES = [
   { icon: <Clock size={22} />, title: '30-Min Confirmation', desc: 'We confirm notary assignment faster than anyone else in the industry.' },
   { icon: <Shield size={22} />, title: 'NNA Certified Agents', desc: 'Every signing agent is background-checked, insured, and NNA certified.' },
   { icon: <DollarSign size={22} />, title: 'Flat-Rate Pricing', desc: 'No surprise fees. Simple, transparent pricing on every single signing.' },
-  { icon: <MapPin size={22} />, title: 'Nationwide Coverage', desc: 'All 50 states covered. One vendor relationship, anywhere you close.' },
+  { icon: <MapPin size={22} />, title: '27-State Coverage', desc: 'All non-attorney states covered. One vendor relationship, anywhere you close.' },
 ]
 
 const SIGNING_TYPES = [
@@ -42,16 +42,16 @@ export default function Home() {
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full pointer-events-none"
           style={{ background: 'radial-gradient(circle, rgba(167,139,250,0.06) 0%, transparent 70%)' }} />
 
-        <div className="relative max-w-6xl mx-auto px-6 pt-16 pb-8 text-center">
+        <div className="relative max-w-6xl mx-auto px-5 pt-20 pb-8 text-center">
           <ScrollReveal>
             <div className="inline-flex items-center gap-2 bg-violet-50 border border-violet-100 text-violet-700 text-xs font-semibold px-4 py-2 rounded-full mb-8">
               <span className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-pulse" />
-              Available Nationwide — All 50 States
+              Available in 27 Non-Attorney States
             </div>
           </ScrollReveal>
 
           <ScrollReveal delay={100}>
-            <h1 className="text-5xl sm:text-7xl font-black text-gray-900 leading-[1.05] mb-6 tracking-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-gray-900 leading-[1.05] mb-5 tracking-tight">
               Signing Agents,{' '}
               <span className="relative inline-block">
                 <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(135deg, #7c3aed, #a78bfa)' }}>
@@ -65,7 +65,7 @@ export default function Home() {
           </ScrollReveal>
 
           <ScrollReveal delay={200}>
-            <p className="text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
+            <p className="text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto mb-8 leading-relaxed">
               Inksent connects title companies, escrow officers, and lenders with vetted NNA-certified signing agents — anywhere, anytime.
             </p>
           </ScrollReveal>
@@ -74,14 +74,14 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
               <Link
                 href="/order"
-                className="group inline-flex items-center justify-center gap-2 bg-violet-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-violet-700 transition-all shadow-xl shadow-violet-200 hover:shadow-violet-300 hover:-translate-y-0.5"
+                className="group inline-flex items-center justify-center gap-2 bg-violet-600 text-white px-6 sm:px-8 py-4 rounded-xl font-bold text-base sm:text-lg hover:bg-violet-700 transition-all shadow-xl shadow-violet-200 hover:shadow-violet-300 hover:-translate-y-0.5 w-full sm:w-auto"
               >
                 Place a Signing Order
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </Link>
               <a
                 href="tel:+16199493361"
-                className="inline-flex items-center justify-center gap-2 border-2 border-gray-200 text-gray-700 px-8 py-4 rounded-xl font-bold text-lg hover:border-violet-300 hover:text-violet-700 transition-all"
+                className="inline-flex items-center justify-center gap-2 border-2 border-gray-200 text-gray-700 px-6 sm:px-8 py-4 rounded-xl font-bold text-base sm:text-lg hover:border-violet-300 hover:text-violet-700 transition-all w-full sm:w-auto"
               >
                 <Phone size={18} />
                 (619) 949-3361
@@ -115,7 +115,7 @@ export default function Home() {
       {/* Trust bar */}
       <div className="bg-gray-900 py-4 px-6">
         <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-6 sm:gap-12 text-gray-300 text-sm font-medium">
-          {['NNA Certified Network', 'E&O Insured', 'Background Checked', 'All 50 States'].map((item) => (
+          {['NNA Certified Network', 'Background Checked', 'Flat-Rate Pricing', '27 States'].map((item) => (
             <span key={item} className="flex items-center gap-2">
               <CheckCircle size={14} className="text-violet-400" /> {item}
             </span>
@@ -173,33 +173,39 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonial */}
-      <section className="px-6 py-20">
-        <div className="max-w-3xl mx-auto">
+      {/* Pricing */}
+      <section id="pricing" className="px-6 py-20">
+        <div className="max-w-4xl mx-auto">
+          <ScrollReveal className="text-center mb-12">
+            <p className="text-violet-600 font-semibold text-sm uppercase tracking-widest mb-3">Simple Pricing</p>
+            <h2 className="text-4xl font-black text-gray-900">One flat rate. No surprises.</h2>
+            <p className="text-gray-500 mt-3 text-lg">No contracts, no minimums, no hidden fees.</p>
+          </ScrollReveal>
           <ScrollReveal>
-            <div className="bg-gradient-to-br from-violet-600 to-violet-800 rounded-3xl p-10 text-center relative overflow-hidden shadow-2xl shadow-violet-200">
-              <div className="absolute inset-0 opacity-10"
-                style={{
-                  backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)',
-                  backgroundSize: '40px 40px',
-                }} />
-              <div className="relative">
-                <div className="flex justify-center gap-1 mb-6">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={20} className="text-amber-300 fill-amber-300" />
-                  ))}
-                </div>
-                <blockquote className="text-xl text-white font-medium leading-relaxed mb-6">
-                  &ldquo;Inksent is the fastest, most reliable signing service we&apos;ve used. Confirmation within 20 minutes every single time. Our escrow team loves them.&rdquo;
-                </blockquote>
-                <div className="flex items-center justify-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-sm">SK</div>
-                  <div className="text-left">
-                    <p className="font-semibold text-white text-sm">Sarah K.</p>
-                    <p className="text-violet-200 text-xs">Escrow Officer, First American Title</p>
-                  </div>
-                </div>
+            <div className="max-w-sm mx-auto bg-white border-2 border-violet-200 rounded-3xl p-8 shadow-xl shadow-violet-100 text-center">
+              <p className="text-violet-600 font-semibold text-sm uppercase tracking-widest mb-4">Per Signing</p>
+              <div className="flex items-end justify-center gap-1 mb-2">
+                <span className="text-4xl font-black text-gray-400">$</span>
+                <span className="text-7xl font-black text-gray-900 leading-none">150</span>
               </div>
+              <p className="text-gray-500 text-sm mb-8">flat rate, any signing type</p>
+              <div className="space-y-3 text-left mb-8">
+                {[
+                  'All signing types — purchase, refi, HELOC, and more',
+                  'NNA-certified, background-checked agent',
+                  'Notary assignment confirmed within 30 minutes',
+                  'Invoice emailed after each completed signing',
+                  'Coverage in all 27 non-attorney states',
+                ].map((item) => (
+                  <div key={item} className="flex items-start gap-3 text-sm text-gray-600">
+                    <CheckCircle size={15} className="text-violet-500 shrink-0 mt-0.5" />
+                    {item}
+                  </div>
+                ))}
+              </div>
+              <Link href="/order" className="block w-full bg-violet-600 text-white px-6 py-3.5 rounded-xl font-bold text-base hover:bg-violet-700 transition-colors">
+                Place an Order
+              </Link>
             </div>
           </ScrollReveal>
         </div>
@@ -209,9 +215,9 @@ export default function Home() {
       <section id="coverage" className="px-6 py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto">
           <ScrollReveal className="text-center mb-10">
-            <p className="text-violet-600 font-semibold text-sm uppercase tracking-widest mb-3">Nationwide</p>
-            <h2 className="text-4xl font-black text-gray-900 mb-3">All 50 States</h2>
-            <p className="text-gray-500">Hover any state to see full name</p>
+            <p className="text-violet-600 font-semibold text-sm uppercase tracking-widest mb-3">Coverage</p>
+            <h2 className="text-4xl font-black text-gray-900 mb-3">27 Non-Attorney States</h2>
+            <p className="text-gray-500">Tap any state to see full name</p>
           </ScrollReveal>
           <StatesGrid />
         </div>
@@ -247,11 +253,13 @@ export default function Home() {
       <footer className="bg-black px-6 py-10">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-            <Image src="/inksent-logo.png" alt="Inksent" width={110} height={83} className="object-contain" />
+            <InksentLogo size="md" dark />
             <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-gray-500">
               <a href="tel:+16199493361" className="hover:text-gray-300 transition-colors flex items-center gap-1.5"><Phone size={13} />(619) 949-3361</a>
               <span className="hidden sm:block">·</span>
               <a href="mailto:orders@inksent.co" className="hover:text-gray-300 transition-colors">orders@inksent.co</a>
+              <span className="hidden sm:block">·</span>
+              <Link href="/apply" className="hover:text-gray-300 transition-colors">Join our network</Link>
             </div>
           </div>
           <div className="mt-8 pt-6 border-t border-gray-800 text-center text-xs text-gray-600">

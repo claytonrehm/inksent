@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendSMS } from '@/lib/sms'
+import { sendNotaryAssignmentEmail, sendClientAssignmentEmail } from '@/lib/email'
 import { format } from 'date-fns'
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -11,7 +12,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const [orderResult, notaryResult] = await Promise.all([
     supabase.from('orders').select('*').eq('id', id).single(),
-    supabase.from('notaries').select('name, phone').eq('id', notary_id).single(),
+    supabase.from('notaries').select('name, phone, email').eq('id', notary_id).single(),
   ])
 
   if (orderResult.error || !orderResult.data) {
@@ -30,16 +31,57 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     .update({ notary_id, status: 'assigned' })
     .eq('id', id)
 
+  const h = parseInt(order.signing_time.split(':')[0])
+  const m = order.signing_time.split(':')[1]
+  const timeStr = `${h % 12 || 12}:${m} ${h < 12 ? 'AM' : 'PM'}`
+  const dateStr = format(new Date(order.signing_date), 'EEEE, MMMM d, yyyy')
+
   // Notify admin
   if (process.env.ADMIN_PHONE && notary) {
-    const h = parseInt(order.signing_time.split(':')[0])
-    const m = order.signing_time.split(':')[1]
-    const timeStr = `${h % 12 || 12}:${m} ${h < 12 ? 'AM' : 'PM'}`
-
-    await sendSMS(
+    sendSMS(
       process.env.ADMIN_PHONE,
       `✓ ${notary.name} accepted the ${format(new Date(order.signing_date), 'MMM d')} ${timeStr} signing for ${order.signer_name} in ${order.property_city}. Conf: ${order.confirmation_number}`
     ).catch(console.error)
+  }
+
+  if (notary) {
+    // Confirmation email + SMS to notary with full details
+    sendNotaryAssignmentEmail({
+      notaryName: notary.name,
+      notaryEmail: notary.email,
+      signerName: order.signer_name,
+      signerPhone: order.signer_phone,
+      signingType: order.signing_type,
+      signingDate: dateStr,
+      signingTime: timeStr,
+      propertyAddress: order.property_address,
+      propertyCity: order.property_city,
+      propertyState: order.property_state,
+      propertyZip: order.property_zip,
+      specialInstructions: order.special_instructions,
+      confirmationNumber: order.confirmation_number,
+      fee: order.notary_fee,
+    }).catch(console.error)
+
+    sendSMS(
+      notary.phone,
+      `✅ You're confirmed for the ${format(new Date(order.signing_date), 'MMM d')} ${timeStr} signing at ${order.property_address}, ${order.property_city}. Signer: ${order.signer_name} · ${order.signer_phone}. Full details sent to your email. Questions? (619) 949-3361`
+    ).catch(console.error)
+
+    // Notify client their agent is confirmed
+    sendClientAssignmentEmail({
+      clientName: order.client_name,
+      clientEmail: order.client_email,
+      notaryName: notary.name,
+      notaryPhone: notary.phone,
+      signerName: order.signer_name,
+      signingType: order.signing_type,
+      signingDate: dateStr,
+      signingTime: timeStr,
+      propertyAddress: order.property_address,
+      propertyCity: order.property_city,
+      confirmationNumber: order.confirmation_number,
+    }).catch(console.error)
   }
 
   return NextResponse.json({ ok: true })

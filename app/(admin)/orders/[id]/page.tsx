@@ -65,6 +65,22 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           <div className="border-t border-gray-100 mt-3 pt-3">
             <Field label="Your Spread" value={formatCurrency(order.client_fee - order.notary_fee)} bold />
           </div>
+          {order.status === 'completed' && (
+            <div className="border-t border-gray-100 mt-3 pt-3 space-y-1.5">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Client paid us</span>
+                <span className={order.client_paid_at ? 'text-green-600 font-medium' : 'text-amber-600 font-medium'}>
+                  {order.client_paid_at ? `✓ ${new Date(order.client_paid_at).toLocaleDateString()}` : '⏳ Outstanding'}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">We paid notary</span>
+                <span className={order.notary_paid_at ? 'text-green-600 font-medium' : 'text-amber-600 font-medium'}>
+                  {order.notary_paid_at ? `✓ ${new Date(order.notary_paid_at).toLocaleDateString()}` : '⏳ Pending'}
+                </span>
+              </div>
+            </div>
+          )}
         </Card>
       </div>
 

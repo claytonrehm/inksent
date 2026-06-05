@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { orderSchema } from '@/lib/validations'
+import { sendSMS, buildDispatchMessage } from '@/lib/sms'
+import { sendOrderConfirmationEmail } from '@/lib/email'
+import { format } from 'date-fns'
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,16 +20,86 @@ export async function POST(req: NextRequest) {
       .insert({
         ...parsed.data,
         status: 'pending',
-        client_fee: 19500,  // $195.00
-        notary_fee: 10000,  // $100.00
+        client_fee: 15000,
+        notary_fee: 7500,
       })
-      .select('id, confirmation_number')
+      .select('id, confirmation_number, signing_date, signing_time, signing_type, signer_name, property_city, property_zip, property_address, client_name, client_email, client_company, notary_fee')
       .single()
 
     if (error) {
       console.error('Supabase error:', error)
       return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
     }
+
+    const h = parseInt(data.signing_time.split(':')[0])
+    const m = data.signing_time.split(':')[1]
+    const timeStr = `${h % 12 || 12}:${m} ${h < 12 ? 'AM' : 'PM'}`
+    const dateStr = format(new Date(data.signing_date), 'MMM d')
+    const typeStr = data.signing_type.replace(/_/g, ' ')
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
+
+    // Auto-blast nearby active notaries
+    const { data: notaries } = await supabase
+      .from('notaries')
+      .select('id, name, phone, zip_codes')
+      .eq('active', true)
+
+    const nearby = (notaries ?? []).filter(n => (n.zip_codes ?? []).includes(data.property_zip))
+    const toBlast = nearby.length > 0 ? nearby : (notaries ?? [])
+
+    let blastCount = 0
+    if (toBlast.length > 0) {
+      const blastResults = await Promise.allSettled(
+        toBlast.map(notary => {
+          const acceptUrl = `${baseUrl}/notary/accept/${data.id}?notary=${notary.id}`
+          return sendSMS(notary.phone, buildDispatchMessage({
+            notaryName: notary.name.split(' ')[0],
+            signerName: data.signer_name,
+            signingType: data.signing_type,
+            signingDate: format(new Date(data.signing_date), 'EEEE, MMM d'),
+            signingTime: data.signing_time,
+            propertyAddress: data.property_address,
+            propertyCity: data.property_city,
+            propertyZip: data.property_zip,
+            fee: data.notary_fee,
+            acceptUrl,
+          }))
+        })
+      )
+      blastCount = blastResults.filter(r => r.status === 'fulfilled').length
+
+      await supabase
+        .from('orders')
+        .update({
+          status: 'dispatching',
+          dispatched_to: toBlast.map(n => n.id),
+        })
+        .eq('id', data.id)
+    }
+
+    // Notify admin
+    if (process.env.ADMIN_PHONE) {
+      const blastNote = blastCount > 0
+        ? ` Blasted to ${blastCount} ${nearby.length > 0 ? 'nearby' : 'available'} notaries.`
+        : ' No active notaries to blast — dispatch manually.'
+
+      sendSMS(
+        process.env.ADMIN_PHONE,
+        `📋 New order: ${typeStr} for ${data.signer_name} in ${data.property_city} on ${dateStr} at ${timeStr}. Conf: ${data.confirmation_number}.${blastNote}`
+      ).catch(console.error)
+    }
+
+    // Confirm to client
+    sendOrderConfirmationEmail({
+      confirmation_number: data.confirmation_number,
+      client_name: data.client_name,
+      client_email: data.client_email,
+      signing_type: data.signing_type,
+      signing_date: data.signing_date,
+      signing_time: data.signing_time,
+      signer_name: data.signer_name,
+      property_city: data.property_city,
+    }).catch(console.error)
 
     return NextResponse.json({ id: data.id, confirmation_number: data.confirmation_number })
   } catch (err) {
@@ -42,9 +115,6 @@ export async function GET() {
     .select('*')
     .order('created_at', { ascending: false })
 
-  if (error) {
-    return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 })
-  }
-
+  if (error) return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 })
   return NextResponse.json(data)
 }
