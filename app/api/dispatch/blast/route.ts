@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   // Send to all notaries — first to accept wins
   const results = await Promise.allSettled(
     notaries.map((notary) => {
-      const acceptUrl = `${baseUrl}/notary/accept/${order_id}?notary=${notary.id}`
+      const acceptUrl = `${baseUrl}/accept/${order_id}?notary=${notary.id}`
       const message = buildDispatchMessage({
         notaryName: notary.name.split(' ')[0],
         signerName: order.signer_name,

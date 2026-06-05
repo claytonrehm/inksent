@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { orderSchema } from '@/lib/validations'
 import { sendSMS, buildDispatchMessage } from '@/lib/sms'
-import { sendOrderConfirmationEmail } from '@/lib/email'
+import { sendOrderConfirmationEmail, sendAdminOrderAlert } from '@/lib/email'
 import { format } from 'date-fns'
 
 export async function POST(req: NextRequest) {
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     if (toBlast.length > 0) {
       const blastResults = await Promise.allSettled(
         toBlast.map(notary => {
-          const acceptUrl = `${baseUrl}/notary/accept/${data.id}?notary=${notary.id}`
+          const acceptUrl = `${baseUrl}/accept/${data.id}?notary=${notary.id}`
           return sendSMS(notary.phone, buildDispatchMessage({
             notaryName: notary.name.split(' ')[0],
             signerName: data.signer_name,
@@ -77,17 +77,34 @@ export async function POST(req: NextRequest) {
         .eq('id', data.id)
     }
 
-    // Notify admin
-    if (process.env.ADMIN_PHONE) {
-      const blastNote = blastCount > 0
-        ? ` Blasted to ${blastCount} ${nearby.length > 0 ? 'nearby' : 'available'} notaries.`
-        : ' No active notaries to blast — dispatch manually.'
+    // Notify admin — SMS (needs A2P) + email (always works)
+    const blastNote = blastCount > 0
+      ? `Auto-blasted to ${blastCount} ${nearby.length > 0 ? 'nearby' : 'available'} notaries — first to accept wins.`
+      : 'No active notaries to blast — dispatch manually from the order page.'
 
+    if (process.env.ADMIN_PHONE) {
       sendSMS(
         process.env.ADMIN_PHONE,
-        `📋 New order: ${typeStr} for ${data.signer_name} in ${data.property_city} on ${dateStr} at ${timeStr}. Conf: ${data.confirmation_number}.${blastNote}`
+        `📋 New order: ${typeStr} for ${data.signer_name} in ${data.property_city} on ${dateStr} at ${timeStr}. Conf: ${data.confirmation_number}. ${blastNote}`
       ).catch(console.error)
     }
+
+    sendAdminOrderAlert({
+      confirmationNumber: data.confirmation_number,
+      signingType: data.signing_type,
+      signingDate: format(new Date(data.signing_date), 'EEEE, MMM d'),
+      signingTime: timeStr,
+      signerName: data.signer_name,
+      propertyAddress: data.property_address,
+      propertyCity: data.property_city,
+      propertyState: parsed.data.property_state,
+      propertyZip: data.property_zip,
+      clientCompany: data.client_company,
+      clientName: data.client_name,
+      clientPhone: parsed.data.client_phone,
+      clientEmail: data.client_email,
+      blastInfo: blastNote,
+    }).catch(console.error)
 
     // Confirm to client
     sendOrderConfirmationEmail({

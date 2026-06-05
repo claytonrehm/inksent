@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   const notary = notaryResult.data
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
-  const acceptUrl = `${baseUrl}/notary/accept/${order_id}?notary=${notary_id}`
+  const acceptUrl = `${baseUrl}/accept/${order_id}?notary=${notary_id}`
 
   const message = buildDispatchMessage({
     notaryName: notary.name.split(' ')[0],

@@ -1,7 +1,7 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { LayoutDashboard, ClipboardList, Users, LogOut, Settings } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import InksentLogo from '@/components/InksentLogo'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -16,8 +16,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="min-h-screen flex bg-gray-100">
       <aside className="w-56 bg-[#0d0d0d] flex flex-col">
         <div className="px-4 py-5 border-b border-gray-800">
-          <Image src="/inksent-logo.png" alt="Inksent" width={110} height={83} className="object-contain" />
-          <p className="text-gray-500 text-xs mt-1 px-1">Admin</p>
+          <InksentLogo size="md" dark />
+          <p className="text-gray-500 text-xs mt-2 px-1">Admin</p>
         </div>
         <nav className="flex-1 px-3 py-4 space-y-1">
           <NavItem href="/dashboard" icon={<LayoutDashboard size={16} />} label="Dashboard" />

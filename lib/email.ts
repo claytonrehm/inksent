@@ -5,6 +5,61 @@ function getResend() {
   return new Resend(process.env.RESEND_API_KEY ?? 're_placeholder')
 }
 
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'clayton.rehm@gmail.com'
+
+// ─── Admin New Order Alert ────────────────────────────────────────────────────
+
+export async function sendAdminOrderAlert(data: {
+  confirmationNumber: string
+  signingType: string
+  signingDate: string
+  signingTime: string
+  signerName: string
+  propertyAddress: string
+  propertyCity: string
+  propertyState: string
+  propertyZip: string
+  clientCompany: string
+  clientName: string
+  clientPhone: string
+  clientEmail: string
+  blastInfo: string
+}) {
+  const typeLabel = data.signingType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/></head>
+  <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9f9f9;margin:0;padding:24px;">
+    <div style="max-width:520px;margin:0 auto;background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+      <div style="background:#5B4FCF;padding:18px 28px;color:white;">
+        <div style="font-size:13px;opacity:0.8;text-transform:uppercase;letter-spacing:1px;">New Signing Order</div>
+        <div style="font-size:20px;font-weight:800;margin-top:2px;font-family:monospace;">${data.confirmationNumber}</div>
+      </div>
+      <div style="padding:24px 28px;">
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 16px;font-size:13px;color:#166534;margin-bottom:20px;">
+          ${data.blastInfo}
+        </div>
+        <table style="width:100%;font-size:14px;border-collapse:collapse;">
+          <tr><td style="color:#888;padding:6px 0;">Type</td><td style="text-align:right;font-weight:600;">${typeLabel}</td></tr>
+          <tr><td style="color:#888;padding:6px 0;">Date</td><td style="text-align:right;font-weight:600;">${data.signingDate} at ${data.signingTime}</td></tr>
+          <tr><td style="color:#888;padding:6px 0;">Signer</td><td style="text-align:right;">${data.signerName}</td></tr>
+          <tr><td style="color:#888;padding:6px 0;">Address</td><td style="text-align:right;">${data.propertyAddress}, ${data.propertyCity}, ${data.propertyState} ${data.propertyZip}</td></tr>
+          <tr><td style="color:#888;padding:6px 0;border-top:1px solid #eee;">Client</td><td style="text-align:right;border-top:1px solid #eee;font-weight:600;">${data.clientCompany}</td></tr>
+          <tr><td style="color:#888;padding:6px 0;">Contact</td><td style="text-align:right;">${data.clientName}</td></tr>
+          <tr><td style="color:#888;padding:6px 0;">Phone</td><td style="text-align:right;"><a href="tel:${data.clientPhone}" style="color:#5B4FCF;">${data.clientPhone}</a></td></tr>
+        </table>
+        <a href="https://inksent.co/orders/" style="display:block;text-align:center;background:#5B4FCF;color:white;text-decoration:none;font-weight:700;padding:12px;border-radius:8px;margin-top:20px;">Manage Order →</a>
+      </div>
+    </div>
+  </body></html>`
+
+  return getResend().emails.send({
+    from: 'Inksent Orders <orders@inksent.co>',
+    to: ADMIN_EMAIL,
+    subject: `📋 New order: ${typeLabel} in ${data.propertyCity} — ${data.signingDate}`,
+    html,
+  })
+}
+
 // ─── Notary Assignment Confirmation ───────────────────────────────────────────
 
 export async function sendNotaryAssignmentEmail(data: {
@@ -217,7 +272,7 @@ export async function sendNotaryApplicationEmail(notary: {
             Address: 123 Main St, San Diego 92101<br/>
             Your fee: $75<br/><br/>
             Reply YES to accept or tap:<br/>
-            <span class="link">inksent.co/notary/accept/...</span><br/><br/>
+            <span class="link">inksent.co/accept/...</span><br/><br/>
             This offer expires in 30 min.
           </div>
         </div>

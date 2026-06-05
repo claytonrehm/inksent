@@ -79,10 +79,11 @@ export async function POST(req: NextRequest) {
 
   if (process.env.RESEND_API_KEY) {
     const resend = new Resend(process.env.RESEND_API_KEY)
+    const adminEmail = process.env.ADMIN_EMAIL || 'clayton.rehm@gmail.com'
     resend.emails.send({
-      from: 'Inksent <orders@inksent.co>',
-      to: 'orders@inksent.co',
-      subject: `Notary application: ${d.name} (${d.years_experience || '?'}yr exp)`,
+      from: 'Inksent Applications <orders@inksent.co>',
+      to: adminEmail,
+      subject: `🖊 New notary application: ${d.name} (${d.years_experience || '?'}yr exp)`,
       html: `
         ${d.photo_url ? `<img src="${d.photo_url}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:16px" />` : ''}
         <p><strong>Name:</strong> ${d.name}</p>
