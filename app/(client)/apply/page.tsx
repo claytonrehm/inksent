@@ -5,11 +5,11 @@ import { DollarSign, Zap, Clock, Star, Shield, CheckCircle } from 'lucide-react'
 
 export const metadata = {
   title: 'Join Our Notary Network — Inksent',
-  description: 'Apply to join Inksent\'s signing agent network. $75/signing, paid within 7 days, simple one-tap accept.',
+  description: 'Apply to join Inksent\'s signing agent network. $90/signing, simple one-tap accept.',
 }
 
 const PERKS = [
-  { icon: <DollarSign size={18} />, title: '$75 per signing', desc: 'Paid per completed signing via Zelle, Venmo, or check. No minimums, no surprises.' },
+  { icon: <DollarSign size={18} />, title: '$90 per signing', desc: 'Paid per completed signing via Zelle, Venmo, or check. No minimums, no surprises.' },
   { icon: <Zap size={18} />, title: 'One-tap accept', desc: 'Get a text with full job details. One tap to accept — no back and forth, no phone calls.' },
   { icon: <Clock size={18} />, title: 'Flexible schedule', desc: 'Accept only what fits your calendar. No minimums, no penalties for passing.' },
   { icon: <Star size={18} />, title: 'Real relationships', desc: 'We are a small, personal team — not a faceless platform. You deal with a real person every time.' },
@@ -53,7 +53,7 @@ export default function ApplyPage() {
             {/* Pay promise */}
             <div className="bg-gradient-to-br from-violet-600 to-violet-800 rounded-2xl p-6 text-white">
               <p className="text-violet-200 text-xs font-semibold uppercase tracking-widest mb-1">Per Signing</p>
-              <div className="text-5xl font-black mb-1">$75</div>
+              <div className="text-5xl font-black mb-1">$90</div>
               <p className="text-violet-200 text-sm">Paid per completed signing</p>
               <div className="mt-4 pt-4 border-t border-white/20 text-xs text-violet-200">
                 Zelle, Venmo, or check. No minimum signings required.

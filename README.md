@@ -29,9 +29,9 @@ Notary signing agent dispatch platform for title companies, escrow officers, and
 
 | | |
 |-|-|
-| Charge clients | **$150/signing** |
-| Pay notaries | **$75/signing** |
-| Your spread | **$75/signing** |
+| Charge clients | **$175/signing** |
+| Pay notaries | **$90/signing** |
+| Your spread | **$85/signing** |
 
 Coverage: 27 non-attorney states only.
 

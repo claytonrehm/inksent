@@ -263,7 +263,7 @@ export async function sendNotaryApplicationEmail(notary: {
           Date: Monday, Jun 16<br/>
           Time: 10:00 AM<br/>
           Address: 123 Main St, San Diego 92101<br/>
-          Your fee: $75<br/><br/>
+          Your fee: $90<br/><br/>
           Reply YES to accept or tap:<br/>
           <span style="color:#7c3aed;font-weight:600;text-decoration:underline;">inksent.co/accept/&hellip;</span><br/><br/>
           This offer expires in 30 min.
@@ -340,7 +340,7 @@ export async function sendOrderConfirmationEmail(order: {
         ${detailRow('Date', dateStr)}
         ${detailRow('Time', timeStr)}
         ${detailRow('Location', order.property_city)}
-        ${detailRow('Fee', '<span style="font-weight:700;color:#5b21b6;">$150.00</span>', { last: true })}
+        ${detailRow('Fee', '<span style="font-weight:700;color:#5b21b6;">$175.00</span>', { last: true })}
       </table>
 
       <div style="background:#f8f8f8;border-radius:10px;padding:16px 20px;margin:24px 0;">

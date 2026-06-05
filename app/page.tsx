@@ -186,7 +186,7 @@ export default function Home() {
               <p className="text-violet-600 font-semibold text-sm uppercase tracking-widest mb-4">Per Signing</p>
               <div className="flex items-end justify-center gap-1 mb-2">
                 <span className="text-4xl font-black text-gray-400">$</span>
-                <span className="text-7xl font-black text-gray-900 leading-none">150</span>
+                <span className="text-7xl font-black text-gray-900 leading-none">175</span>
               </div>
               <p className="text-gray-500 text-sm mb-8">flat rate, any signing type</p>
               <div className="space-y-3 text-left mb-8">

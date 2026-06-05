@@ -270,7 +270,7 @@ export default function OrderActions({ order, notaries }: { order: Order; notari
         <div className="pt-2 border-t border-gray-100">
           {order.client_paid_at ? (
             <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-2.5">
-              <CheckCircle size={14} /> Client paid ${order.client_fee ? (order.client_fee / 100).toFixed(0) : '150'} on {new Date(order.client_paid_at).toLocaleDateString()}
+              <CheckCircle size={14} /> Client paid ${order.client_fee ? (order.client_fee / 100).toFixed(0) : '175'} on {new Date(order.client_paid_at).toLocaleDateString()}
             </div>
           ) : (
             <Button
@@ -281,7 +281,7 @@ export default function OrderActions({ order, notaries }: { order: Order; notari
               className="w-full bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
             >
               <DollarSign size={14} className="mr-1.5" />
-              Mark Client Paid (${order.client_fee ? (order.client_fee / 100).toFixed(0) : '150'})
+              Mark Client Paid (${order.client_fee ? (order.client_fee / 100).toFixed(0) : '175'})
             </Button>
           )}
         </div>
@@ -304,7 +304,7 @@ export default function OrderActions({ order, notaries }: { order: Order; notari
               className="w-full bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
             >
               <DollarSign size={14} className="mr-1.5" />
-              Mark Notary Paid (${order.notary_fee ? (order.notary_fee / 100).toFixed(0) : '75'})
+              Mark Notary Paid (${order.notary_fee ? (order.notary_fee / 100).toFixed(0) : '90'})
             </Button>
           )}
         </div>
