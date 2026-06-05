@@ -18,7 +18,7 @@ function Code({ children }: { children: React.ReactNode }) {
 
 export default function SetupPage() {
   return (
-    <div className="p-8 max-w-2xl">
+    <div className="p-6 lg:p-8 max-w-2xl">
       <h1 className="text-2xl font-bold text-gray-900 mb-2">Integrations Setup</h1>
       <p className="text-gray-500 text-sm mb-10">Complete these steps to activate SMS dispatch and invoice emails.</p>
 

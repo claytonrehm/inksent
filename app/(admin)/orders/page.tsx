@@ -13,8 +13,8 @@ export default async function OrdersPage() {
     .order('signing_date', { ascending: true })
 
   return (
-    <div className="p-8">
-      <div className="mb-6 flex items-center justify-between">
+    <div className="p-6 lg:p-8">
+      <div className="mb-6 flex items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-900">All Orders</h1>
         <Link
           href="/order"
@@ -25,8 +25,8 @@ export default async function OrdersPage() {
         </Link>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
+        <table className="w-full text-sm min-w-[820px]">
           <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
             <tr>
               <th className="px-4 py-3 text-left">Confirmation</th>
