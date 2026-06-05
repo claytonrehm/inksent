@@ -83,6 +83,33 @@ export default async function NotaryDetailPage({ params }: { params: Promise<{ i
         )}
       </div>
 
+      {/* Onboarding / credentials */}
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Credentials &amp; Payment</h2>
+          {notary.onboarded_at ? (
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-700">Onboarding complete</span>
+          ) : (
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Onboarding pending</span>
+          )}
+        </div>
+        {notary.onboarded_at ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3 text-sm">
+            <Detail label="NNA Number" value={notary.nna_number || '—'} />
+            <Detail label="Commission" value={[notary.commission_state_code, notary.commission_expiry && `exp ${notary.commission_expiry}`].filter(Boolean).join(' · ') || '—'} />
+            <Detail label="Background Check" value={[notary.bgc_provider, notary.bgc_date].filter(Boolean).join(' · ') || 'Not provided'} />
+            <Detail label="E&O Carrier" value={[notary.eo_carrier, notary.eo_expiry && `exp ${notary.eo_expiry}`].filter(Boolean).join(' · ') || '—'} />
+            <Detail label="Dual-Tray Printer" value={notary.has_dual_tray == null ? '—' : notary.has_dual_tray ? 'Yes' : 'No'} />
+            <Detail label="Payment" value={[notary.payment_method, notary.payment_handle].filter(Boolean).join(' · ') || '—'} />
+          </div>
+        ) : (
+          <p className="text-sm text-gray-500">
+            This notary hasn&apos;t completed onboarding yet. They received a link on approval; you can resend it:{' '}
+            <span className="font-mono text-violet-600 text-xs">inksent.co/onboard/{notary.id}</span>
+          </p>
+        )}
+      </div>
+
       {/* Metrics */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <Metric label="Jobs Done" value={String(completed.length)} />
@@ -167,6 +194,15 @@ function Metric({ label, value, star, tone }: { label: string; value: string; st
       <p className={`text-xl font-bold flex items-center gap-1 ${color}`}>
         {star && <Star size={15} className="text-amber-400 fill-amber-400" />}{value}
       </p>
+    </div>
+  )
+}
+
+function Detail({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-xs text-gray-400">{label}</p>
+      <p className="text-sm text-gray-800 font-medium">{value}</p>
     </div>
   )
 }

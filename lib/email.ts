@@ -20,6 +20,34 @@ const META = `<meta name="viewport" content="width=device-width,initial-scale=1"
   <meta name="color-scheme" content="light only"/>
   <meta name="supported-color-schemes" content="light"/>`
 
+// ─── Notary Approved (with onboarding link) ───────────────────────────────────
+
+export async function sendNotaryApprovedEmail(data: { name: string; email: string; onboardUrl: string }) {
+  const firstName = data.name.split(' ')[0]
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/>${META}</head>
+  <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111111;margin:0;padding:0;background:#f4f4f5;">
+  <div style="max-width:560px;margin:32px auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+    ${HEADER}
+    <div style="padding:32px;">
+      <div style="display:inline-block;background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;">&#10003; You're Approved</div>
+      <p style="font-size:18px;font-weight:700;color:#111111;margin:0 0 8px;">Welcome to the team, ${firstName}! 🎉</p>
+      <p style="font-size:14px;color:#555555;line-height:1.6;margin:0 0 8px;">You&rsquo;re now part of the Inksent signing network. One quick step before your first job — we need a few details to verify your credentials and set up your payment.</p>
+      <p style="font-size:14px;color:#555555;line-height:1.6;margin:0 0 24px;">It takes about 3 minutes:</p>
+      <a href="${data.onboardUrl}" style="display:block;text-align:center;background:#7c3aed;color:#ffffff;text-decoration:none;font-weight:700;padding:14px;border-radius:10px;font-size:15px;">Complete My Profile →</a>
+      <p style="font-size:13px;color:#888888;line-height:1.6;margin:20px 0 0;">Once that&rsquo;s done, you&rsquo;ll start getting signing job texts in your area. Save <strong>(619) 949-3361</strong> as &ldquo;Inksent Signing&rdquo; so you never miss one.</p>
+      <p style="font-size:13px;color:#888888;margin:12px 0 0;">— Clayton<br/>Inksent Signing Services</p>
+    </div>
+    ${FOOTER}
+  </div></body></html>`
+
+  return getResend().emails.send({
+    from: 'Clayton at Inksent <orders@inksent.co>',
+    to: data.email,
+    subject: `You're approved — one quick step to finish, ${firstName}`,
+    html,
+  })
+}
+
 // ─── Admin New Order Alert ────────────────────────────────────────────────────
 
 export async function sendAdminOrderAlert(data: {

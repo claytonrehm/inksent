@@ -1,20 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import states from '@/lib/us-states-paths.json'
 
-// Canonical tile-grid layout of the 50 states (geographically arranged)
-const GRID: (string | null)[][] = [
-  ['AK', null, null, null, null, null, null, null, null, null, 'ME'],
-  [null, null, null, null, null, null, null, null, null, 'VT', 'NH'],
-  ['WA', 'ID', 'MT', 'ND', 'MN', 'IL', 'WI', 'MI', null, 'NY', 'MA'],
-  ['OR', 'NV', 'WY', 'SD', 'IA', 'IN', 'OH', 'PA', 'NJ', 'CT', 'RI'],
-  ['CA', 'UT', 'CO', 'NE', 'MO', 'KY', 'WV', 'VA', 'MD', 'DE', null],
-  [null, 'AZ', 'NM', 'KS', 'AR', 'TN', 'NC', 'SC', null, null, null],
-  [null, null, null, 'OK', 'LA', 'MS', 'AL', 'GA', null, null, null],
-  ['HI', null, null, 'TX', null, null, null, null, 'FL', null, null],
-]
-
-// States where closings are attorney-conducted
 const ATTORNEY_STATES = new Set([
   'CT', 'DE', 'GA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MS', 'NH',
   'NJ', 'NY', 'NC', 'ND', 'OH', 'OR', 'PA', 'RI', 'SC', 'VT', 'VA', 'WV',
@@ -35,49 +23,53 @@ const NAMES: Record<string, string> = {
 
 export default function USMap() {
   const [hovered, setHovered] = useState<string | null>(null)
+  const isAttorney = (c: string) => ATTORNEY_STATES.has(c)
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="grid gap-1.5" style={{ gridTemplateColumns: 'repeat(11, minmax(0, 1fr))' }}>
-        {GRID.flat().map((code, i) => {
-          if (!code) return <div key={i} />
-          const isAttorney = ATTORNEY_STATES.has(code)
-          const isHovered = hovered === code
+    <div className="max-w-3xl mx-auto">
+      <svg viewBox="0 0 960 600" className="w-full h-auto" role="img" aria-label="US coverage map">
+        {states.map((s) => {
+          const attorney = isAttorney(s.code)
+          const active = hovered === s.code
+          const fill = attorney
+            ? (active ? '#334155' : '#475569')   // slate-700 / slate-600
+            : (active ? '#7c3aed' : '#8b5cf6')    // violet-600 / violet-500
           return (
-            <div key={i} className="relative aspect-square">
-              <button
-                onMouseEnter={() => setHovered(code)}
-                onMouseLeave={() => setHovered(null)}
-                className={`w-full h-full rounded-md flex items-center justify-center text-[10px] sm:text-xs font-bold transition-all duration-150 cursor-default
-                  ${isAttorney
-                    ? 'bg-slate-700 text-slate-300 hover:bg-slate-800'
-                    : 'bg-violet-500 text-white hover:bg-violet-600'}
-                  ${isHovered ? 'scale-110 shadow-lg z-10' : ''}`}
-              >
-                {code}
-              </button>
-              {isHovered && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1.5 bg-gray-900 text-white text-xs font-medium rounded-lg shadow-xl whitespace-nowrap z-20 pointer-events-none">
-                  {NAMES[code]}
-                  <span className={`ml-1.5 ${isAttorney ? 'text-slate-400' : 'text-violet-300'}`}>
-                    · {isAttorney ? 'Attorney state' : 'Direct dispatch'}
-                  </span>
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
-                </div>
-              )}
-            </div>
+            <path
+              key={s.code}
+              d={s.d}
+              fill={fill}
+              stroke="#ffffff"
+              strokeWidth={active ? 1.5 : 0.75}
+              onMouseEnter={() => setHovered(s.code)}
+              onMouseLeave={() => setHovered(null)}
+              style={{ transition: 'fill 120ms', cursor: 'default' }}
+            />
           )
         })}
+      </svg>
+
+      {/* Caption + legend */}
+      <div className="mt-4 text-center min-h-[24px]">
+        {hovered ? (
+          <p className="text-sm font-medium text-gray-900">
+            {NAMES[hovered]}
+            <span className={isAttorney(hovered) ? 'text-slate-500' : 'text-violet-600'}>
+              {' '}· {isAttorney(hovered) ? 'Attorney-state closing' : 'Direct dispatch'}
+            </span>
+          </p>
+        ) : (
+          <p className="text-sm text-gray-400">Hover any state for coverage details</p>
+        )}
       </div>
 
-      {/* Legend */}
-      <div className="flex items-center justify-center gap-6 mt-8 text-sm">
+      <div className="flex items-center justify-center gap-6 mt-4 text-sm">
         <div className="flex items-center gap-2">
-          <span className="w-4 h-4 rounded bg-violet-500 inline-block" />
+          <span className="w-4 h-4 rounded inline-block" style={{ background: '#8b5cf6' }} />
           <span className="text-gray-600">Direct dispatch</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-4 h-4 rounded bg-slate-700 inline-block" />
+          <span className="w-4 h-4 rounded inline-block" style={{ background: '#475569' }} />
           <span className="text-gray-600">Attorney-state closings</span>
         </div>
       </div>

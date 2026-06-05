@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendSMS } from '@/lib/sms'
+import { sendNotaryApprovedEmail } from '@/lib/email'
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -8,17 +9,26 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const supabase = await createClient()
 
   // Get current notary state to detect approval
-  const { data: before } = await supabase.from('notaries').select('active, name, phone').eq('id', id).single()
+  const { data: before } = await supabase.from('notaries').select('active, name, phone, email').eq('id', id).single()
 
   const { error } = await supabase.from('notaries').update(body).eq('id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Send welcome SMS when newly approved
-  if (body.active === true && before && !before.active && before.phone) {
-    sendSMS(
-      before.phone,
-      `Hi ${before.name.split(' ')[0]}! You've been approved for the Inksent signing network. When a job is available in your area, you'll get a text with full details and a one-tap accept link. Welcome to the team! — Clayton, Inksent (619) 949-3361`
-    ).catch(console.error)
+  // On newly approved: send welcome SMS + approval email, both with the onboarding link
+  if (body.active === true && before && !before.active) {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'
+    const onboardUrl = `${baseUrl}/onboard/${id}`
+    const firstName = before.name.split(' ')[0]
+
+    if (before.phone) {
+      sendSMS(
+        before.phone,
+        `Hi ${firstName}! You're approved for the Inksent signing network 🎉 One quick step before your first job — complete your profile here: ${onboardUrl} — Clayton, Inksent`
+      ).catch(console.error)
+    }
+    if (before.email) {
+      sendNotaryApprovedEmail({ name: before.name, email: before.email, onboardUrl }).catch(console.error)
+    }
   }
 
   return NextResponse.json({ ok: true })
