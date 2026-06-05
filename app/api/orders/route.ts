@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { orderSchema } from '@/lib/validations'
 import { sendSMS, buildDispatchMessage } from '@/lib/sms'
 import { sendOrderConfirmationEmail, sendAdminOrderAlert } from '@/lib/email'
+import { notaryCoversZip } from '@/lib/coverage'
 import { format } from 'date-fns'
 
 export async function POST(req: NextRequest) {
@@ -38,14 +39,17 @@ export async function POST(req: NextRequest) {
     const typeStr = data.signing_type.replace(/_/g, ' ')
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
 
-    // Auto-blast nearby active notaries
+    // Auto-blast active notaries whose coverage area reaches this property
     const { data: notaries } = await supabase
       .from('notaries')
-      .select('id, name, phone, zip_codes')
+      .select('id, name, phone, base_zip, coverage_radius')
       .eq('active', true)
 
-    const nearby = (notaries ?? []).filter(n => (n.zip_codes ?? []).includes(data.property_zip))
-    const toBlast = nearby.length > 0 ? nearby : (notaries ?? [])
+    // Match by real driving distance — only notaries within their travel radius
+    const toBlast = (notaries ?? []).filter(n =>
+      notaryCoversZip(n.base_zip, n.coverage_radius, data.property_zip)
+    )
+    const totalActive = (notaries ?? []).length
 
     let blastCount = 0
     if (toBlast.length > 0) {
@@ -79,8 +83,10 @@ export async function POST(req: NextRequest) {
 
     // Notify admin — SMS (needs A2P) + email (always works)
     const blastNote = blastCount > 0
-      ? `Auto-blasted to ${blastCount} ${nearby.length > 0 ? 'nearby' : 'available'} notaries — first to accept wins.`
-      : 'No active notaries to blast — dispatch manually from the order page.'
+      ? `Auto-blasted to ${blastCount} notar${blastCount === 1 ? 'y' : 'ies'} covering ${data.property_zip} — first to accept wins.`
+      : totalActive === 0
+        ? 'No active notaries yet — approve some, then dispatch manually.'
+        : `⚠️ No notary in your network covers ZIP ${data.property_zip}. Dispatch manually or recruit coverage there.`
 
     if (process.env.ADMIN_PHONE) {
       sendSMS(

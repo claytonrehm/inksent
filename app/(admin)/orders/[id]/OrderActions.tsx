@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Send, UserCheck, X, CheckCircle, DollarSign, Zap, Star } from 'lucide-react'
 
-interface Notary { id: string; name: string; phone: string; zip_codes: string[] }
+interface Notary { id: string; name: string; phone: string; covers: boolean; distance: number | null }
 interface Order {
   id: string
   status: string
@@ -31,9 +31,10 @@ export default function OrderActions({ order, notaries }: { order: Order; notari
   const [ratingNotes, setRatingNotes] = useState('')
   const [ratingSaved, setRatingSaved] = useState(false)
 
-  const nearby = notaries.filter((n) => n.zip_codes.includes(order.property_zip))
-  const others = notaries.filter((n) => !n.zip_codes.includes(order.property_zip))
+  const nearby = notaries.filter((n) => n.covers)
+  const others = notaries.filter((n) => !n.covers)
   const sorted = [...nearby, ...others]
+  const distLabel = (n: Notary) => n.distance != null ? `${n.distance} mi` : ''
 
   function toggleBlast(id: string) {
     setBlastSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
@@ -155,13 +156,13 @@ export default function OrderActions({ order, notaries }: { order: Order; notari
               >
                 <option value="">Select a notary...</option>
                 {nearby.length > 0 && (
-                  <optgroup label={`Nearby (${order.property_zip})`}>
-                    {nearby.map((n) => <option key={n.id} value={n.id}>{n.name} · {n.phone}</option>)}
+                  <optgroup label={`Covers ${order.property_zip}`}>
+                    {nearby.map((n) => <option key={n.id} value={n.id}>{n.name} · {distLabel(n)} · {n.phone}</option>)}
                   </optgroup>
                 )}
                 {others.length > 0 && (
-                  <optgroup label="Other notaries">
-                    {others.map((n) => <option key={n.id} value={n.id}>{n.name} · {n.phone}</option>)}
+                  <optgroup label="Out of coverage area">
+                    {others.map((n) => <option key={n.id} value={n.id}>{n.name}{n.distance != null ? ` · ${n.distance} mi away` : ''} · {n.phone}</option>)}
                   </optgroup>
                 )}
               </select>
@@ -195,8 +196,11 @@ export default function OrderActions({ order, notaries }: { order: Order; notari
                       <span className="text-sm font-medium text-gray-900">{n.name}</span>
                       <span className="text-xs text-gray-400 ml-2">{n.phone}</span>
                     </div>
-                    {nearby.find(nb => nb.id === n.id) && (
-                      <span className="text-xs bg-violet-50 text-violet-600 px-1.5 py-0.5 rounded">nearby</span>
+                    {n.distance != null && (
+                      <span className="text-xs text-gray-400">{n.distance} mi</span>
+                    )}
+                    {n.covers && (
+                      <span className="text-xs bg-violet-50 text-violet-600 px-1.5 py-0.5 rounded">covers</span>
                     )}
                   </label>
                 ))}

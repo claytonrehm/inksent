@@ -5,22 +5,21 @@ import { DollarSign, Zap, Clock, Star, Shield, CheckCircle } from 'lucide-react'
 
 export const metadata = {
   title: 'Join Our Notary Network — Inksent',
-  description: 'Apply to join Inksent\'s signing agent network. $90/signing, simple one-tap accept.',
+  description: 'Join Inksent\'s approved notary network. $90 per completed signing, job offers by text.',
 }
 
-const PERKS = [
-  { icon: <DollarSign size={18} />, title: '$90 per signing', desc: 'Paid per completed signing via Zelle, Venmo, or check. No minimums, no surprises.' },
-  { icon: <Zap size={18} />, title: 'One-tap accept', desc: 'Get a text with full job details. One tap to accept — no back and forth, no phone calls.' },
-  { icon: <Clock size={18} />, title: 'Flexible schedule', desc: 'Accept only what fits your calendar. No minimums, no penalties for passing.' },
-  { icon: <Star size={18} />, title: 'Real relationships', desc: 'We are a small, personal team — not a faceless platform. You deal with a real person every time.' },
+const HOW_IT_WORKS = [
+  { icon: <DollarSign size={18} />, title: '$90 per signing', desc: 'Paid per completed signing via Zelle, Venmo, or check. No minimums, no membership fees.' },
+  { icon: <Zap size={18} />, title: 'Jobs come by text', desc: 'When a signing opens up in a ZIP code you cover, we text you the details. Tap to accept — first to respond gets it.' },
+  { icon: <Clock size={18} />, title: 'You stay in control', desc: 'Only accept the jobs that fit your schedule. No penalty for passing on one.' },
+  { icon: <Star size={18} />, title: 'A real person', desc: 'We\'re a small, local team — not a faceless platform. You always reach an actual person.' },
 ]
 
 const REQUIREMENTS = [
-  'NNA-certified signing agent',
-  'Current background check (within 2 years)',
+  'Commissioned notary public',
   'Reliable transportation',
   'Professional appearance',
-  'E&O insurance (preferred)',
+  'A phone that receives text messages',
 ]
 
 export default function ApplyPage() {
@@ -41,9 +40,9 @@ export default function ApplyPage() {
             <span className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-pulse" />
             Now accepting applications
           </div>
-          <h1 className="text-4xl font-black text-gray-900 mb-3">Join Our Signing Network</h1>
+          <h1 className="text-4xl font-black text-gray-900 mb-3">Join Our Notary Network</h1>
           <p className="text-gray-500 text-lg max-w-2xl">
-            Inksent partners with elite NNA-certified signing agents. We send you the jobs — you focus on the closing.
+            Get added to our approved notary list and start receiving signing jobs by text in the areas you cover. <strong className="text-gray-700">$90 per completed signing.</strong>
           </p>
         </div>
 
@@ -60,10 +59,10 @@ export default function ApplyPage() {
               </div>
             </div>
 
-            {/* Perks */}
+            {/* How it works */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
-              <h3 className="font-bold text-gray-900">What you get</h3>
-              {PERKS.map(({ icon, title, desc }) => (
+              <h3 className="font-bold text-gray-900">How it works</h3>
+              {HOW_IT_WORKS.map(({ icon, title, desc }) => (
                 <div key={title} className="flex gap-3">
                   <div className="bg-violet-50 text-violet-600 rounded-lg p-2 shrink-0 h-fit">{icon}</div>
                   <div>
@@ -91,8 +90,8 @@ export default function ApplyPage() {
           {/* Right — form */}
           <div className="lg:col-span-3">
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-1">Agent Application</h2>
-              <p className="text-sm text-gray-500 mb-6">Takes about 3 minutes. We review every application personally.</p>
+              <h2 className="text-xl font-bold text-gray-900 mb-1">Notary Application</h2>
+              <p className="text-sm text-gray-500 mb-6">Takes about 1 minute. We review every application personally.</p>
               <NotaryApplyForm />
             </div>
             <p className="text-center text-xs text-gray-400 mt-4">

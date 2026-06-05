@@ -10,20 +10,19 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { formatPhone } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
+import { compressImage } from '@/lib/compress-image'
 
 const schema = z.object({
   name: z.string().min(2, 'Name required'),
   email: z.string().email('Valid email required'),
   phone: z.string().min(10, 'Phone required'),
-  zip_codes: z.string().min(3, 'At least one ZIP required'),
-  nna_certified: z.enum(['yes', 'no'], { message: 'Required' }),
-  nna_number: z.string().optional(),
-  commission_state_code: z.string().min(2, 'Required'),
-  background_checked: z.enum(['yes', 'no'], { message: 'Required' }),
-  years_experience: z.string().optional(),
+  base_zip: z.string().regex(/^\d{5}$/, 'Enter a valid 5-digit ZIP'),
+  coverage_radius: z.string().min(1, 'Select how far you\'ll travel'),
+  years_experience: z.string().min(1, 'Required'),
+  signings_completed: z.string().min(1, 'Please select'),
+  nna_certified: z.enum(['yes', 'no'], { message: 'Please select' }),
+  background_checked: z.enum(['yes', 'no'], { message: 'Please select' }),
   notes: z.string().optional(),
-  w9_acknowledged: z.literal(true, { message: 'Required' }),
-  ic_acknowledged: z.literal(true, { message: 'Required' }),
 })
 type FormData = z.infer<typeof schema>
 
@@ -33,50 +32,80 @@ export default function NotaryApplyForm() {
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [photoError, setPhotoError] = useState<string | null>(null)
+  const [cityLabel, setCityLabel] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
-  const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<FormData>({
+  const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
+    defaultValues: { coverage_radius: '20' },
   })
 
-  const nnaCertified = watch('nna_certified')
+  async function lookupCity(zip: string) {
+    if (!/^\d{5}$/.test(zip)) { setCityLabel(null); return }
+    try {
+      const res = await fetch(`/api/zip-lookup?zip=${zip}`)
+      if (!res.ok) { setCityLabel(null); return }
+      const data = await res.json()
+      setCityLabel(data.city ? `${data.city}, ${data.state}` : null)
+    } catch { setCityLabel(null) }
+  }
 
   function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    if (!file.type.startsWith('image/')) { setPhotoError('Please upload an image file'); return }
-    if (file.size > 5 * 1024 * 1024) { setPhotoError('Photo must be under 5MB'); return }
+    // Phones sometimes report an empty type for HEIC — accept by extension too.
+    const looksImage = file.type.startsWith('image/') || /\.(jpe?g|png|heic|heif|webp)$/i.test(file.name)
+    if (!looksImage) { setPhotoError('Please choose a photo (JPG, PNG, or HEIC)'); return }
+    if (file.size > 25 * 1024 * 1024) { setPhotoError('That photo is very large — please choose one under 25MB'); return }
     setPhotoError(null)
     setPhotoFile(file)
     setPhotoPreview(URL.createObjectURL(file))
   }
 
   async function onSubmit(data: FormData) {
-    if (!photoFile) { setPhotoError('A professional photo is required'); return }
+    if (!photoFile) { setPhotoError('A photo is required so we know who we are dispatching'); return }
     setError(null)
 
-    const supabase = createClient()
-    const ext = photoFile.name.split('.').pop()
-    const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-    const { error: uploadError } = await supabase.storage
-      .from('notary-photos')
-      .upload(filename, photoFile, { contentType: photoFile.type })
+    let photo_url: string
+    try {
+      const supabase = createClient()
+      // Compress/normalize to JPEG before upload (fast + reliable on cellular)
+      const blob = await compressImage(photoFile)
+      const ctype = blob.type || 'image/jpeg'
+      const fext = ctype === 'image/jpeg' ? 'jpg' : (ctype.split('/')[1] || 'jpg')
+      const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fext}`
+      const { error: uploadError } = await supabase.storage
+        .from('notary-photos')
+        .upload(filename, blob, { contentType: ctype, upsert: false })
 
-    if (uploadError) {
-      setError('Photo upload failed. Please try again or email us at orders@inksent.co.')
+      if (uploadError) {
+        setError('Your photo couldn\'t upload. Please tap "Submit" again, or try a different photo.')
+        return
+      }
+      photo_url = supabase.storage.from('notary-photos').getPublicUrl(filename).data.publicUrl
+    } catch {
+      setError('Your photo couldn\'t upload. Please check your connection and tap "Submit" again.')
       return
     }
 
-    const { data: { publicUrl } } = supabase.storage.from('notary-photos').getPublicUrl(filename)
-
-    const res = await fetch('/api/notary-apply', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...data, photo_url: publicUrl }),
-    })
-
-    if (!res.ok) {
-      setError('Something went wrong. Please email us at orders@inksent.co.')
+    try {
+      const res = await fetch('/api/notary-apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...data, photo_url }),
+      })
+      if (res.status === 409) {
+        const j = await res.json().catch(() => ({}))
+        setError(j.error || 'You\'ve already applied with this email — we have you on file!')
+        return
+      }
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}))
+        setError(j.error || 'Something went wrong. Please try again or email orders@inksent.co.')
+        return
+      }
+    } catch {
+      setError('Network error submitting your application. Please check your connection and try again.')
       return
     }
     setSubmitted(true)
@@ -88,9 +117,9 @@ export default function NotaryApplyForm() {
         <div className="bg-green-50 rounded-full p-5">
           <CheckCircle className="text-green-500 w-12 h-12" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-900">Application Received!</h2>
+        <h2 className="text-2xl font-bold text-gray-900">You&apos;re on the list!</h2>
         <p className="text-gray-500 max-w-sm">
-          We review every application personally and will reach out within 1–2 business days. Check your email for next steps.
+          We&apos;ll review your info and add you to our approved notary network. Once you&apos;re approved, you&apos;ll start receiving text messages when signings are available in your area.
         </p>
       </div>
     )
@@ -101,16 +130,17 @@ export default function NotaryApplyForm() {
 
       {/* Photo */}
       <section>
-        <p className="text-sm font-semibold text-gray-700 mb-3">Professional Photo *</p>
+        <p className="text-sm font-semibold text-gray-700 mb-1">Your Photo <span className="text-violet-600">*</span></p>
+        <p className="text-xs text-gray-400 mb-3">A clear headshot so we know who&apos;s representing us at the signing table.</p>
         <div className="flex items-start gap-4">
           <div
             onClick={() => fileRef.current?.click()}
-            className={`w-20 h-20 rounded-2xl border-2 border-dashed flex items-center justify-center cursor-pointer transition-colors shrink-0 overflow-hidden
+            className={`w-24 h-24 rounded-2xl border-2 border-dashed flex items-center justify-center cursor-pointer transition-colors shrink-0 overflow-hidden
               ${photoPreview ? 'border-violet-300' : 'border-gray-300 hover:border-violet-400 bg-gray-50'}`}
           >
             {photoPreview
               ? <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
-              : <Camera size={22} className="text-gray-400" />
+              : <Camera size={24} className="text-gray-400" />
             }
           </div>
           <div className="flex-1 min-w-0">
@@ -118,17 +148,17 @@ export default function NotaryApplyForm() {
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="flex items-center gap-2 text-sm font-medium text-violet-600 hover:text-violet-700 border border-violet-200 bg-violet-50 rounded-lg px-4 py-2 transition-colors"
+              className="flex items-center gap-2 text-sm font-medium text-violet-600 hover:text-violet-700 border border-violet-200 bg-violet-50 rounded-lg px-4 py-2.5 transition-colors"
             >
-              <Upload size={13} /> {photoFile ? 'Change Photo' : 'Upload Photo'}
+              <Upload size={14} /> {photoFile ? 'Change Photo' : 'Upload Photo'}
             </button>
-            <p className="text-xs text-gray-400 mt-1.5">Clear headshot or professional photo. Max 5MB.</p>
-            {photoFile && <p className="text-xs text-green-600 mt-1 flex items-center gap-1"><CheckCircle size={11} /> {photoFile.name}</p>}
+            <p className="text-xs text-gray-400 mt-2">JPG or PNG, up to 10MB. You can take one right now on your phone.</p>
+            {photoFile && <p className="text-xs text-green-600 mt-1 flex items-center gap-1"><CheckCircle size={11} /> Photo added</p>}
             {photoError && <p className="text-xs text-red-500 mt-1">{photoError}</p>}
           </div>
           {photoPreview && (
             <button type="button" onClick={() => { setPhotoFile(null); setPhotoPreview(null) }} className="text-gray-400 hover:text-gray-600 shrink-0">
-              <X size={15} />
+              <X size={16} />
             </button>
           )}
         </div>
@@ -136,7 +166,6 @@ export default function NotaryApplyForm() {
 
       {/* Contact */}
       <section className="space-y-4">
-        <p className="text-sm font-semibold text-gray-700">Contact Information</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input id="name" label="Full Name *" placeholder="Jane Smith"
             error={errors.name?.message} {...register('name')} />
@@ -146,15 +175,65 @@ export default function NotaryApplyForm() {
         </div>
         <Input id="email" label="Email *" type="email" placeholder="jane@email.com"
           error={errors.email?.message} {...register('email')} />
+        <p className="text-xs text-gray-400 -mt-1">Job offers come by text to your cell. Make sure it&apos;s a number that receives SMS.</p>
       </section>
 
-      {/* Credentials */}
+      {/* Coverage — the critical dispatch fields */}
+      <section>
+        <p className="text-sm font-semibold text-gray-700 mb-1">Your Coverage Area <span className="text-violet-600">*</span></p>
+        <p className="text-xs text-gray-400 mb-3">
+          This is how we match you to signings. Just give us your home base and how far you&apos;ll drive — we&apos;ll text you any job within that range.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <Input id="base_zip" label="Home / Office ZIP *" placeholder="92101"
+              maxLength={5} inputMode="numeric"
+              error={errors.base_zip?.message}
+              {...register('base_zip', { onChange: (e) => lookupCity(e.target.value) })} />
+            {cityLabel && (
+              <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                <CheckCircle size={11} /> {cityLabel}
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">How far will you travel? *</label>
+            <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+              {...register('coverage_radius')}>
+              <option value="10">Up to 10 miles</option>
+              <option value="20">Up to 20 miles</option>
+              <option value="30">Up to 30 miles</option>
+              <option value="50">Up to 50 miles</option>
+            </select>
+            {errors.coverage_radius && <p className="text-xs text-red-500 mt-1">{errors.coverage_radius.message}</p>}
+          </div>
+        </div>
+      </section>
+
+      {/* Experience & credentials */}
       <section className="space-y-4">
-        <p className="text-sm font-semibold text-gray-700">Credentials</p>
+        <p className="text-sm font-semibold text-gray-700">Experience &amp; Credentials</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input id="years_experience" label="Years as a Signing Agent *" placeholder="3"
+            type="number" min="0" max="50"
+            error={errors.years_experience?.message} {...register('years_experience')} />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Loan Signings Completed *</label>
+            <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+              {...register('signings_completed')}>
+              <option value="">Select...</option>
+              <option value="under_50">Under 50</option>
+              <option value="50_200">50 – 200</option>
+              <option value="200_500">200 – 500</option>
+              <option value="500_plus">500+</option>
+            </select>
+            {errors.signings_completed && <p className="text-xs text-red-500 mt-1">{errors.signings_completed.message}</p>}
+          </div>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">NNA Certified? *</label>
-            <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+            <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
               {...register('nna_certified')}>
               <option value="">Select...</option>
               <option value="yes">Yes</option>
@@ -164,72 +243,32 @@ export default function NotaryApplyForm() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Background Checked? *</label>
-            <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+            <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
               {...register('background_checked')}>
               <option value="">Select...</option>
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
+              <option value="yes">Yes — within last 2 years</option>
+              <option value="no">No / not current</option>
             </select>
             {errors.background_checked && <p className="text-xs text-red-500 mt-1">{errors.background_checked.message}</p>}
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {nnaCertified === 'yes' && (
-            <Input id="nna_number" label="NNA Member Number (optional)" placeholder="12345678"
-              {...register('nna_number')} />
-          )}
-          <Input id="commission_state_code" label="Commission State *" placeholder="CA"
-            error={errors.commission_state_code?.message} {...register('commission_state_code')} />
-          <Input id="years_experience" label="Years of Experience" placeholder="3"
-            type="number" min="0" max="50" {...register('years_experience')} />
-        </div>
       </section>
 
-      {/* Coverage */}
+      {/* Optional notes */}
       <section>
-        <Input id="zip_codes" label="ZIP Codes You Cover *"
-          placeholder="92101, 92103, 92110, 92130"
-          error={errors.zip_codes?.message} {...register('zip_codes')} />
-        <p className="text-xs text-gray-400 mt-1.5">Separate multiple ZIPs with commas. You can always update this later.</p>
-      </section>
-
-      {/* Notes */}
-      <section>
-        <Textarea id="notes" label="Anything else you'd like us to know (optional)"
-          placeholder="Experience with loan packages, availability, certifications, etc."
+        <Textarea id="notes" label="Anything else? (optional)"
+          placeholder="Other certifications, languages you speak, availability, etc."
           {...register('notes')} />
-      </section>
-
-      {/* Agreements */}
-      <section className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-4">
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Before you submit</p>
-        <label className="flex items-start gap-3 cursor-pointer">
-          <input type="checkbox" className="mt-0.5 h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
-            {...register('w9_acknowledged')} />
-          <span className="text-sm text-gray-600">
-            I understand Inksent requires a <strong>W-9 form</strong> before my first assignment. Earnings of $600+ per year will be reported on a 1099-NEC.
-          </span>
-        </label>
-        {errors.w9_acknowledged && <p className="text-xs text-red-500 ml-7">{errors.w9_acknowledged.message}</p>}
-
-        <label className="flex items-start gap-3 cursor-pointer">
-          <input type="checkbox" className="mt-0.5 h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
-            {...register('ic_acknowledged')} />
-          <span className="text-sm text-gray-600">
-            I understand I will work as an <strong>independent contractor</strong>, not an employee. I am responsible for my own taxes, transportation, and equipment.
-          </span>
-        </label>
-        {errors.ic_acknowledged && <p className="text-xs text-red-500 ml-7">{errors.ic_acknowledged.message}</p>}
       </section>
 
       {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">{error}</p>}
 
       <Button type="submit" size="lg" loading={isSubmitting} className="w-full">
-        {isSubmitting ? 'Submitting...' : 'Submit Application'}
+        {isSubmitting ? 'Submitting...' : 'Join the Network'}
       </Button>
 
       <p className="text-center text-xs text-gray-400">
-        We review every application personally. You&apos;ll hear back within 1–2 business days.
+        After you&apos;re approved, we&apos;ll collect a few more details (W-9, payment info) before your first job.
       </p>
     </form>
   )

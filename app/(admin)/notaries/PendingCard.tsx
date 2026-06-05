@@ -2,8 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
-import { CheckCircle, XCircle, Phone, Mail, ExternalLink } from 'lucide-react'
+import { CheckCircle, XCircle, Phone, Mail, ExternalLink, MapPin } from 'lucide-react'
 
 interface Notary {
   id: string
@@ -12,10 +11,10 @@ interface Notary {
   phone: string
   photo_url?: string
   nna_certified: boolean
-  nna_number?: string
-  commission_state_code?: string
   years_experience?: number
-  zip_codes: string[]
+  base_zip?: string
+  coverage_radius?: number
+  coverage_label?: string
   notes?: string
 }
 
@@ -50,16 +49,15 @@ export default function PendingCard({ notary }: { notary: Notary }) {
         <div className="flex gap-4">
           {/* Photo */}
           {notary.photo_url ? (
-            <Image
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
               src={notary.photo_url}
               alt={notary.name}
-              width={72}
-              height={72}
-              className="w-18 h-18 rounded-xl object-cover border border-gray-200 shrink-0"
+              className="rounded-xl object-cover border border-gray-200 shrink-0"
               style={{ width: 72, height: 72 }}
             />
           ) : (
-            <div className="w-18 h-18 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl font-bold shrink-0" style={{ width: 72, height: 72 }}>
+            <div className="rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl font-bold shrink-0" style={{ width: 72, height: 72 }}>
               {notary.name.split(' ').map(w => w[0]).join('').slice(0, 2)}
             </div>
           )}
@@ -79,19 +77,18 @@ export default function PendingCard({ notary }: { notary: Notary }) {
         </div>
 
         {/* Credentials grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 pt-4 border-t border-gray-100">
-          <Detail label="NNA Certified" value={notary.nna_certified ? `Yes${notary.nna_number ? ` · #${notary.nna_number}` : ''}` : 'No'} highlight={notary.nna_certified} />
-          <Detail label="Commission" value={notary.commission_state_code || '—'} />
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4 pt-4 border-t border-gray-100">
+          <Detail label="NNA Certified" value={notary.nna_certified ? 'Yes' : 'No'} highlight={notary.nna_certified} />
           <Detail label="Experience" value={notary.years_experience ? `${notary.years_experience} yrs` : '—'} />
-          <Detail label="Coverage" value={`${notary.zip_codes.length} ZIPs`} />
+          <Detail label="Coverage" value={notary.coverage_radius ? `${notary.coverage_radius} mi radius` : '—'} />
         </div>
 
-        {/* ZIPs */}
-        <div className="flex flex-wrap gap-1 mt-3">
-          {notary.zip_codes.map(z => (
-            <span key={z} className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded">{z}</span>
-          ))}
-        </div>
+        {/* Coverage area */}
+        {notary.coverage_label && (
+          <div className="mt-3 inline-flex items-center gap-1.5 bg-violet-50 border border-violet-100 text-violet-700 text-xs font-medium px-3 py-1.5 rounded-lg">
+            <MapPin size={12} /> Based in {notary.coverage_label} · serves {notary.coverage_radius} mi
+          </div>
+        )}
 
         {notary.notes && (
           <div className="mt-3 bg-gray-50 rounded-lg p-3 text-sm text-gray-600">

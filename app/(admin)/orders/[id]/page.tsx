@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import { format } from 'date-fns'
 import { STATUS_COLORS, STATUS_LABELS, formatCurrency } from '@/lib/utils'
+import { notaryCoversZip, zipDistance } from '@/lib/coverage'
 import OrderActions from './OrderActions'
 import Link from 'next/link'
 import { FileText } from 'lucide-react'
@@ -14,13 +15,22 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
 
   const [orderResult, notariesResult] = await Promise.all([
     supabase.from('orders').select('*, notaries(name, phone, email)').eq('id', id).single(),
-    supabase.from('notaries').select('id, name, phone, zip_codes').eq('active', true).order('name'),
+    supabase.from('notaries').select('id, name, phone, base_zip, coverage_radius').eq('active', true).order('name'),
   ])
 
   if (orderResult.error || !orderResult.data) notFound()
 
   const order = orderResult.data
-  const notaries = notariesResult.data ?? []
+  // Mark which notaries cover this property's ZIP, with distance for sorting
+  const notaries = (notariesResult.data ?? [])
+    .map(n => ({
+      id: n.id,
+      name: n.name,
+      phone: n.phone,
+      covers: notaryCoversZip(n.base_zip, n.coverage_radius, order.property_zip),
+      distance: n.base_zip ? zipDistance(n.base_zip, order.property_zip) : null,
+    }))
+    .sort((a, b) => (a.distance ?? 9999) - (b.distance ?? 9999))
 
   return (
     <div className="p-6 lg:p-8 max-w-4xl">

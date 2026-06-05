@@ -21,6 +21,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const order = orderResult.data
   const notaryName = notaryResult.data?.name ?? 'Notary'
 
+  // Track the decline against this notary (engagement / reliability signal)
+  if (notary_id) {
+    const { data: n } = await supabase.from('notaries').select('times_declined').eq('id', notary_id).single()
+    await supabase
+      .from('notaries')
+      .update({ times_declined: (n?.times_declined ?? 0) + 1 })
+      .eq('id', notary_id)
+  }
+
   // Only reset if this notary was the dispatched one
   if (order.notary_id === notary_id && order.status === 'dispatching') {
     await supabase
