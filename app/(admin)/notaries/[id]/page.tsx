@@ -14,11 +14,11 @@ export default async function NotaryDetailPage({ params }: { params: Promise<{ i
   const { id } = await params
   const supabase = await createClient()
 
-  const [{ data: notary }, { data: orders }, { data: ratings }, { data: dispatched }] = await Promise.all([
+  const [{ data: notary }, { data: orders }, { data: ratings }, { data: cancellations }] = await Promise.all([
     supabase.from('notaries').select('*').eq('id', id).single(),
     supabase.from('orders').select('id, confirmation_number, signing_date, signer_name, property_city, status, notary_fee, notary_paid_at').eq('notary_id', id).order('signing_date', { ascending: false }),
     supabase.from('notary_ratings').select('*').eq('notary_id', id).order('created_at', { ascending: false }),
-    supabase.from('orders').select('id', { count: 'exact', head: true }).contains('dispatched_to', [id]),
+    supabase.from('notary_cancellations').select('*').eq('notary_id', id).order('created_at', { ascending: false }),
   ])
 
   if (!notary) notFound()
@@ -115,10 +115,40 @@ export default async function NotaryDetailPage({ params }: { params: Promise<{ i
         <Metric label="Jobs Done" value={String(completed.length)} />
         <Metric label="Rating" value={avg ? avg.toFixed(1) : '—'} star={!!avg} />
         <Metric label="On-Time" value={onTimePct != null ? `${onTimePct}%` : '—'} tone={onTimePct == null ? undefined : onTimePct >= 90 ? 'good' : onTimePct >= 70 ? 'warn' : 'bad'} />
+        <Metric label="Cancellations" value={String(notary.times_cancelled ?? 0)} tone={(notary.times_cancelled ?? 0) > 0 ? 'bad' : 'good'} />
         <Metric label="Concerns" value={String(concerns)} tone={concerns > 0 ? 'bad' : 'good'} />
-        <Metric label="Declines" value={String(notary.times_declined ?? 0)} tone={(notary.times_declined ?? 0) > 3 ? 'warn' : undefined} />
         <Metric label="Owed" value={formatCurrency(owed)} tone={owed > 0 ? 'warn' : undefined} />
       </div>
+
+      {/* Cancellation history */}
+      {(cancellations ?? []).length > 0 && (
+        <section>
+          <h2 className="text-sm font-semibold text-red-600 uppercase tracking-wide mb-3">Cancellations ({cancellations!.length})</h2>
+          <div className="bg-white rounded-xl border border-red-200 shadow-sm divide-y divide-gray-100">
+            {cancellations!.map((c) => {
+              const lastMinute = c.hours_before_signing != null && c.hours_before_signing < 24
+              return (
+                <div key={c.id} className="px-4 py-3 flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm text-gray-900">{c.signer_name || c.confirmation_number}</p>
+                    <p className="text-xs text-gray-400">{format(new Date(c.created_at), 'MMM d, yyyy · h:mm a')}</p>
+                  </div>
+                  {c.hours_before_signing != null && (
+                    <span className={`text-xs font-medium px-2 py-1 rounded-full ${lastMinute ? 'bg-red-100 text-red-700' : 'bg-amber-50 text-amber-700'}`}>
+                      {c.hours_before_signing < 0
+                        ? 'after signing time'
+                        : c.hours_before_signing < 24
+                          ? `${c.hours_before_signing}h before`
+                          : `${Math.round(c.hours_before_signing / 24)}d before`}
+                    </span>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+          <p className="text-xs text-gray-400 mt-2">Last-minute cancellations (under 24h) are the most damaging. Repeat offenders should be removed.</p>
+        </section>
+      )}
 
       {/* Reviews */}
       <section>

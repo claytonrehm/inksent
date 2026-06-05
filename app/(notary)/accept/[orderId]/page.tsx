@@ -64,7 +64,7 @@ export default async function AcceptPage({
               <Row label="Time" value={formatTime(order.signing_time)} />
               <Row label="Address" value={`${order.property_address}, ${order.property_city} ${order.property_zip}`} />
               <div className="border-t border-gray-100 pt-3">
-                <Row label="Your Fee" value={`$${(order.notary_fee / 100).toFixed(0)}`} bold />
+                <Row label="Your Pay" value={`$${(order.notary_fee / 100).toFixed(0)}`} bold />
               </div>
             </div>
 

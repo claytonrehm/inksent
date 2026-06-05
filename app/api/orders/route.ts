@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { orderSchema } from '@/lib/validations'
-import { sendSMS, buildDispatchMessage } from '@/lib/sms'
+import { sendSMS } from '@/lib/sms'
 import { sendOrderConfirmationEmail, sendAdminOrderAlert } from '@/lib/email'
-import { notaryCoversZip } from '@/lib/coverage'
+import { blastOrderToCoveringNotaries } from '@/lib/dispatch'
 import { format } from 'date-fns'
 
 export async function POST(req: NextRequest) {
@@ -37,49 +37,9 @@ export async function POST(req: NextRequest) {
     const timeStr = `${h % 12 || 12}:${m} ${h < 12 ? 'AM' : 'PM'}`
     const dateStr = format(new Date(data.signing_date), 'MMM d')
     const typeStr = data.signing_type.replace(/_/g, ' ')
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
 
-    // Auto-blast active notaries whose coverage area reaches this property
-    const { data: notaries } = await supabase
-      .from('notaries')
-      .select('id, name, phone, base_zip, coverage_radius')
-      .eq('active', true)
-
-    // Match by real driving distance — only notaries within their travel radius
-    const toBlast = (notaries ?? []).filter(n =>
-      notaryCoversZip(n.base_zip, n.coverage_radius, data.property_zip)
-    )
-    const totalActive = (notaries ?? []).length
-
-    let blastCount = 0
-    if (toBlast.length > 0) {
-      const blastResults = await Promise.allSettled(
-        toBlast.map(notary => {
-          const acceptUrl = `${baseUrl}/accept/${data.id}?notary=${notary.id}`
-          return sendSMS(notary.phone, buildDispatchMessage({
-            notaryName: notary.name.split(' ')[0],
-            signerName: data.signer_name,
-            signingType: data.signing_type,
-            signingDate: format(new Date(data.signing_date), 'EEEE, MMM d'),
-            signingTime: data.signing_time,
-            propertyAddress: data.property_address,
-            propertyCity: data.property_city,
-            propertyZip: data.property_zip,
-            fee: data.notary_fee,
-            acceptUrl,
-          }))
-        })
-      )
-      blastCount = blastResults.filter(r => r.status === 'fulfilled').length
-
-      await supabase
-        .from('orders')
-        .update({
-          status: 'dispatching',
-          dispatched_to: toBlast.map(n => n.id),
-        })
-        .eq('id', data.id)
-    }
+    // Auto-blast active notaries whose coverage radius reaches this property
+    const { blastCount, totalActive } = await blastOrderToCoveringNotaries(supabase, data)
 
     // Notify admin — SMS (needs A2P) + email (always works)
     const blastNote = blastCount > 0

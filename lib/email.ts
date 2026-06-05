@@ -145,7 +145,7 @@ export async function sendNotaryAssignmentEmail(data: {
 
       <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f5f3ff;border-radius:8px;margin-top:16px;">
         <tr>
-          <td style="padding:14px 16px;font-size:14px;font-weight:600;color:#111111;">Your Fee</td>
+          <td style="padding:14px 16px;font-size:14px;font-weight:600;color:#111111;">Your Pay</td>
           <td style="padding:14px 16px;font-size:22px;font-weight:800;color:#5b21b6;text-align:right;">$${(data.fee / 100).toFixed(0)}</td>
         </tr>
       </table>
@@ -279,7 +279,7 @@ export async function sendNotaryApplicationEmail(notary: {
     ${HEADER}
     <div style="padding:36px;">
       <h2 style="font-size:20px;font-weight:800;color:#111111;margin:0 0 6px;">You&rsquo;re almost in, ${firstName}! 🎉</h2>
-      <p style="font-size:14px;color:#555555;line-height:1.6;margin:0 0 16px;">Thanks for applying to the Inksent signing network. We review every application personally — you&rsquo;ll hear from us within 1&ndash;2 business days.</p>
+      <p style="font-size:14px;color:#555555;line-height:1.6;margin:0 0 16px;">Thanks for applying to the Inksent signing network. We review every application personally — you&rsquo;ll hear from us within 7 days.</p>
 
       <p style="font-weight:600;color:#111111;font-size:15px;margin:0 0 20px;">Here&rsquo;s exactly how it works once you&rsquo;re approved:</p>
 
@@ -291,7 +291,7 @@ export async function sendNotaryApplicationEmail(notary: {
           Date: Monday, Jun 16<br/>
           Time: 10:00 AM<br/>
           Address: 123 Main St, San Diego 92101<br/>
-          Your fee: $90<br/><br/>
+          Your pay: $90<br/><br/>
           Reply YES to accept or tap:<br/>
           <span style="color:#7c3aed;font-weight:600;text-decoration:underline;">inksent.co/accept/&hellip;</span><br/><br/>
           This offer expires in 30 min.

@@ -8,11 +8,13 @@ export default function ScrollReveal({
   className = '',
   delay = 0,
   direction = 'up',
+  zoom = false,
 }: {
   children: React.ReactNode
   className?: string
   delay?: number
   direction?: 'up' | 'down' | 'left' | 'right' | 'none'
+  zoom?: boolean
 }) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-60px' })
@@ -29,9 +31,9 @@ export default function ScrollReveal({
     <motion.div
       ref={ref}
       className={className}
-      initial={{ opacity: 0, ...offsets[direction] }}
-      animate={inView ? { opacity: 1, y: 0, x: 0 } : {}}
-      transition={{ duration: 0.6, delay: delay / 1000, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0, scale: zoom ? 0.92 : 1, ...offsets[direction] }}
+      animate={inView ? { opacity: 1, y: 0, x: 0, scale: 1 } : {}}
+      transition={{ duration: zoom ? 0.8 : 0.6, delay: delay / 1000, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>

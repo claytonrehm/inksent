@@ -23,6 +23,7 @@ const schema = z.object({
   nna_certified: z.enum(['yes', 'no'], { message: 'Please select' }),
   background_checked: z.enum(['yes', 'no'], { message: 'Please select' }),
   notes: z.string().optional(),
+  sms_consent: z.literal(true, { message: 'Required to receive job offers' }),
 })
 type FormData = z.infer<typeof schema>
 
@@ -119,7 +120,7 @@ export default function NotaryApplyForm() {
         </div>
         <h2 className="text-2xl font-bold text-gray-900">You&apos;re on the list!</h2>
         <p className="text-gray-500 max-w-sm">
-          We&apos;ll review your info and add you to our approved notary network. Once you&apos;re approved, you&apos;ll start receiving text messages when signings are available in your area.
+          We review every application personally and will be in touch within 7 days. Once you&apos;re approved, you&apos;ll start receiving text messages when signings are available in your area.
         </p>
       </div>
     )
@@ -213,6 +214,7 @@ export default function NotaryApplyForm() {
       {/* Experience & credentials */}
       <section className="space-y-4">
         <p className="text-sm font-semibold text-gray-700">Experience &amp; Credentials</p>
+        <p className="text-xs text-gray-400 -mt-2">We work with title companies, so signing experience matters. More experienced agents get priority for jobs.</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input id="years_experience" label="Years as a Signing Agent *" placeholder="3"
             type="number" min="0" max="50"
@@ -259,6 +261,20 @@ export default function NotaryApplyForm() {
         <Textarea id="notes" label="Anything else? (optional)"
           placeholder="Other certifications, languages you speak, availability, etc."
           {...register('notes')} />
+      </section>
+
+      {/* SMS consent */}
+      <section className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input type="checkbox" className="mt-0.5 h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
+            {...register('sms_consent')} />
+          <span className="text-sm text-gray-600">
+            I agree to receive SMS text messages from Inksent about signing jobs and my account. Message frequency varies; message &amp; data rates may apply. Reply STOP to opt out. See our{' '}
+            <a href="/privacy" target="_blank" className="text-violet-600 underline">Privacy Policy</a> and{' '}
+            <a href="/terms" target="_blank" className="text-violet-600 underline">Terms</a>.
+          </span>
+        </label>
+        {errors.sms_consent && <p className="text-xs text-red-500 mt-2 ml-7">{errors.sms_consent.message}</p>}
       </section>
 
       {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">{error}</p>}

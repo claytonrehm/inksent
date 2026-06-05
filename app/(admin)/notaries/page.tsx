@@ -145,7 +145,8 @@ export default async function NotariesPage() {
                     <td className="px-4 py-3 text-right text-gray-700">{s?.count ?? 0}</td>
                     <td className="px-4 py-3 text-right">
                       {rs && rs.concerns > 0 ? <span className="text-red-600 font-semibold">{rs.concerns}</span> : <span className="text-gray-300">0</span>}
-                      {n.times_declined > 0 && <div className="text-xs text-gray-400">{n.times_declined} declines</div>}
+                      {(n.times_cancelled ?? 0) > 0 && <div className="text-xs text-red-500 font-medium">{n.times_cancelled} cancelled</div>}
+                      {(n.times_declined ?? 0) > 0 && <div className="text-xs text-gray-400">{n.times_declined} declined</div>}
                     </td>
                     <td className="px-4 py-3 text-right">
                       {(s?.unpaid ?? 0) > 0 ? <span className="text-red-600 font-semibold">{formatCurrency(s.unpaid)}</span> : <span className="text-gray-400">—</span>}

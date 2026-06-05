@@ -171,6 +171,9 @@ export default function ApplicantsBoard({ applicants }: { applicants: Applicant[
                   <h3 className="font-bold text-gray-900">{a.name}</h3>
                   {a.nna_certified && <span className="text-xs bg-green-50 text-green-700 border border-green-200 px-1.5 py-0.5 rounded">NNA</span>}
                   {a.background_checked && <span className="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-1.5 py-0.5 rounded">Bg ✓</span>}
+                  {((a.years_experience ?? 0) < 2 || (SIGNINGS_RANK[a.signings_completed ?? ''] ?? 0) <= 1) && (
+                    <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-1.5 py-0.5 rounded">Newer</span>
+                  )}
                 </div>
                 <div className="flex flex-wrap gap-x-4 gap-y-0.5 mt-1 text-xs text-gray-500">
                   <span className="flex items-center gap-1"><MapPin size={11} /> {a.coverage_label ?? a.base_zip} · {a.coverage_radius ?? 25}mi</span>

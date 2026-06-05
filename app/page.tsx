@@ -4,6 +4,7 @@ import InksentLogo from '@/components/InksentLogo'
 import HeroStats from '@/components/HeroStats'
 import USMap from '@/components/USMap'
 import ScrollReveal from '@/components/ScrollReveal'
+import AuroraBackground from '@/components/AuroraBackground'
 import NavClient from '@/components/NavClient'
 
 const HOW_IT_WORKS = [
@@ -34,13 +35,9 @@ export default function Home() {
       {/* Nav — client component handles scroll-based transparency */}
       <NavClient />
 
-      {/* Hero — light with violet accents */}
+      {/* Hero — light with animated violet aurora */}
       <section className="relative overflow-hidden bg-white pt-10 pb-0">
-        {/* Decorative blobs */}
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full pointer-events-none"
-          style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%)' }} />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full pointer-events-none"
-          style={{ background: 'radial-gradient(circle, rgba(167,139,250,0.06) 0%, transparent 70%)' }} />
+        <AuroraBackground />
 
         <div className="relative max-w-6xl mx-auto px-5 pt-20 pb-8 text-center">
           <ScrollReveal>
@@ -181,7 +178,7 @@ export default function Home() {
             <h2 className="text-4xl font-black text-gray-900">One flat rate. No surprises.</h2>
             <p className="text-gray-500 mt-3 text-lg">No contracts, no minimums, no hidden fees.</p>
           </ScrollReveal>
-          <ScrollReveal>
+          <ScrollReveal zoom>
             <div className="max-w-sm mx-auto bg-white border-2 border-violet-200 rounded-3xl p-8 shadow-xl shadow-violet-100 text-center">
               <p className="text-violet-600 font-semibold text-sm uppercase tracking-widest mb-4">Per Signing</p>
               <div className="flex items-end justify-center gap-1 mb-2">
@@ -219,7 +216,7 @@ export default function Home() {
             <h2 className="text-4xl font-black text-gray-900 mb-3">All 50 States</h2>
             <p className="text-gray-500 max-w-lg mx-auto">We dispatch signing agents coast to coast. Hover any state for details.</p>
           </ScrollReveal>
-          <ScrollReveal>
+          <ScrollReveal zoom>
             <USMap />
           </ScrollReveal>
         </div>
@@ -232,7 +229,7 @@ export default function Home() {
             style={{ background: 'radial-gradient(ellipse, rgba(139,92,246,0.07) 0%, transparent 70%)' }} />
         </div>
         <div className="relative max-w-2xl mx-auto text-center">
-          <ScrollReveal>
+          <ScrollReveal zoom>
             <h2 className="text-4xl sm:text-5xl font-black text-gray-900 mb-5 leading-tight">
               Ready to close{' '}
               <span className="text-violet-600">faster?</span>
@@ -264,8 +261,13 @@ export default function Home() {
               <Link href="/apply" className="hover:text-gray-300 transition-colors">Join our network</Link>
             </div>
           </div>
-          <div className="mt-8 pt-6 border-t border-gray-800 text-center text-xs text-gray-600">
-            © {new Date().getFullYear()} Inksent Signing Services · All rights reserved
+          <div className="mt-8 pt-6 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-600">
+            <span>© {new Date().getFullYear()} Inksent Signing Services · All rights reserved</span>
+            <div className="flex items-center gap-4">
+              <Link href="/privacy" className="hover:text-gray-400 transition-colors">Privacy</Link>
+              <Link href="/terms" className="hover:text-gray-400 transition-colors">Terms</Link>
+              <a href="mailto:orders@inksent.co" className="hover:text-gray-400 transition-colors">Support</a>
+            </div>
           </div>
         </div>
       </footer>

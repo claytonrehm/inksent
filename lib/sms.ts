@@ -47,7 +47,7 @@ Signer: ${signerName}
 Date: ${signingDate}
 Time: ${timeStr}
 Address: ${propertyAddress}, ${propertyCity} ${propertyZip}
-Your fee: $${(fee / 100).toFixed(0)}
+Your pay: $${(fee / 100).toFixed(0)}
 
 Reply YES to accept or tap: ${acceptUrl}
 

@@ -19,6 +19,7 @@ const schema = z.object({
   background_checked: z.string().optional(),
   photo_url: z.string().optional(),
   notes: z.string().optional(),
+  sms_consent: z.boolean().optional(),
 })
 
 export async function POST(req: NextRequest) {
@@ -51,6 +52,7 @@ export async function POST(req: NextRequest) {
     years_experience: d.years_experience ? parseInt(d.years_experience) : null,
     notes: d.notes || null,
     photo_url: d.photo_url || null,
+    sms_consent_at: d.sms_consent ? new Date().toISOString() : null,
     active: false,
   })
 
