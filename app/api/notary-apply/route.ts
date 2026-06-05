@@ -66,6 +66,13 @@ export async function POST(req: NextRequest) {
   // Send onboarding email to the applicant
   sendNotaryApplicationEmail({ name: d.name, email: d.email }).catch(console.error)
 
+  // Confirmation text to the applicant — also prompts them to save our number
+  // (will deliver once Twilio A2P is approved)
+  sendSMS(
+    d.phone,
+    `Hi ${d.name.split(' ')[0]}, thanks for applying to Inksent! We got your application and will review it shortly. Please save this number as "Inksent Signing" — it's how we'll text you signing jobs once you're approved. — Clayton`
+  ).catch(console.error)
+
   if (process.env.ADMIN_PHONE) {
     sendSMS(
       process.env.ADMIN_PHONE,

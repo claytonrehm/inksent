@@ -21,7 +21,7 @@ export default function OrderPage() {
           <Link href="/" className="text-sm text-violet-600 hover:underline font-medium">← Back to home</Link>
           <h1 className="text-3xl font-black text-gray-900 mt-4 mb-2">Place a Signing Order</h1>
           <p className="text-gray-500">
-            Available in 27 non-attorney states. Submit your order and we&apos;ll confirm a signing agent within 30 minutes.
+            Available in all 50 states. Submit your order and we&apos;ll confirm a signing agent within 30 minutes.
           </p>
         </div>
 

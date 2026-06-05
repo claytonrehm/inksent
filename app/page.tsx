@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { CheckCircle, Clock, DollarSign, MapPin, Phone, Shield, ArrowRight } from 'lucide-react'
 import InksentLogo from '@/components/InksentLogo'
 import HeroStats from '@/components/HeroStats'
-import StatesGrid from '@/components/StatesGrid'
+import USMap from '@/components/USMap'
 import ScrollReveal from '@/components/ScrollReveal'
 import NavClient from '@/components/NavClient'
 
@@ -16,7 +16,7 @@ const FEATURES = [
   { icon: <Clock size={22} />, title: '30-Min Confirmation', desc: 'We confirm notary assignment faster than anyone else in the industry.' },
   { icon: <Shield size={22} />, title: 'NNA Certified Agents', desc: 'Every signing agent is background-checked, insured, and NNA certified.' },
   { icon: <DollarSign size={22} />, title: 'Flat-Rate Pricing', desc: 'No surprise fees. Simple, transparent pricing on every single signing.' },
-  { icon: <MapPin size={22} />, title: '27-State Coverage', desc: 'All non-attorney states covered. One vendor relationship, anywhere you close.' },
+  { icon: <MapPin size={22} />, title: 'Nationwide Coverage', desc: 'All 50 states covered. One vendor relationship, anywhere you close.' },
 ]
 
 const SIGNING_TYPES = [
@@ -46,7 +46,7 @@ export default function Home() {
           <ScrollReveal>
             <div className="inline-flex items-center gap-2 bg-violet-50 border border-violet-100 text-violet-700 text-xs font-semibold px-4 py-2 rounded-full mb-8">
               <span className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-pulse" />
-              Available in 27 Non-Attorney States
+              Available Nationwide — All 50 States
             </div>
           </ScrollReveal>
 
@@ -115,7 +115,7 @@ export default function Home() {
       {/* Trust bar */}
       <div className="bg-gray-900 py-4 px-6">
         <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-6 sm:gap-12 text-gray-300 text-sm font-medium">
-          {['NNA Certified Network', 'Background Checked', 'Flat-Rate Pricing', '27 States'].map((item) => (
+          {['NNA Certified Network', 'Background Checked', 'Flat-Rate Pricing', 'All 50 States'].map((item) => (
             <span key={item} className="flex items-center gap-2">
               <CheckCircle size={14} className="text-violet-400" /> {item}
             </span>
@@ -195,7 +195,7 @@ export default function Home() {
                   'NNA-certified, background-checked agent',
                   'Notary assignment confirmed within 30 minutes',
                   'Invoice emailed after each completed signing',
-                  'Coverage in all 27 non-attorney states',
+                  'Coverage in all 50 states',
                 ].map((item) => (
                   <div key={item} className="flex items-start gap-3 text-sm text-gray-600">
                     <CheckCircle size={15} className="text-violet-500 shrink-0 mt-0.5" />
@@ -215,11 +215,13 @@ export default function Home() {
       <section id="coverage" className="px-6 py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto">
           <ScrollReveal className="text-center mb-10">
-            <p className="text-violet-600 font-semibold text-sm uppercase tracking-widest mb-3">Coverage</p>
-            <h2 className="text-4xl font-black text-gray-900 mb-3">27 Non-Attorney States</h2>
-            <p className="text-gray-500">Tap any state to see full name</p>
+            <p className="text-violet-600 font-semibold text-sm uppercase tracking-widest mb-3">Nationwide Coverage</p>
+            <h2 className="text-4xl font-black text-gray-900 mb-3">All 50 States</h2>
+            <p className="text-gray-500 max-w-lg mx-auto">We dispatch signing agents coast to coast. Hover any state for details.</p>
           </ScrollReveal>
-          <StatesGrid />
+          <ScrollReveal>
+            <USMap />
+          </ScrollReveal>
         </div>
       </section>
 
