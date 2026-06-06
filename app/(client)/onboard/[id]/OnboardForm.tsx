@@ -52,12 +52,16 @@ export default function OnboardForm({ notaryId, notaryName }: { notaryId: string
 
   if (done) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-center gap-4">
+      <div className="flex flex-col items-center justify-center py-10 text-center gap-4">
         <div className="bg-green-50 rounded-full p-5"><CheckCircle className="text-green-500 w-12 h-12" /></div>
-        <h2 className="text-2xl font-bold text-gray-900">Profile complete!</h2>
+        <h2 className="text-2xl font-bold text-gray-900">One last step!</h2>
         <p className="text-gray-500 max-w-sm">
-          Thanks, {notaryName.split(' ')[0]}. You&apos;re fully set up and ready for jobs. Don&apos;t forget to email your signed W-9 to orders@inksent.co before your first signing.
+          Thanks, {notaryName.split(' ')[0]}. Now set up automatic payouts so your $90 lands in your bank after each signing — no waiting, no invoicing.
         </p>
+        <a href={`/onboard/${notaryId}/connect`} className="w-full max-w-xs bg-violet-600 text-white font-bold py-3.5 rounded-xl hover:bg-violet-700 transition-colors">
+          Set Up Automatic Payouts →
+        </a>
+        <p className="text-xs text-gray-400 max-w-sm">Don&apos;t forget to email your signed W-9 to orders@inksent.co before your first signing.</p>
       </div>
     )
   }
