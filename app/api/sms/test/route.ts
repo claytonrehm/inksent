@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendSMS } from '@/lib/sms'
+import { isAdminAuthed } from '@/lib/admin-auth'
 
 export async function POST(req: NextRequest) {
+  if (!(await isAdminAuthed())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { to } = await req.json()
 
   if (!to) return NextResponse.json({ error: 'Phone number required' }, { status: 400 })

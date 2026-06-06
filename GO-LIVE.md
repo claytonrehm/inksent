@@ -44,6 +44,17 @@ The entire product is built. What's left is operational. Updated to track what's
 
 ---
 
+## 📲 WHEN TWILIO A2P APPROVES (all SMS code is already built)
+
+Nothing to code — the dispatch/accept/borrower/payout/thank-you texts all call
+`sendSMS` already. When A2P clears:
+1. In Twilio, confirm your number is attached to the **approved A2P campaign / Messaging Service**.
+2. If Twilio gives you a **Messaging Service SID**, add env `TWILIO_MESSAGING_SERVICE_SID` in Vercel (the code auto-uses it; otherwise it keeps using `TWILIO_FROM_NUMBER`).
+3. Log into admin and POST to `/api/sms/test` (or use the setup page) to send yourself a test.
+4. Done — job dispatch texts start delivering.
+
+---
+
 ## ⚪ LATER (not blocking launch)
 
 - [ ] **LLC** — talk to a CPA (TN vs CA). Do once revenue flows.

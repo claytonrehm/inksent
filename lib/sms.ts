@@ -5,10 +5,14 @@ function getClient() {
 }
 
 export async function sendSMS(to: string, body: string) {
+  // A2P-ready: if a Messaging Service SID is set (the usual A2P setup), send
+  // through it; otherwise fall back to the raw number. Lets you go live the
+  // moment A2P clears by just adding TWILIO_MESSAGING_SERVICE_SID — no code change.
+  const messagingServiceSid = process.env.TWILIO_MESSAGING_SERVICE_SID
   return getClient().messages.create({
-    from: process.env.TWILIO_FROM_NUMBER!,
     to,
     body,
+    ...(messagingServiceSid ? { messagingServiceSid } : { from: process.env.TWILIO_FROM_NUMBER! }),
   })
 }
 
