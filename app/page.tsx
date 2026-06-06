@@ -168,23 +168,42 @@ export default function Home() {
         <div className="max-w-4xl mx-auto relative">
           <ScrollReveal>
             <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 sm:p-12 backdrop-blur-sm">
-              <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-400/20 text-violet-300 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
+              <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-400/20 text-violet-300 text-xs font-semibold px-3 py-1.5 rounded-full mb-8">
                 Built by the industry, for the industry
               </div>
-              <h2 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-5">
-                Made by a mortgage professional who&apos;s been on your side of the table.
-              </h2>
-              <p className="text-slate-400 leading-relaxed mb-4">
-                Inksent was founded by an active loan officer with deep roots in the mortgage industry — hundreds of millions of dollars in personal fundings and partnerships with title companies on countless closings.
-              </p>
-              <p className="text-slate-400 leading-relaxed mb-8">
-                After watching too many closings get derailed by a late notary, a no-show, or a last-minute scramble for coverage, we built the signing service we always wished existed. We know what a clean closing looks like — and exactly what a bad signing costs you. That&apos;s the difference between us and a faceless platform: this was built by someone who actually does this work.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+              <div className="flex flex-col sm:flex-row gap-8 items-start">
+                {/* Photo */}
+                <div className="shrink-0 mx-auto sm:mx-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/clayton.png" alt="Clayton Rehm, Founder of Inksent"
+                    className="rounded-2xl object-cover border border-white/15"
+                    style={{ width: 150, height: 150 }} />
+                  <div className="mt-3 text-center sm:text-left">
+                    <div className="font-bold text-white">Clayton Rehm</div>
+                    <div className="text-xs text-slate-400">Founder · Mortgage Loan Officer</div>
+                  </div>
+                </div>
+
+                {/* Bio */}
+                <div>
+                  <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight mb-4">
+                    Built by a mortgage pro who&apos;s been on your side of the table.
+                  </h2>
+                  <p className="text-slate-400 leading-relaxed mb-4">
+                    San Diego born and raised, Clayton is an active mortgage loan officer with deep roots in the industry — hundreds of millions of dollars in personal production and fundings, and working partnerships with title companies and large nationwide lenders.
+                  </p>
+                  <p className="text-slate-400 leading-relaxed">
+                    After watching too many closings get derailed by a late notary, a no-show, or a last-minute scramble for coverage, he built the signing service he always wished existed. Inksent isn&apos;t a faceless platform — it&apos;s built by someone who lives this work and knows exactly what a clean closing is worth.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-10">
                 {[
-                  ['$100Ms+', 'In personal fundings'],
-                  ['Countless', 'Title-company partnerships'],
-                  ['Active', 'In the industry today'],
+                  ['$100Ms+', 'In personal production'],
+                  ['Nationwide', 'Lender & title partnerships'],
+                  ['Active', 'Loan officer today'],
                 ].map(([big, small]) => (
                   <div key={small} className="rounded-xl border border-white/10 bg-white/[0.02] p-4 text-center">
                     <div className="text-2xl font-black text-white">{big}</div>
