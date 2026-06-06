@@ -32,14 +32,14 @@ export default function USMap() {
           const attorney = isAttorney(s.code)
           const active = hovered === s.code
           const fill = attorney
-            ? (active ? '#334155' : '#475569')   // slate-700 / slate-600
-            : (active ? '#7c3aed' : '#8b5cf6')    // violet-600 / violet-500
+            ? (active ? '#475569' : '#334155')   // slate-600 / slate-700
+            : (active ? '#a78bfa' : '#7c3aed')    // violet-400 / violet-600
           return (
             <path
               key={s.code}
               d={s.d}
               fill={fill}
-              stroke="#ffffff"
+              stroke="#07070d"
               strokeWidth={active ? 1.5 : 0.75}
               onMouseEnter={() => setHovered(s.code)}
               onMouseLeave={() => setHovered(null)}
@@ -52,25 +52,25 @@ export default function USMap() {
       {/* Caption + legend */}
       <div className="mt-4 text-center min-h-[24px]">
         {hovered ? (
-          <p className="text-sm font-medium text-gray-900">
+          <p className="text-sm font-medium text-white">
             {NAMES[hovered]}
-            <span className={isAttorney(hovered) ? 'text-slate-500' : 'text-violet-600'}>
+            <span className={isAttorney(hovered) ? 'text-slate-400' : 'text-violet-300'}>
               {' '}· {isAttorney(hovered) ? 'Attorney-state closing' : 'Direct dispatch'}
             </span>
           </p>
         ) : (
-          <p className="text-sm text-gray-400">Hover any state for coverage details</p>
+          <p className="text-sm text-slate-500">Hover any state for coverage details</p>
         )}
       </div>
 
       <div className="flex items-center justify-center gap-6 mt-4 text-sm">
         <div className="flex items-center gap-2">
-          <span className="w-4 h-4 rounded inline-block" style={{ background: '#8b5cf6' }} />
-          <span className="text-gray-600">Direct dispatch</span>
+          <span className="w-4 h-4 rounded inline-block" style={{ background: '#7c3aed' }} />
+          <span className="text-slate-400">Direct dispatch</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-4 h-4 rounded inline-block" style={{ background: '#475569' }} />
-          <span className="text-gray-600">Attorney-state closings</span>
+          <span className="w-4 h-4 rounded inline-block" style={{ background: '#334155' }} />
+          <span className="text-slate-400">Attorney-state closings</span>
         </div>
       </div>
     </div>
