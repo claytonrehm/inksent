@@ -20,7 +20,7 @@ const FEATURES = [
   { icon: <Eye size={22} />, title: 'You Know Who Shows Up', desc: 'Every agent is photographed, credential-verified, background-checked, and rated on punctuality.' },
   { icon: <Clock size={22} />, title: '30-Minute Confirmation', desc: 'We alert every qualified agent at once; first to accept wins. No phone tag, no waiting hours.' },
   { icon: <MapPin size={22} />, title: 'Live Tracking', desc: 'Watch real-time status from a link — dispatched, confirmed with agent photo, complete.' },
-  { icon: <DollarSign size={22} />, title: 'Flat $185, No Games', desc: 'No contracts, no minimums, no surprise fees. Pay online in one click or by check.' },
+  { icon: <DollarSign size={22} />, title: 'Flat-Rate, No Games', desc: 'No contracts, no minimums, no surprise fees. Pay online in one click or by check.' },
 ]
 
 const SIGNING_TYPES = [
@@ -272,11 +272,10 @@ export default function Home() {
           <ScrollReveal>
             <div className="max-w-sm mx-auto rounded-3xl p-8 text-center border border-violet-400/30 bg-gradient-to-b from-violet-600/15 to-white/[0.02] shadow-[0_0_60px_-15px_rgba(139,92,246,0.5)] backdrop-blur-sm">
               <p className="text-violet-300 font-semibold text-sm uppercase tracking-widest mb-4">Per Signing</p>
-              <div className="flex items-end justify-center gap-1 mb-2">
-                <span className="text-4xl font-black text-slate-500">$</span>
-                <span className="text-7xl font-black text-white leading-none">185</span>
+              <div className="mb-2">
+                <span className="text-5xl sm:text-6xl font-black text-white leading-none">Flat Rate</span>
               </div>
-              <p className="text-slate-400 text-sm mb-8">flat rate, any signing type</p>
+              <p className="text-slate-400 text-sm mb-8">one transparent fee, any signing type</p>
               <div className="space-y-3 text-left mb-8">
                 {[
                   'All signing types — purchase, refi, HELOC, and more',
