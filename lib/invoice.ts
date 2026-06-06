@@ -25,6 +25,7 @@ export function buildInvoiceHTML(order: {
   client_name: string
   client_email: string
   client_fee: number
+  pay_url?: string | null
 }) {
   const signingTypeLabel = order.signing_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
   const [h, m] = order.signing_time.split(':').map(Number)
@@ -97,6 +98,7 @@ export function buildInvoiceHTML(order: {
         <span>Total Due</span>
         <span class="amount">$${fee}</span>
       </div>
+      ${order.pay_url ? `<a href="${order.pay_url}" style="display:block;text-align:center;background:#5b21b6;color:#ffffff;text-decoration:none;font-weight:700;padding:14px;border-radius:10px;margin-top:20px;font-size:15px;">Pay Invoice Online →</a><p style="text-align:center;font-size:12px;color:#999;margin-top:8px;">Secure payment via Stripe. Or pay by check/ACH — net 30.</p>` : '<p style="text-align:center;font-size:13px;color:#666;margin-top:18px;">Payment due within 30 days. Pay by check or ACH — details on request.</p>'}
     </div>
     <div class="footer">
       Inksent Signing Services · orders@inksent.co · (619) 949-3361<br/>
@@ -107,8 +109,19 @@ export function buildInvoiceHTML(order: {
 </html>`
 }
 
-export async function sendInvoiceEmail(order: Parameters<typeof buildInvoiceHTML>[0]) {
-  const html = buildInvoiceHTML(order)
+export async function sendInvoiceEmail(order: Parameters<typeof buildInvoiceHTML>[0] & { id?: string }) {
+  // Create a Stripe pay-now link if configured (auto-reconciled via webhook)
+  let pay_url: string | null = null
+  if (order.id) {
+    const { createInvoicePaymentLink } = await import('./stripe')
+    pay_url = await createInvoicePaymentLink({
+      id: order.id,
+      confirmation_number: order.confirmation_number,
+      client_fee: order.client_fee,
+      client_company: order.client_company,
+    })
+  }
+  const html = buildInvoiceHTML({ ...order, pay_url })
   return getResend().emails.send({
     from: 'Inksent <invoices@inksent.co>',
     to: order.client_email,
