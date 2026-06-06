@@ -6,8 +6,21 @@ const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Inksent — Signing Services',
-  description: 'Professional notary signing agents on demand. NNA-certified, 30-minute confirmation, 15 states.',
+  metadataBase: new URL('https://inksent.co'),
+  title: 'Inksent — Signing Agents, On Demand',
+  description: 'Vetted, NNA-certified notary signing agents — confirmed in ~30 minutes, with automatic backup if anyone cancels.',
+  openGraph: {
+    title: 'Inksent — Signing Agents, On Demand',
+    description: 'Vetted notary signing agents, confirmed in ~30 minutes, with automatic backup if anyone cancels.',
+    url: 'https://inksent.co',
+    siteName: 'Inksent',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Inksent — Signing Agents, On Demand',
+    description: 'Vetted notary signing agents, confirmed in ~30 minutes, with automatic backup if anyone cancels.',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
