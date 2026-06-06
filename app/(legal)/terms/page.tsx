@@ -37,7 +37,7 @@ export default function TermsPage() {
       <p>We may update these terms. Continued use of the service after changes constitutes acceptance.</p>
 
       <H>Contact</H>
-      <p>Questions? Email <a href="mailto:orders@inksent.co" className="text-violet-600 underline">orders@inksent.co</a> or call (619) 949-3361.</p>
+      <p>Questions? Email <a href="mailto:support@inksent.co" className="text-violet-600 underline">support@inksent.co</a> or call (619) 949-3361.</p>
 
       <p className="text-xs text-gray-400 pt-4 border-t border-gray-100">These terms are provided as a general agreement and may be updated. Please review periodically.</p>
     </div>

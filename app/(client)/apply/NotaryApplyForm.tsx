@@ -102,7 +102,7 @@ export default function NotaryApplyForm() {
       }
       if (!res.ok) {
         const j = await res.json().catch(() => ({}))
-        setError(j.error || 'Something went wrong. Please try again or email orders@inksent.co.')
+        setError(j.error || 'Something went wrong. Please try again or email support@inksent.co.')
         return
       }
     } catch {

@@ -54,7 +54,7 @@ export default function PartnersPage() {
           </div>
           <div className="text-right text-sm text-gray-500">
             <a href="tel:+16199493361" className="flex items-center justify-end gap-1.5 font-semibold text-gray-700"><Phone size={13} /> (619) 949-3361</a>
-            <a href="mailto:orders@inksent.co" className="flex items-center justify-end gap-1.5"><Mail size={12} /> orders@inksent.co</a>
+            <a href="mailto:support@inksent.co" className="flex items-center justify-end gap-1.5"><Mail size={12} /> support@inksent.co</a>
           </div>
         </div>
 
@@ -118,7 +118,7 @@ export default function PartnersPage() {
             </Link>
             <span className="text-gray-500 text-sm">or call <a href="tel:+16199493361" className="font-semibold text-gray-800">(619) 949-3361</a></span>
           </div>
-          <p className="text-xs text-gray-400 mt-6">Inksent Signing Services · orders@inksent.co · (619) 949-3361 · inksent.co</p>
+          <p className="text-xs text-gray-400 mt-6">Inksent Signing Services · support@inksent.co · (619) 949-3361 · inksent.co</p>
         </div>
       </div>
     </main>

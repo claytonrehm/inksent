@@ -21,7 +21,7 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
           <span className="mx-2">·</span>
           <Link href="/terms" className="hover:text-gray-600">Terms</Link>
           <span className="mx-2">·</span>
-          <a href="mailto:orders@inksent.co" className="hover:text-gray-600">orders@inksent.co</a>
+          <a href="mailto:support@inksent.co" className="hover:text-gray-600">support@inksent.co</a>
         </div>
       </div>
     </main>

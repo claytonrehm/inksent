@@ -52,7 +52,7 @@ export default function FAQPage() {
 
       <section className="bg-violet-50 border border-violet-100 rounded-xl p-5 text-sm">
         <p className="font-semibold text-gray-900">Still have a question?</p>
-        <p className="text-gray-600 mt-0.5">Email <a href="mailto:orders@inksent.co" className="text-violet-600 underline">orders@inksent.co</a> or call/text <a href="tel:+16199493361" className="text-violet-600 underline">(619) 949-3361</a>.</p>
+        <p className="text-gray-600 mt-0.5">Email <a href="mailto:support@inksent.co" className="text-violet-600 underline">support@inksent.co</a> or call/text <a href="tel:+16199493361" className="text-violet-600 underline">(619) 949-3361</a>.</p>
       </section>
     </div>
   )

@@ -31,10 +31,10 @@ export default function PrivacyPage() {
       <p>We keep information for as long as needed to provide the service and meet legal and tax obligations, then delete or anonymize it. We use reasonable safeguards to protect your data. Sensitive tax documents (such as W-9 forms) are collected by email and handled separately from our application database.</p>
 
       <H>Your choices</H>
-      <p>You may request access to, correction of, or deletion of your information by emailing <a href="mailto:orders@inksent.co" className="text-violet-600 underline">orders@inksent.co</a>. You can opt out of SMS by replying STOP.</p>
+      <p>You may request access to, correction of, or deletion of your information by emailing <a href="mailto:support@inksent.co" className="text-violet-600 underline">support@inksent.co</a>. You can opt out of SMS by replying STOP.</p>
 
       <H>Contact</H>
-      <p>Questions? Email <a href="mailto:orders@inksent.co" className="text-violet-600 underline">orders@inksent.co</a> or call (619) 949-3361.</p>
+      <p>Questions? Email <a href="mailto:support@inksent.co" className="text-violet-600 underline">support@inksent.co</a> or call (619) 949-3361.</p>
 
       <p className="text-xs text-gray-400 pt-4 border-t border-gray-100">This policy is provided for transparency and may be updated. Please review periodically.</p>
     </div>

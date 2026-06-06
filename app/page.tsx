@@ -318,7 +318,7 @@ export default function Home() {
                 Place an Order Now
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </Link>
-              <a href="mailto:orders@inksent.co" className="inline-flex items-center justify-center border border-white/15 bg-white/5 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-white/10 transition-all">
+              <a href="mailto:support@inksent.co" className="inline-flex items-center justify-center border border-white/15 bg-white/5 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-white/10 transition-all">
                 Email Us
               </a>
             </div>
@@ -334,7 +334,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-slate-500">
               <a href="tel:+16199493361" className="hover:text-slate-300 transition-colors flex items-center gap-1.5"><Phone size={13} />(619) 949-3361</a>
               <span className="hidden sm:block">·</span>
-              <a href="mailto:orders@inksent.co" className="hover:text-slate-300 transition-colors">orders@inksent.co</a>
+              <a href="mailto:support@inksent.co" className="hover:text-slate-300 transition-colors">support@inksent.co</a>
               <span className="hidden sm:block">·</span>
               <Link href="/join" className="hover:text-slate-300 transition-colors">For Notaries</Link>
               <span className="hidden sm:block">·</span>
@@ -347,7 +347,7 @@ export default function Home() {
               <Link href="/faq" className="hover:text-slate-400 transition-colors">FAQ</Link>
               <Link href="/privacy" className="hover:text-slate-400 transition-colors">Privacy</Link>
               <Link href="/terms" className="hover:text-slate-400 transition-colors">Terms</Link>
-              <a href="mailto:orders@inksent.co" className="hover:text-slate-400 transition-colors">Support</a>
+              <a href="mailto:support@inksent.co" className="hover:text-slate-400 transition-colors">Support</a>
             </div>
           </div>
         </div>
