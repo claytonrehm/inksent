@@ -160,6 +160,43 @@ export default function Home() {
         </div>
       </section>
 
+      {/* About / founder credibility */}
+      <section id="about" className="px-6 py-24 relative">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[460px] h-[460px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(217,70,239,0.10) 0%, transparent 70%)' }} />
+        </div>
+        <div className="max-w-4xl mx-auto relative">
+          <ScrollReveal>
+            <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 sm:p-12 backdrop-blur-sm">
+              <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-400/20 text-violet-300 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
+                Built by the industry, for the industry
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-5">
+                Made by a mortgage professional who&apos;s been on your side of the table.
+              </h2>
+              <p className="text-slate-400 leading-relaxed mb-4">
+                Inksent was founded by an active loan officer with deep roots in the mortgage industry — hundreds of millions of dollars in personal fundings and partnerships with title companies on countless closings.
+              </p>
+              <p className="text-slate-400 leading-relaxed mb-8">
+                After watching too many closings get derailed by a late notary, a no-show, or a last-minute scramble for coverage, we built the signing service we always wished existed. We know what a clean closing looks like — and exactly what a bad signing costs you. That&apos;s the difference between us and a faceless platform: this was built by someone who actually does this work.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {[
+                  ['$100Ms+', 'In personal fundings'],
+                  ['Countless', 'Title-company partnerships'],
+                  ['Active', 'In the industry today'],
+                ].map(([big, small]) => (
+                  <div key={small} className="rounded-xl border border-white/10 bg-white/[0.02] p-4 text-center">
+                    <div className="text-2xl font-black text-white">{big}</div>
+                    <div className="text-xs text-slate-400 mt-0.5">{small}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
       {/* Two paths */}
       <section className="px-6 py-20">
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
