@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendSMS } from '@/lib/sms'
+import { sendPaymentReminderEmail } from '@/lib/invoice'
 import { format } from 'date-fns'
 
 // Runs on a schedule (see vercel.json). Surfaces orders that need a human:
@@ -55,5 +56,39 @@ export async function GET(req: NextRequest) {
     await supabase.from('orders').update({ escalated_at: new Date().toISOString() }).eq('id', o.id)
   }
 
-  return NextResponse.json({ ok: true, alerted: toAlert.length })
+  // 3. Auto-chase unpaid invoices so you never have to. Reminders at 7 & 14 days,
+  //    final escalation to admin at 30 days.
+  const { data: unpaid } = await supabase
+    .from('orders')
+    .select('id, invoice_id, confirmation_number, signing_type, signing_date, signer_name, client_name, client_email, client_company, client_fee, completed_at, payment_reminders')
+    .eq('status', 'completed')
+    .is('client_paid_at', null)
+    .not('completed_at', 'is', null)
+
+  let reminded = 0
+  for (const o of unpaid ?? []) {
+    const days = Math.floor((now - new Date(o.completed_at).getTime()) / 86_400_000)
+    const sent = o.payment_reminders ?? 0
+    let act: 'remind' | 'escalate' | null = null
+    if (days >= 30 && sent < 3) act = 'escalate'
+    else if (days >= 14 && sent < 2) act = 'remind'
+    else if (days >= 7 && sent < 1) act = 'remind'
+    if (!act) continue
+
+    if (act === 'remind') {
+      await sendPaymentReminderEmail({
+        id: o.id, invoice_number: o.invoice_id, confirmation_number: o.confirmation_number,
+        signing_type: o.signing_type, signing_date: o.signing_date, signer_name: o.signer_name,
+        client_name: o.client_name, client_email: o.client_email, client_company: o.client_company,
+        client_fee: o.client_fee, daysOverdue: days,
+      }).catch(() => {})
+    } else if (process.env.ADMIN_PHONE) {
+      await sendSMS(process.env.ADMIN_PHONE, `🔴 Invoice ${o.invoice_id} (${o.client_company}, $${(o.client_fee / 100).toFixed(0)}) is ${days} days unpaid after 2 reminders. Time for a personal nudge.`).catch(() => {})
+    }
+    const next = days >= 30 ? 3 : days >= 14 ? 2 : 1
+    await supabase.from('orders').update({ payment_reminders: next }).eq('id', o.id)
+    reminded++
+  }
+
+  return NextResponse.json({ ok: true, alerted: toAlert.length, reminded })
 }

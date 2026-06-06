@@ -109,6 +109,44 @@ export function buildInvoiceHTML(order: {
 </html>`
 }
 
+// Gentle automated reminder for an unpaid invoice — re-sends the pay link.
+export async function sendPaymentReminderEmail(order: {
+  id: string
+  invoice_number: string
+  confirmation_number: string
+  signing_type: string
+  signing_date: string
+  signer_name: string
+  client_name: string
+  client_email: string
+  client_company: string
+  client_fee: number
+  daysOverdue: number
+}) {
+  const { createInvoicePaymentLink } = await import('./stripe')
+  const pay_url = await createInvoicePaymentLink(order)
+  const firstName = order.client_name.split(' ')[0]
+  const fee = (order.client_fee / 100).toFixed(2)
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/></head>
+  <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111;background:#f4f4f5;margin:0;padding:24px;">
+    <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+      <div style="background:#000;padding:20px 28px;"><span style="font-size:22px;font-weight:900;color:#fff;">ink</span><span style="font-size:22px;font-weight:900;color:#a78bfa;">sent</span></div>
+      <div style="padding:28px;">
+        <p style="font-size:15px;color:#111;margin:0 0 8px;">Hi ${firstName}, a friendly reminder —</p>
+        <p style="font-size:14px;color:#555;line-height:1.6;margin:0 0 18px;">Invoice <strong>${order.invoice_number}</strong> for the ${order.signer_name} signing (${fee ? '$' + fee : ''}) is still open. You can settle it in a few seconds below.</p>
+        ${pay_url ? `<a href="${pay_url}" style="display:block;text-align:center;background:#5b21b6;color:#fff;text-decoration:none;font-weight:700;padding:14px;border-radius:10px;font-size:15px;">Pay Invoice — $${fee} →</a>` : `<p style="font-size:14px;color:#555;">Please remit payment by check or ACH at your earliest convenience.</p>`}
+        <p style="font-size:12px;color:#999;margin:16px 0 0;text-align:center;">Already paid? Thank you — please disregard. Questions? orders@inksent.co · (619) 949-3361</p>
+      </div>
+    </div>
+  </body></html>`
+  return getResend().emails.send({
+    from: 'Inksent <invoices@inksent.co>',
+    to: order.client_email,
+    subject: `Reminder: Invoice ${order.invoice_number} ($${fee})`,
+    html,
+  })
+}
+
 export async function sendInvoiceEmail(order: Parameters<typeof buildInvoiceHTML>[0] & { id?: string }) {
   // Create a Stripe pay-now link if configured (auto-reconciled via webhook)
   let pay_url: string | null = null
