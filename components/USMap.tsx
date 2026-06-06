@@ -43,7 +43,9 @@ export default function USMap() {
               strokeWidth={active ? 1.5 : 0.75}
               onMouseEnter={() => setHovered(s.code)}
               onMouseLeave={() => setHovered(null)}
-              style={{ transition: 'fill 120ms', cursor: 'default' }}
+              onClick={() => setHovered(s.code)}
+              onTouchStart={() => setHovered(s.code)}
+              style={{ transition: 'fill 120ms', cursor: 'pointer' }}
             />
           )
         })}
@@ -59,7 +61,7 @@ export default function USMap() {
             </span>
           </p>
         ) : (
-          <p className="text-sm text-slate-500">Hover any state for coverage details</p>
+          <p className="text-sm text-slate-500">Tap any state for coverage details</p>
         )}
       </div>
 

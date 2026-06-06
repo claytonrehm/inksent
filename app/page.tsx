@@ -83,8 +83,8 @@ export default function Home() {
               </ScrollReveal>
             </div>
 
-            {/* Right — product visual */}
-            <div className="hidden lg:block">
+            {/* Right — product visual (scaled down on mobile) */}
+            <div className="mt-4 lg:mt-0 scale-90 sm:scale-100">
               <PhoneMockup />
             </div>
           </div>
@@ -122,7 +122,7 @@ export default function Home() {
       </div>
 
       {/* How it works */}
-      <section id="how-it-works" className="px-6 py-24 relative">
+      <section id="how-it-works" className="px-6 py-16 sm:py-24 relative">
         <div className="max-w-5xl mx-auto">
           <ScrollReveal className="text-center mb-16">
             <p className="text-violet-400 font-semibold text-sm uppercase tracking-widest mb-3">Simple Process</p>
@@ -146,7 +146,7 @@ export default function Home() {
       </section>
 
       {/* Why Inksent */}
-      <section id="features" className="px-6 py-24 relative">
+      <section id="features" className="px-6 py-16 sm:py-24 relative">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[500px] h-[500px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.10) 0%, transparent 70%)' }} />
         </div>
@@ -172,7 +172,7 @@ export default function Home() {
       </section>
 
       {/* About / founder credibility */}
-      <section id="about" className="px-6 py-24 relative">
+      <section id="about" className="px-6 py-16 sm:py-24 relative">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[460px] h-[460px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(217,70,239,0.10) 0%, transparent 70%)' }} />
         </div>
@@ -228,7 +228,7 @@ export default function Home() {
       </section>
 
       {/* Two paths */}
-      <section className="px-6 py-20">
+      <section className="px-6 py-16 sm:py-20">
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
           <ScrollReveal>
             <Link href="/partners" className="block h-full group rounded-3xl border border-white/10 bg-gradient-to-br from-violet-600/20 to-transparent p-8 hover:border-violet-400/50 transition-all">
@@ -250,7 +250,7 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="px-6 py-20">
+      <section id="pricing" className="px-6 py-16 sm:py-20">
         <div className="max-w-4xl mx-auto">
           <ScrollReveal className="text-center mb-12">
             <p className="text-violet-400 font-semibold text-sm uppercase tracking-widest mb-3">Simple Pricing</p>
@@ -288,12 +288,12 @@ export default function Home() {
       </section>
 
       {/* Coverage map */}
-      <section id="coverage" className="px-6 py-20">
+      <section id="coverage" className="px-6 py-16 sm:py-20">
         <div className="max-w-4xl mx-auto">
           <ScrollReveal className="text-center mb-10">
             <p className="text-violet-400 font-semibold text-sm uppercase tracking-widest mb-3">Nationwide Coverage</p>
             <h2 className="text-4xl font-black text-white mb-3">All 50 States</h2>
-            <p className="text-slate-400 max-w-lg mx-auto">We dispatch signing agents coast to coast. Hover any state for details.</p>
+            <p className="text-slate-400 max-w-lg mx-auto">We dispatch signing agents coast to coast. Tap any state for details.</p>
           </ScrollReveal>
           <ScrollReveal>
             <USMap />
@@ -302,7 +302,7 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="relative px-6 py-28 overflow-hidden">
+      <section className="relative px-6 py-20 sm:py-28 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] rounded-full" style={{ background: 'radial-gradient(ellipse, rgba(139,92,246,0.18) 0%, transparent 70%)' }} />
         </div>
