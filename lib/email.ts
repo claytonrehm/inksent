@@ -405,7 +405,7 @@ export async function sendOrderConfirmationEmail(order: {
         ${detailRow('Date', dateStr)}
         ${detailRow('Time', timeStr)}
         ${detailRow('Location', order.property_city)}
-        ${detailRow('Fee', '<span style="font-weight:700;color:#5b21b6;">$175.00</span>', { last: true })}
+        ${detailRow('Fee', '<span style="font-weight:700;color:#5b21b6;">$185.00</span>', { last: true })}
       </table>
 
       ${uploadUrl ? `<div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:18px 20px;margin:24px 0;">

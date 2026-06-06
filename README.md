@@ -20,7 +20,7 @@ Most signing services are either **impersonal platforms** (SnapDocs, ServiceLink
 | **Borrower heads-up text** | The signer gets a text with who's coming and when — fewer no-answer doors, more professional. |
 | **Bilingual matching** | Need a Spanish (or Mandarin, Vietnamese, etc.) signing? We auto-route to agents who speak it. |
 | **Pay online, net-30** | One-click invoice payment (ACH/card) that auto-reconciles. Or pay by check — your call. |
-| **Flat $175, no games** | No contracts, no minimums, no surprise fees. "Try us on one signing." |
+| **Flat $185, no games** | No contracts, no minimums, no surprise fees. "Try us on one signing." |
 | **A real person** | Small, local team — you reach an actual human, not a queue. |
 
 ### For signing agents (notaries)
@@ -40,7 +40,7 @@ Most signing services are either **impersonal platforms** (SnapDocs, ServiceLink
 
 | | |
 |-|-|
-| Charge clients | **$175 / signing** |
+| Charge clients | **$185 / signing** |
 | Pay notaries | **$90 / signing** |
 | Gross spread | **$85 / signing** |
 

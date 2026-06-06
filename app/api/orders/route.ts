@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       .insert({
         ...parsed.data,
         status: 'pending',
-        client_fee: 17500,  // $175.00
+        client_fee: 18500,  // $185.00
         notary_fee: 9000,   // $90.00
       })
       .select('id, confirmation_number, signing_date, signing_time, signing_type, signer_name, property_city, property_zip, property_address, client_name, client_email, client_company, notary_fee, language_needed')

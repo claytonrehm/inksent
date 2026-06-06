@@ -13,7 +13,7 @@ export default function TermsPage() {
 
       <H>For clients</H>
       <ul className="list-disc pl-5 space-y-1">
-        <li>Our flat fee is $175 per signing unless otherwise agreed in writing.</li>
+        <li>Our flat fee is $185 per signing unless otherwise agreed in writing.</li>
         <li>Payment is due within 30 days of a completed signing.</li>
         <li>You are responsible for providing accurate signing details and documents.</li>
         <li>We aim to confirm a signing agent quickly but do not guarantee availability in every location at every time.</li>

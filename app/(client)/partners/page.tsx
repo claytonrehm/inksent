@@ -4,7 +4,7 @@ import PrintButton from './PrintButton'
 
 export const metadata = {
   title: 'Inksent for Title Companies — Notary Signing, Done Right',
-  description: 'A faster, more reliable signing service: backup-on-cancel, vetted agents, live tracking, flat $175.',
+  description: 'A faster, more reliable signing service: backup-on-cancel, vetted agents, live tracking, flat $185.',
 }
 
 const EDGES = [
@@ -35,7 +35,7 @@ const EDGES = [
   },
   {
     icon: <DollarSign size={20} />,
-    title: 'Flat $175. No games.',
+    title: 'Flat $185. No games.',
     body: 'No contracts, no minimums, no surprise fees. Pay online in one click or by check, net-30. Bilingual agents matched on request.',
   },
 ]
@@ -102,7 +102,7 @@ export default function PartnersPage() {
           </div>
           <div className="bg-gradient-to-br from-violet-600 to-violet-800 rounded-xl p-6 text-white text-center flex flex-col justify-center">
             <p className="text-violet-200 text-xs font-semibold uppercase tracking-widest mb-1">Flat Rate</p>
-            <div className="text-5xl font-black">$175</div>
+            <div className="text-5xl font-black">$185</div>
             <p className="text-violet-200 text-sm mt-1">per signing</p>
             <p className="text-violet-100 text-xs mt-3 border-t border-white/20 pt-3">No contracts · No minimums · All signing types</p>
           </div>
