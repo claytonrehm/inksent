@@ -1,9 +1,16 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { LayoutDashboard, ClipboardList, Users, LogOut, Settings } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { isAdminAuthed } from '@/lib/admin-auth'
 import InksentLogo from '@/components/InksentLogo'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  // Gate: every admin page requires a valid admin session.
+  if (!(await isAdminAuthed())) redirect('/admin-login')
+
   const supabase = await createClient()
   const { count } = await supabase
     .from('notaries')

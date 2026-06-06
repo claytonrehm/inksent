@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { isAdminAuthed } from '@/lib/admin-auth'
 import { sendSMS, buildDispatchMessage } from '@/lib/sms'
 import { format } from 'date-fns'
 
 export async function POST(req: NextRequest) {
+  if (!(await isAdminAuthed())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { order_id, notary_id } = await req.json()
 
   if (!order_id || !notary_id) {

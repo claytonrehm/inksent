@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { isAdminAuthed } from '@/lib/admin-auth'
 import { orderSchema } from '@/lib/validations'
 import { sendSMS } from '@/lib/sms'
 import { sendOrderConfirmationEmail, sendAdminOrderAlert } from '@/lib/email'
@@ -99,6 +100,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
+  if (!(await isAdminAuthed())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('orders')

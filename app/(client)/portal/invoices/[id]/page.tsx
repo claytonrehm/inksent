@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAuthClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import { buildInvoiceHTML } from '@/lib/invoice'
 import PrintButton from './PrintButton'
@@ -7,11 +7,11 @@ export const dynamic = 'force-dynamic'
 
 export default async function ClientInvoicePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
+  const auth = await createAuthClient()
+  const { data: { user } } = await auth.auth.getUser()
   if (!user) redirect('/login')
 
+  const supabase = await createClient()
   const { data: order } = await supabase
     .from('orders')
     .select('*')

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAuthClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { format } from 'date-fns'
 import { STATUS_COLORS, STATUS_LABELS, formatCurrency } from '@/lib/utils'
@@ -9,11 +9,12 @@ import { FileText, Plus } from 'lucide-react'
 export const dynamic = 'force-dynamic'
 
 export default async function PortalPage() {
-  const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
+  // Auth check uses the cookie-aware client; data reads use the service-role client.
+  const auth = await createAuthClient()
+  const { data: { user } } = await auth.auth.getUser()
   if (!user) redirect('/login')
 
+  const supabase = await createClient()
   const { data: orders } = await supabase
     .from('orders')
     .select('id, confirmation_number, status, signing_date, signing_time, signing_type, signer_name, property_city, property_state, client_fee, invoice_id, created_at')

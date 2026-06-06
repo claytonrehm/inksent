@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { isAdminAuthed } from '@/lib/admin-auth'
 import { lookupZip } from '@/lib/coverage'
 import { z } from 'zod'
 
@@ -14,6 +15,7 @@ const schema = z.object({
 })
 
 export async function POST(req: NextRequest) {
+  if (!(await isAdminAuthed())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const body = await req.json()
   const parsed = schema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: 'Check the required fields' }, { status: 400 })
@@ -42,6 +44,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
+  if (!(await isAdminAuthed())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const supabase = await createClient()
   const { data } = await supabase.from('notaries').select('*').order('name')
   return NextResponse.json(data ?? [])
