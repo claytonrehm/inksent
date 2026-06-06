@@ -48,6 +48,32 @@ export async function sendNotaryApprovedEmail(data: { name: string; email: strin
   })
 }
 
+// ─── Documents Ready for Notary ───────────────────────────────────────────────
+
+export async function sendNotaryDocsEmail(data: { notaryName: string; notaryEmail: string; signerName: string; docsUrl: string }) {
+  const firstName = data.notaryName.split(' ')[0]
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/>${META}</head>
+  <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111111;margin:0;padding:0;background:#f4f4f5;">
+  <div style="max-width:560px;margin:32px auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+    ${HEADER}
+    <div style="padding:32px;">
+      <div style="display:inline-block;background:#ede9fe;color:#5b21b6;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;">📄 Documents Ready</div>
+      <p style="font-size:16px;font-weight:700;color:#111111;margin:0 0 6px;">Your signing docs are ready, ${firstName}.</p>
+      <p style="font-size:14px;color:#555555;line-height:1.6;margin:0 0 22px;">The document package for your <strong>${data.signerName}</strong> signing is available to download. Please print everything and bring it to the appointment.</p>
+      <a href="${data.docsUrl}" style="display:block;text-align:center;background:#7c3aed;color:#ffffff;text-decoration:none;font-weight:700;padding:14px;border-radius:10px;font-size:15px;">View &amp; Download Documents →</a>
+      <p style="font-size:13px;color:#888888;line-height:1.6;margin:20px 0 0;">This is a private link for your assigned signing. Questions? Call or text (619) 949-3361.</p>
+    </div>
+    ${FOOTER}
+  </div></body></html>`
+
+  return getResend().emails.send({
+    from: 'Inksent <orders@inksent.co>',
+    to: data.notaryEmail,
+    subject: `Documents ready — ${data.signerName} signing`,
+    html,
+  })
+}
+
 // ─── Admin New Order Alert ────────────────────────────────────────────────────
 
 export async function sendAdminOrderAlert(data: {
@@ -327,6 +353,7 @@ export async function sendNotaryApplicationEmail(notary: {
 // ─── Order Confirmation (Title Company) ───────────────────────────────────────
 
 export async function sendOrderConfirmationEmail(order: {
+  id?: string
   confirmation_number: string
   client_name: string
   client_email: string
@@ -341,6 +368,8 @@ export async function sendOrderConfirmationEmail(order: {
   const dateStr = format(new Date(order.signing_date), 'EEEE, MMMM d, yyyy')
   const typeLabel = order.signing_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
   const firstName = order.client_name.split(' ')[0]
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'
+  const uploadUrl = order.id ? `${baseUrl}/upload/${order.id}` : null
 
   const nextItem = (text: string) => `<tr>
     <td width="24" valign="top" style="padding:4px 0;font-size:14px;color:#7c3aed;font-weight:700;">&#10003;</td>
@@ -371,11 +400,18 @@ export async function sendOrderConfirmationEmail(order: {
         ${detailRow('Fee', '<span style="font-weight:700;color:#5b21b6;">$175.00</span>', { last: true })}
       </table>
 
+      ${uploadUrl ? `<div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:18px 20px;margin:24px 0;">
+        <div style="font-size:14px;font-weight:700;color:#5b21b6;margin-bottom:4px;">📄 Send us the documents</div>
+        <div style="font-size:13px;color:#555;line-height:1.5;margin-bottom:14px;">Upload the signing package when it&rsquo;s ready — your assigned notary gets it automatically, even if coverage changes.</div>
+        <a href="${uploadUrl}" style="display:inline-block;background:#7c3aed;color:#fff;text-decoration:none;font-weight:700;padding:10px 18px;border-radius:8px;font-size:14px;">Upload Documents →</a>
+      </div>` : ''}
+
       <div style="background:#f8f8f8;border-radius:10px;padding:16px 20px;margin:24px 0;">
         <div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#888888;font-weight:600;margin-bottom:10px;">What happens next</div>
         <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
           ${nextItem('We&rsquo;re contacting signing agents in the area right now')}
           ${nextItem('You&rsquo;ll receive agent confirmation details once assigned')}
+          ${nextItem('Upload your documents anytime — we route them to the agent automatically')}
           ${nextItem('Invoice will be emailed after the signing is completed')}
         </table>
       </div>

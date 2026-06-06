@@ -94,6 +94,21 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         </Card>
       </div>
 
+      {/* Documents */}
+      <div className="mb-6 flex items-center justify-between bg-white border border-gray-200 rounded-xl px-5 py-4">
+        <div>
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Signing Documents</p>
+          <p className="text-sm mt-0.5">
+            {(order.documents?.length ?? 0) > 0
+              ? <span className="text-green-700 font-medium">{order.documents.length} file{order.documents.length === 1 ? '' : 's'} uploaded{order.notary_id ? ' · sent to assigned notary' : ' · will auto-send on accept'}</span>
+              : <span className="text-gray-400">None yet — title company uploads via their link</span>}
+          </p>
+        </div>
+        <a href={`/upload/${order.id}`} target="_blank" className="text-sm text-violet-600 font-semibold hover:underline whitespace-nowrap">
+          Upload link →
+        </a>
+      </div>
+
       {/* Invoice */}
       {order.invoice_id && (
         <div className="mb-6 flex items-center justify-between bg-green-50 border border-green-200 rounded-xl px-5 py-4">

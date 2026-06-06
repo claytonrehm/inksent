@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendSMS } from '@/lib/sms'
-import { sendNotaryAssignmentEmail, sendClientAssignmentEmail } from '@/lib/email'
+import { sendNotaryAssignmentEmail, sendClientAssignmentEmail, sendNotaryDocsEmail } from '@/lib/email'
 import { format } from 'date-fns'
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -82,6 +82,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       propertyCity: order.property_city,
       confirmationNumber: order.confirmation_number,
     }).catch(console.error)
+
+    // If documents are already uploaded, deliver them to whoever just accepted
+    // (this is what makes a backup notary instantly get the docs after a cancel)
+    const docs = (order.documents as unknown[] | null) ?? []
+    if (docs.length > 0) {
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'
+      sendNotaryDocsEmail({
+        notaryName: notary.name,
+        notaryEmail: notary.email,
+        signerName: order.signer_name,
+        docsUrl: `${baseUrl}/docs/${id}?notary=${notary_id}`,
+      }).catch(console.error)
+    }
   }
 
   return NextResponse.json({ ok: true })
