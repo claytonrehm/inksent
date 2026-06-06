@@ -128,19 +128,31 @@ export default function Home() {
             <p className="text-violet-400 font-semibold text-sm uppercase tracking-widest mb-3">Simple Process</p>
             <h2 className="text-4xl font-black text-white">How It Works</h2>
           </ScrollReveal>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {HOW_IT_WORKS.map(({ step, title, desc, icon }, i) => (
-              <ScrollReveal key={step} delay={i * 120}>
-                <div className="relative bg-white/[0.03] rounded-2xl p-8 border border-white/10 hover:border-violet-400/40 hover:bg-white/[0.05] transition-all duration-300 group h-full backdrop-blur-sm">
-                  <div className="w-14 h-14 bg-violet-500/15 rounded-2xl flex items-center justify-center text-2xl mb-5 group-hover:bg-violet-500/25 transition-colors">
-                    {icon}
+          <div className="relative">
+            {/* connecting path behind the step nodes (desktop) */}
+            <div className="hidden md:block absolute top-10 left-[16.66%] right-[16.66%] h-px bg-gradient-to-r from-violet-500/0 via-violet-500/60 to-violet-500/0" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-y-2 md:gap-8 relative">
+              {HOW_IT_WORKS.map(({ step, title, desc, icon }, i) => (
+                <ScrollReveal key={step} delay={i * 150}>
+                  <div className="relative flex flex-col items-center text-center px-4">
+                    {/* node on the path */}
+                    <div className="relative z-10 w-20 h-20 rounded-full bg-[#11111b] border border-violet-400/40 flex items-center justify-center text-3xl shadow-[0_0_40px_-8px_rgba(139,92,246,0.7)]">
+                      {icon}
+                      <span className="absolute -top-1.5 -right-1.5 w-7 h-7 rounded-full bg-violet-600 text-white text-[11px] font-black flex items-center justify-center ring-4 ring-[#07070d]">{step}</span>
+                    </div>
+                    <h3 className="mt-6 text-lg font-bold text-white">{title}</h3>
+                    <p className="mt-2 text-slate-400 text-sm leading-relaxed max-w-xs">{desc}</p>
+                    {/* mobile connector to the next step */}
+                    {i < HOW_IT_WORKS.length - 1 && (
+                      <div className="md:hidden flex flex-col items-center mt-5 mb-1 text-violet-400/50">
+                        <div className="w-px h-6 bg-gradient-to-b from-violet-500/0 to-violet-500/60" />
+                        <ArrowRight size={16} className="rotate-90 -mt-1" />
+                      </div>
+                    )}
                   </div>
-                  <div className="absolute top-6 right-7 text-3xl font-black text-white/10">{step}</div>
-                  <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
-                  <p className="text-slate-400 text-sm leading-relaxed">{desc}</p>
-                </div>
-              </ScrollReveal>
-            ))}
+                </ScrollReveal>
+              ))}
+            </div>
           </div>
         </div>
       </section>
