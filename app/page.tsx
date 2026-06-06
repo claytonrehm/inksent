@@ -119,7 +119,7 @@ export default function Home() {
           </ScrollReveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {HOW_IT_WORKS.map(({ step, title, desc, icon }, i) => (
-              <ScrollReveal key={step} delay={i * 120} zoom>
+              <ScrollReveal key={step} delay={i * 120}>
                 <div className="relative bg-white/[0.03] rounded-2xl p-8 border border-white/10 hover:border-violet-400/40 hover:bg-white/[0.05] transition-all duration-300 group h-full backdrop-blur-sm">
                   <div className="w-14 h-14 bg-violet-500/15 rounded-2xl flex items-center justify-center text-2xl mb-5 group-hover:bg-violet-500/25 transition-colors">
                     {icon}
@@ -146,7 +146,7 @@ export default function Home() {
           </ScrollReveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {FEATURES.map(({ icon, title, desc }, i) => (
-              <ScrollReveal key={title} delay={i * 70} zoom>
+              <ScrollReveal key={title} delay={i * 70}>
                 <div className="p-7 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-violet-400/40 hover:bg-white/[0.05] transition-all duration-300 group h-full backdrop-blur-sm">
                   <div className="bg-violet-500/15 text-violet-300 rounded-2xl p-3 w-fit mb-4 group-hover:bg-violet-500/25 group-hover:scale-110 transition-all">
                     {icon}
@@ -163,7 +163,7 @@ export default function Home() {
       {/* Two paths */}
       <section className="px-6 py-20">
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-          <ScrollReveal zoom>
+          <ScrollReveal>
             <Link href="/partners" className="block h-full group rounded-3xl border border-white/10 bg-gradient-to-br from-violet-600/20 to-transparent p-8 hover:border-violet-400/50 transition-all">
               <Building2 className="text-violet-300 mb-4" size={28} />
               <h3 className="text-2xl font-black text-white mb-2">For Title Companies</h3>
@@ -171,7 +171,7 @@ export default function Home() {
               <span className="inline-flex items-center gap-1.5 text-violet-300 font-semibold text-sm group-hover:gap-2.5 transition-all">View overview <ArrowRight size={15} /></span>
             </Link>
           </ScrollReveal>
-          <ScrollReveal zoom delay={100}>
+          <ScrollReveal delay={100}>
             <Link href="/join" className="block h-full group rounded-3xl border border-white/10 bg-gradient-to-br from-fuchsia-600/20 to-transparent p-8 hover:border-fuchsia-400/50 transition-all">
               <UserRoundCheck className="text-fuchsia-300 mb-4" size={28} />
               <h3 className="text-2xl font-black text-white mb-2">For Notaries</h3>
@@ -190,7 +190,7 @@ export default function Home() {
             <h2 className="text-4xl font-black text-white">One flat rate. No surprises.</h2>
             <p className="text-slate-400 mt-3 text-lg">No contracts, no minimums, no hidden fees.</p>
           </ScrollReveal>
-          <ScrollReveal zoom>
+          <ScrollReveal>
             <div className="max-w-sm mx-auto rounded-3xl p-8 text-center border border-violet-400/30 bg-gradient-to-b from-violet-600/15 to-white/[0.02] shadow-[0_0_60px_-15px_rgba(139,92,246,0.5)] backdrop-blur-sm">
               <p className="text-violet-300 font-semibold text-sm uppercase tracking-widest mb-4">Per Signing</p>
               <div className="flex items-end justify-center gap-1 mb-2">
@@ -228,7 +228,7 @@ export default function Home() {
             <h2 className="text-4xl font-black text-white mb-3">All 50 States</h2>
             <p className="text-slate-400 max-w-lg mx-auto">We dispatch signing agents coast to coast. Hover any state for details.</p>
           </ScrollReveal>
-          <ScrollReveal zoom>
+          <ScrollReveal>
             <USMap />
           </ScrollReveal>
         </div>
@@ -240,7 +240,7 @@ export default function Home() {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] rounded-full" style={{ background: 'radial-gradient(ellipse, rgba(139,92,246,0.18) 0%, transparent 70%)' }} />
         </div>
         <div className="relative max-w-2xl mx-auto text-center">
-          <ScrollReveal zoom>
+          <ScrollReveal>
             <h2 className="text-4xl sm:text-5xl font-black text-white mb-5 leading-tight">
               Ready to close{' '}
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-fuchsia-400">faster?</span>

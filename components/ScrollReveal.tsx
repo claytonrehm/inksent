@@ -20,10 +20,10 @@ export default function ScrollReveal({
   const inView = useInView(ref, { once: true, margin: '-60px' })
 
   const offsets = {
-    up: { y: 30, x: 0 },
-    down: { y: -30, x: 0 },
-    left: { y: 0, x: 30 },
-    right: { y: 0, x: -30 },
+    up: { y: 18, x: 0 },
+    down: { y: -18, x: 0 },
+    left: { y: 0, x: 18 },
+    right: { y: 0, x: -18 },
     none: { y: 0, x: 0 },
   }
 
@@ -31,9 +31,9 @@ export default function ScrollReveal({
     <motion.div
       ref={ref}
       className={className}
-      initial={{ opacity: 0, scale: zoom ? 0.92 : 1, ...offsets[direction] }}
+      initial={{ opacity: 0, scale: zoom ? 0.96 : 1, ...offsets[direction] }}
       animate={inView ? { opacity: 1, y: 0, x: 0, scale: 1 } : {}}
-      transition={{ duration: zoom ? 0.8 : 0.6, delay: delay / 1000, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.5, delay: delay / 1000, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>
