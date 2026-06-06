@@ -109,6 +109,16 @@ export default function OrderForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
 
+      {/* Honeypot — hidden from humans, catches bots. Do not remove. */}
+      <input
+        type="text"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        {...register('company_url' as never)}
+        style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, opacity: 0 }}
+      />
+
       {/* Signing Details */}
       <section>
         <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">

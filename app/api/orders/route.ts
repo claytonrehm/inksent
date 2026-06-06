@@ -9,6 +9,13 @@ import { format } from 'date-fns'
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
+
+    // Honeypot: a hidden field real users never fill. Bots do. Silently accept
+    // so the bot thinks it worked, but never create or dispatch anything.
+    if (body.company_url) {
+      return NextResponse.json({ id: 'ok', confirmation_number: 'RECEIVED' })
+    }
+
     const parsed = orderSchema.safeParse(body)
 
     if (!parsed.success) {
@@ -38,28 +45,14 @@ export async function POST(req: NextRequest) {
     const dateStr = format(new Date(data.signing_date), 'MMM d')
     const typeStr = data.signing_type.replace(/_/g, ' ')
 
-    // Spam gate: only auto-blast for known clients (a prior released order from this email).
-    // First-time clients are held for a 1-tap review so randoms can't blast your notaries.
-    const { count: priorOrders } = await supabase
-      .from('orders')
-      .select('id', { count: 'exact', head: true })
-      .eq('client_email', data.client_email)
-      .eq('hold_for_review', false)
-      .neq('id', data.id)
-    const knownClient = (priorOrders ?? 0) > 0
-
-    let blastNote: string
-    if (!knownClient) {
-      await supabase.from('orders').update({ hold_for_review: true, status: 'pending' }).eq('id', data.id)
-      blastNote = `🔒 First order from ${data.client_company} — held for your review (not blasted). Release it from the order page to dispatch.`
-    } else {
-      const { blastCount, totalActive } = await blastOrderToCoveringNotaries(supabase, data)
-      blastNote = blastCount > 0
-        ? `Auto-blasted to ${blastCount} notar${blastCount === 1 ? 'y' : 'ies'} covering ${data.property_zip} — first to accept wins.`
-        : totalActive === 0
-          ? 'No active onboarded notaries yet — approve/onboard some, then dispatch manually.'
-          : `⚠️ No onboarded notary covers ZIP ${data.property_zip}. Dispatch manually or recruit coverage there.`
-    }
+    // Fully automatic: every valid order dispatches immediately, zero touch.
+    // (Bots are filtered by the honeypot before we ever get here.)
+    const { blastCount, totalActive } = await blastOrderToCoveringNotaries(supabase, data)
+    const blastNote = blastCount > 0
+      ? `Auto-blasted to ${blastCount} notar${blastCount === 1 ? 'y' : 'ies'} covering ${data.property_zip} — first to accept wins.`
+      : totalActive === 0
+        ? 'No active onboarded notaries yet — approve/onboard some.'
+        : `⚠️ No onboarded notary covers ZIP ${data.property_zip} — recruit coverage there.`
 
     if (process.env.ADMIN_PHONE) {
       sendSMS(
