@@ -1,4 +1,5 @@
 import { sendSMS, buildDispatchMessage } from '@/lib/sms'
+import { sendNotaryJobOfferEmail } from '@/lib/email'
 import { notaryCoversZip } from '@/lib/coverage'
 import { format } from 'date-fns'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -29,7 +30,7 @@ export async function blastOrderToCoveringNotaries(
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'
   const { data: notaries } = await supabase
     .from('notaries')
-    .select('id, name, phone, base_zip, coverage_radius, onboarded_at, languages')
+    .select('id, name, phone, email, base_zip, coverage_radius, onboarded_at, languages')
     .eq('active', true)
 
   const exclude = new Set(opts.exclude ?? [])
@@ -54,24 +55,51 @@ export async function blastOrderToCoveringNotaries(
 
   let blastCount = 0
   if (covering.length > 0) {
+    const dateLabel = format(new Date(order.signing_date), 'EEEE, MMM d')
+    // Reach each covering notary by EMAIL and SMS. Email always works; SMS works
+    // once A2P clears. A notary counts as reached if either channel succeeds —
+    // so dispatch is fully operational even before Twilio A2P is approved.
     const results = await Promise.allSettled(
-      covering.map((n) => {
+      covering.map(async (n) => {
         const acceptUrl = `${baseUrl}/accept/${order.id}?notary=${n.id}`
-        return sendSMS(
-          n.phone,
-          buildDispatchMessage({
-            notaryName: n.name.split(' ')[0],
-            signerName: order.signer_name,
-            signingType: order.signing_type,
-            signingDate: format(new Date(order.signing_date), 'EEEE, MMM d'),
-            signingTime: order.signing_time,
-            propertyAddress: order.property_address,
-            propertyCity: order.property_city,
-            propertyZip: order.property_zip,
-            fee: order.notary_fee,
-            acceptUrl,
-          })
-        )
+        const channels = await Promise.allSettled([
+          n.email
+            ? sendNotaryJobOfferEmail({
+                notaryName: n.name.split(' ')[0],
+                notaryEmail: n.email,
+                signerName: order.signer_name,
+                signingType: order.signing_type,
+                signingDate: dateLabel,
+                signingTime: order.signing_time,
+                propertyAddress: order.property_address,
+                propertyCity: order.property_city,
+                propertyZip: order.property_zip,
+                fee: order.notary_fee,
+                acceptUrl,
+              })
+            : Promise.reject(new Error('no email')),
+          n.phone
+            ? sendSMS(
+                n.phone,
+                buildDispatchMessage({
+                  notaryName: n.name.split(' ')[0],
+                  signerName: order.signer_name,
+                  signingType: order.signing_type,
+                  signingDate: dateLabel,
+                  signingTime: order.signing_time,
+                  propertyAddress: order.property_address,
+                  propertyCity: order.property_city,
+                  propertyZip: order.property_zip,
+                  fee: order.notary_fee,
+                  acceptUrl,
+                })
+              )
+            : Promise.reject(new Error('no phone')),
+        ])
+        if (channels.every((c) => c.status === 'rejected')) {
+          throw new Error('all channels failed')
+        }
+        return true
       })
     )
     blastCount = results.filter((r) => r.status === 'fulfilled').length

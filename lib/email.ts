@@ -310,6 +310,58 @@ export async function sendSigningCompleteEmail(data: {
   })
 }
 
+// ─── Job Offer to a Notary (email channel — works with or without SMS) ────────
+export async function sendNotaryJobOfferEmail(data: {
+  notaryName: string
+  notaryEmail: string
+  signerName: string
+  signingType: string
+  signingDate: string
+  signingTime: string
+  propertyAddress: string
+  propertyCity: string
+  propertyZip: string
+  fee: number
+  acceptUrl: string
+}) {
+  const typeLabel = data.signingType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  const feeStr = `$${(data.fee / 100).toFixed(0)}`
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/>${META}</head>
+  <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111111;margin:0;padding:0;background:#f4f4f5;">
+  <div style="max-width:560px;margin:32px auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+    ${HEADER}
+    <div style="padding:32px;">
+      <p style="font-size:16px;font-weight:700;color:#111111;margin:0 0 4px;">New signing opportunity — ${feeStr}</p>
+      <p style="font-size:14px;color:#555555;margin:0 0 20px;line-height:1.6;">Hi ${data.notaryName}, a signing in your area just opened up. First to accept gets it.</p>
+
+      <div style="background:#f8f8f8;border-radius:10px;padding:8px 20px;margin:0 0 20px;">
+        <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+          ${detailRow('Your pay', `<span style="color:#16a34a;font-weight:700;">${feeStr}</span>`, { bold: true })}
+          ${detailRow('Type', `${typeLabel} Signing`)}
+          ${detailRow('Signer', data.signerName)}
+          ${detailRow('Date', data.signingDate, { bold: true })}
+          ${detailRow('Time', data.signingTime, { bold: true })}
+          ${detailRow('Location', `${data.propertyAddress}, ${data.propertyCity} ${data.propertyZip}`, { last: true })}
+        </table>
+      </div>
+
+      <table width="100%" cellpadding="0" cellspacing="0" role="presentation"><tr><td align="center">
+        <a href="${data.acceptUrl}" style="display:inline-block;background:#7c3aed;color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:14px 36px;border-radius:10px;">Accept this signing →</a>
+      </td></tr></table>
+
+      <p style="font-size:13px;color:#999999;margin:18px 0 0;text-align:center;">⏱ First to accept wins — this offer may expire soon.</p>
+    </div>
+    ${FOOTER}
+  </div></body></html>`
+
+  return getResend().emails.send({
+    from: 'Inksent Dispatch <orders@inksent.co>',
+    to: data.notaryEmail,
+    subject: `New signing — ${feeStr} · ${typeLabel} · ${data.signingDate}`,
+    html,
+  })
+}
+
 const HEADER = `
   <div style="background:#000;padding:24px 32px;">
     <div style="font-size:24px;font-weight:900;letter-spacing:-0.5px;">
