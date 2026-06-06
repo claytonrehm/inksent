@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { sendNotaryApplicationEmail } from '@/lib/email'
 import { lookupZip } from '@/lib/coverage'
 import { SIGNINGS_LABEL } from '@/lib/notary'
+import { verifyTurnstile } from '@/lib/turnstile'
 
 const schema = z.object({
   name: z.string().min(2),
@@ -24,6 +25,11 @@ const schema = z.object({
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
+
+  // Bot protection (no-op until Turnstile keys are configured)
+  const okHuman = await verifyTurnstile(body?.turnstileToken, req.headers.get('x-forwarded-for') ?? undefined)
+  if (!okHuman) return NextResponse.json({ error: 'Verification failed. Please try again.' }, { status: 400 })
+
   const parsed = schema.safeParse(body)
 
   if (!parsed.success) {

@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
+import Turnstile from '@/components/Turnstile'
 
 const SIGNING_TYPES = [
   { value: 'purchase', label: 'Purchase' },
@@ -57,6 +58,7 @@ interface ConfirmationState {
 export default function OrderForm() {
   const [confirmation, setConfirmation] = useState<ConfirmationState | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [captchaToken, setCaptchaToken] = useState('')
 
   const {
     register,
@@ -73,7 +75,7 @@ export default function OrderForm() {
     const res = await fetch('/api/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify({ ...data, turnstileToken: captchaToken }),
     })
 
     if (!res.ok) {
@@ -299,7 +301,8 @@ export default function OrderForm() {
         </p>
       )}
 
-      <div className="flex justify-end pt-2">
+      <div className="flex flex-col items-end gap-3 pt-2">
+        <Turnstile onToken={setCaptchaToken} />
         <Button type="submit" size="lg" loading={isSubmitting}>
           {isSubmitting ? 'Placing Order...' : 'Place Signing Order'}
         </Button>

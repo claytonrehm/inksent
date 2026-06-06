@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { formatPhone } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { compressImage } from '@/lib/compress-image'
+import Turnstile from '@/components/Turnstile'
 
 const schema = z.object({
   name: z.string().min(2, 'Name required'),
@@ -34,6 +35,7 @@ export default function NotaryApplyForm() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [photoError, setPhotoError] = useState<string | null>(null)
   const [cityLabel, setCityLabel] = useState<string | null>(null)
+  const [captchaToken, setCaptchaToken] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm<FormData>({
@@ -93,7 +95,7 @@ export default function NotaryApplyForm() {
       const res = await fetch('/api/notary-apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, photo_url }),
+        body: JSON.stringify({ ...data, photo_url, turnstileToken: captchaToken }),
       })
       if (res.status === 409) {
         const j = await res.json().catch(() => ({}))
@@ -278,6 +280,8 @@ export default function NotaryApplyForm() {
       </section>
 
       {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">{error}</p>}
+
+      <Turnstile onToken={setCaptchaToken} />
 
       <Button type="submit" size="lg" loading={isSubmitting} className="w-full">
         {isSubmitting ? 'Submitting...' : 'Join the Network'}

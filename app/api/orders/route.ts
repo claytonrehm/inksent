@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { isAdminAuthed } from '@/lib/admin-auth'
+import { verifyTurnstile } from '@/lib/turnstile'
 import { orderSchema } from '@/lib/validations'
 import { sendSMS } from '@/lib/sms'
 import { sendOrderConfirmationEmail, sendAdminOrderAlert } from '@/lib/email'
@@ -16,6 +17,10 @@ export async function POST(req: NextRequest) {
     if (body.company_url) {
       return NextResponse.json({ id: 'ok', confirmation_number: 'RECEIVED' })
     }
+
+    // CAPTCHA (no-op until Turnstile keys are configured)
+    const okHuman = await verifyTurnstile(body?.turnstileToken, req.headers.get('x-forwarded-for') ?? undefined)
+    if (!okHuman) return NextResponse.json({ error: 'Verification failed. Please try again.' }, { status: 400 })
 
     const parsed = orderSchema.safeParse(body)
 
