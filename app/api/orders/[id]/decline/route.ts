@@ -56,12 +56,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   let backupNote = ''
   if (wasOnHook) {
-    // Instant backup: reset and re-blast to every other covering notary
-    await supabase.from('orders').update({ notary_id: null, status: 'pending' }).eq('id', id)
-    const { blastCount } = await blastOrderToCoveringNotaries(supabase, order, { exclude: [notary_id] })
+    // Accumulate everyone who has bailed on this order, so we never re-offer to them
+    const declinedBy = Array.from(new Set([...(order.declined_by ?? []), notary_id]))
+    await supabase.from('orders').update({ notary_id: null, status: 'pending', declined_by: declinedBy }).eq('id', id)
+
+    // Re-blast to every covering notary who HASN'T bailed yet
+    const { blastCount } = await blastOrderToCoveringNotaries(supabase, order, { exclude: declinedBy })
     backupNote = blastCount > 0
-      ? ` Auto-reblasted to ${blastCount} backup notar${blastCount === 1 ? 'y' : 'ies'} — first to accept wins.`
-      : ' ⚠️ No other notary covers this area — dispatch manually.'
+      ? ` Auto-reblasted to ${blastCount} remaining backup${blastCount === 1 ? '' : 's'} — first to accept wins.`
+      : ` ⚠️ All ${declinedBy.length} covering notar${declinedBy.length === 1 ? 'y has' : 'ies have'} now passed — dispatch manually or recruit more coverage.`
   }
 
   if (process.env.ADMIN_PHONE) {
