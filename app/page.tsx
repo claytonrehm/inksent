@@ -338,7 +338,7 @@ export default function Home() {
               <span className="hidden sm:block">·</span>
               <Link href="/join" className="hover:text-slate-300 transition-colors">For Notaries</Link>
               <span className="hidden sm:block">·</span>
-              <Link href="/partners" className="hover:text-slate-300 transition-colors">For Title Cos</Link>
+              <Link href="/partners" className="hover:text-slate-300 transition-colors">For Title Companies</Link>
             </div>
           </div>
           <div className="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
