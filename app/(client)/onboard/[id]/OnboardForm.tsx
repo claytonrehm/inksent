@@ -18,8 +18,6 @@ const schema = z.object({
   eo_policy: z.string().optional(),
   eo_expiry: z.string().min(1, 'Required'),
   has_dual_tray: z.enum(['yes', 'no'], { message: 'Please select' }),
-  payment_method: z.string().min(1, 'Please select'),
-  payment_handle: z.string().min(2, 'Required'),
   w9_acknowledged: z.literal(true, { message: 'Required' }),
   ic_acknowledged: z.literal(true, { message: 'Required' }),
 })
@@ -31,10 +29,9 @@ export default function OnboardForm({ notaryId, notaryName }: { notaryId: string
   const [done, setDone] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [languages, setLanguages] = useState<string[]>([])
-  const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<FormData>({
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
   })
-  const method = watch('payment_method')
 
   function toggleLang(l: string) {
     setLanguages((p) => p.includes(l) ? p.filter((x) => x !== l) : [...p, l])
@@ -130,26 +127,11 @@ export default function OnboardForm({ notaryId, notaryName }: { notaryId: string
       </section>
 
       {/* Payment */}
-      <section className="space-y-4">
-        <p className="text-sm font-semibold text-gray-700">How should we pay you?</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Method *</label>
-            <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
-              {...register('payment_method')}>
-              <option value="">Select...</option>
-              <option value="zelle">Zelle</option>
-              <option value="venmo">Venmo</option>
-              <option value="paypal">PayPal</option>
-              <option value="check">Check (mailed)</option>
-            </select>
-            {errors.payment_method && <p className="text-xs text-red-500 mt-1">{errors.payment_method.message}</p>}
-          </div>
-          <Input id="payment_handle"
-            label={method === 'check' ? 'Mailing Address *' : 'Handle / Email *'}
-            placeholder={method === 'check' ? '123 Main St, San Diego CA 92101' : '@janesmith or jane@email.com'}
-            error={errors.payment_handle?.message} {...register('payment_handle')} />
-        </div>
+      <section className="bg-violet-50 border border-violet-100 rounded-xl p-4">
+        <p className="text-sm font-semibold text-gray-900">How you&apos;ll get paid</p>
+        <p className="text-sm text-gray-600 mt-1">
+          Payouts are sent by <b>secure direct deposit</b> — automatically, once the client pays for the signing (no chasing checks). After you submit this profile, the next step is a 2-minute bank connection through our payments partner, <b>Stripe</b>.
+        </p>
       </section>
 
       {/* W-9 */}

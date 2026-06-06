@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { isAdminAuthed } from '@/lib/admin-auth'
 import { sendSMS } from '@/lib/sms'
 
+// Notary-facing: the [id] in the URL is the notary's unguessable UUID, which
+// acts as the capability token (same pattern as accept/decline). NOT admin-gated.
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await isAdminAuthed())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { id } = await params
   const d = await req.json()
 
@@ -19,8 +19,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     eo_policy: d.eo_policy || null,
     eo_expiry: d.eo_expiry || null,
     has_dual_tray: d.has_dual_tray === 'yes',
-    payment_method: d.payment_method || null,
-    payment_handle: d.payment_handle || null,
     languages: Array.isArray(d.languages) ? d.languages : [],
     onboarded_at: new Date().toISOString(),
   }).eq('id', id)
@@ -32,7 +30,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (process.env.ADMIN_PHONE && n) {
     sendSMS(
       process.env.ADMIN_PHONE,
-      `✅ ${n.name} completed onboarding — credentials + payment info on file. (W-9 still to be emailed.)`
+      `✅ ${n.name} completed their profile — credentials + E&O on file. Next they connect direct deposit (Stripe).`
     ).catch(console.error)
   }
 
