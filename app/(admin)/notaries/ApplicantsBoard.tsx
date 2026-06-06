@@ -151,17 +151,16 @@ export default function ApplicantsBoard({ applicants, mode = 'pending' }: { appl
               className="flex items-center gap-1.5 bg-green-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-green-700 disabled:opacity-50">
               <CheckCircle size={13} /> Approve all
             </button>
-            {mode === 'pending' ? (
+            {mode === 'pending' && (
               <button onClick={() => bulk('deny')} disabled={busy === 'bulk'}
                 className="flex items-center gap-1.5 text-red-600 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 disabled:opacity-50">
                 <XCircle size={13} /> Deny all
               </button>
-            ) : (
-              <button onClick={() => bulk('delete')} disabled={busy === 'bulk'}
-                className="flex items-center gap-1.5 text-red-600 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 disabled:opacity-50">
-                <Trash2 size={13} /> Delete all
-              </button>
             )}
+            <button onClick={() => bulk('delete')} disabled={busy === 'bulk'}
+              className="flex items-center gap-1.5 text-gray-500 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 hover:text-red-600 disabled:opacity-50">
+              <Trash2 size={13} /> Delete all
+            </button>
             <button onClick={() => setSelected(new Set())} className="text-xs text-gray-400 hover:underline ml-auto">Clear selection</button>
           </div>
         )}
@@ -216,17 +215,23 @@ export default function ApplicantsBoard({ applicants, mode = 'pending' }: { appl
                   <CheckCircle size={13} /> Approve
                 </button>
                 {mode === 'pending' ? (
-                  <button onClick={() => act(a.id, 'deny')} disabled={busy === a.id}
-                    className="flex items-center gap-1.5 text-red-600 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 disabled:opacity-50 whitespace-nowrap">
-                    <XCircle size={13} /> Deny
-                  </button>
+                  <>
+                    <button onClick={() => act(a.id, 'deny')} disabled={busy === a.id}
+                      className="flex items-center gap-1.5 text-red-600 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 disabled:opacity-50 whitespace-nowrap">
+                      <XCircle size={13} /> Deny
+                    </button>
+                    <button onClick={() => act(a.id, 'delete')} disabled={busy === a.id} title="Permanently delete — no notification sent"
+                      className="flex items-center gap-1.5 text-gray-400 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 hover:text-red-600 disabled:opacity-50 whitespace-nowrap">
+                      <Trash2 size={13} /> Delete
+                    </button>
+                  </>
                 ) : (
                   <>
                     <button onClick={() => act(a.id, 'restore')} disabled={busy === a.id}
                       className="flex items-center gap-1.5 text-violet-600 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-violet-50 disabled:opacity-50 whitespace-nowrap">
                       <RotateCcw size={13} /> Restore
                     </button>
-                    <button onClick={() => act(a.id, 'delete')} disabled={busy === a.id}
+                    <button onClick={() => act(a.id, 'delete')} disabled={busy === a.id} title="Permanently delete"
                       className="flex items-center gap-1.5 text-gray-400 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 hover:text-red-600 disabled:opacity-50 whitespace-nowrap">
                       <Trash2 size={13} /> Delete
                     </button>
