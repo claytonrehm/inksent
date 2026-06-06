@@ -1,133 +1,62 @@
 # Inksent — Go-Live Checklist
 
-Everything left before you're fully operational, in order. Code is done; these are owner actions.
+The entire product is built. What's left is operational. Updated to track what's done.
 
 ---
 
-## PHASE 1 — Activate the code (~15 min, do first)
+## ✅ DONE
 
-### 1. Run the consolidated database migration
-Paste this **entire block** into Supabase → SQL Editor → Run. It's idempotent (safe to run even if you've already run parts).
-
-```sql
--- ORDERS columns
-alter table orders add column if not exists client_paid_at timestamptz;
-alter table orders add column if not exists notary_paid_at timestamptz;
-alter table orders add column if not exists dispatched_to text[] not null default '{}';
-alter table orders add column if not exists documents jsonb not null default '[]'::jsonb;
-alter table orders add column if not exists completed_at timestamptz;
-alter table orders add column if not exists scan_backs jsonb not null default '[]'::jsonb;
-alter table orders add column if not exists dispatched_at timestamptz;
-alter table orders add column if not exists escalated_at timestamptz;
-alter table orders add column if not exists hold_for_review boolean not null default false;
-alter table orders add column if not exists language_needed text;
-alter table orders add column if not exists borrower_notified_at timestamptz;
-alter table orders add column if not exists payment_reminders integer not null default 0;
-alter table orders add column if not exists declined_by text[] not null default '{}';
-
--- NOTARIES columns
-alter table notaries add column if not exists photo_url text;
-alter table notaries add column if not exists nna_number text;
-alter table notaries add column if not exists commission_state_code text;
-alter table notaries add column if not exists commission_expiry date;
-alter table notaries add column if not exists eo_carrier text;
-alter table notaries add column if not exists eo_expiry date;
-alter table notaries add column if not exists eo_policy text;
-alter table notaries add column if not exists bgc_provider text;
-alter table notaries add column if not exists bgc_date date;
-alter table notaries add column if not exists years_experience integer;
-alter table notaries add column if not exists signings_completed text;
-alter table notaries add column if not exists background_checked boolean default false;
-alter table notaries add column if not exists notes text;
-alter table notaries add column if not exists availability_notes text;
-alter table notaries add column if not exists signing_types_comfort text[] default '{}';
-alter table notaries add column if not exists languages text[] not null default '{}';
-alter table notaries add column if not exists payment_method text;
-alter table notaries add column if not exists payment_handle text;
-alter table notaries add column if not exists has_dual_tray boolean;
-alter table notaries add column if not exists onboarded_at timestamptz;
-alter table notaries add column if not exists sms_consent_at timestamptz;
-alter table notaries add column if not exists times_declined integer default 0;
-alter table notaries add column if not exists times_cancelled integer default 0;
-alter table notaries add column if not exists stripe_account_id text;
-alter table notaries add column if not exists payouts_enabled boolean not null default false;
-
--- RATINGS table
-create table if not exists notary_ratings (
-  id uuid primary key default gen_random_uuid(),
-  created_at timestamptz default now(),
-  order_id uuid references orders(id) unique,
-  notary_id uuid references notaries(id),
-  rating integer check (rating between 1 and 5),
-  on_time boolean, docs_complete boolean, professional boolean, notes text
-);
-
--- CANCELLATIONS table
-create table if not exists notary_cancellations (
-  id uuid primary key default gen_random_uuid(),
-  created_at timestamptz default now(),
-  notary_id uuid references notaries(id) on delete cascade,
-  order_id uuid references orders(id) on delete set null,
-  hours_before_signing numeric, signer_name text, confirmation_number text
-);
-create index if not exists notary_cancellations_notary_idx on notary_cancellations(notary_id);
-
--- STORAGE buckets + policies
-insert into storage.buckets (id, name, public) values ('notary-photos','notary-photos',true) on conflict (id) do nothing;
-insert into storage.buckets (id, name, public) values ('signing-docs','signing-docs',false) on conflict (id) do nothing;
-drop policy if exists "Public read" on storage.objects;
-drop policy if exists "Anon upload" on storage.objects;
-drop policy if exists "Anon upload signing docs" on storage.objects;
-create policy "Public read" on storage.objects for select using (bucket_id = 'notary-photos');
-create policy "Anon upload" on storage.objects for insert with check (bucket_id = 'notary-photos');
-create policy "Anon upload signing docs" on storage.objects for insert with check (bucket_id = 'signing-docs');
-```
-
-### 2. Supabase auth redirect URL
-Supabase → Authentication → URL Configuration → Site URL `https://inksent.co`, add redirect `https://inksent.co/portal`.
-
-### 3. DMARC record (email deliverability) — ✅ DONE
-Confirmed live in DNS: `v=DMARC1; p=quarantine; rua=mailto:orders@inksent.co`
+- [x] **Full product built** — site, order flow, radius matching, applicant filtering + vetting, onboarding, document routing, backup-on-cancel, cancellation tracking, live tracker, borrower texts, bilingual matching, self-complete + scan-backs, escalation + invoice auto-reminders, Stripe payment links + Connect payout code, FAQ/privacy/terms, sell sheets
+- [x] **Database migration** — consolidated migration run in Supabase
+- [x] **Website** — dark redesign, founder/About section ($200M+), hero product mockup, two sell sheets (`/partners`, `/join`), ink-drop logo live
+- [x] **DMARC** — live in DNS
+- [x] **Resend** — verified + upgraded plan
+- [x] **EIN** — 42-2961534
+- [x] **Zero-touch order flow** — orders auto-dispatch, honeypot bot filter
+- [x] **Twilio A2P** — submitted (in manual review — waiting on them)
 
 ---
 
-## PHASE 2 — Payments (when ready; optional to launch)
+## 🟢 DO NOW — all in parallel, none block each other
 
-### 4. Stripe
-- Create account at stripe.com (use your EIN)
-- Copy **Secret key** → add to Vercel as `STRIPE_SECRET_KEY` (Production)
-- **Enable Connect** (Dashboard → search "Connect" → Get started → Platform/Marketplace)
-- **Webhook**: Developers → Webhooks → Add endpoint `https://inksent.co/api/stripe/webhook`, events: `checkout.session.completed` + `account.updated` → copy signing secret → add to Vercel as `STRIPE_WEBHOOK_SECRET`
-- Enable **ACH Direct Debit** (Settings → Payment methods) for low fees
-- Redeploy, then have Claude run the live money test
+**Recruiting notaries is NOT gated by the bank account or insurance. Start it today.**
 
-> Skippable for launch — invoices fall back to "net 30, pay by check" if Stripe isn't set.
+- [ ] **Recruit notaries** — post `inksent.co/join` in SD notary Facebook/WhatsApp groups; DM contacts. Applications collect with zero dependencies.
+- [ ] **Finish Stripe** — secret key + enable Connect (Marketplace) + webhook (`checkout.session.completed`, `account.updated`) + ACH. *Needed before you approve/onboard notaries so their payout setup works.*
+- [ ] **Open business bank account** — Mercury (mercury.com), ~15 min, EIN ready. *Stripe deposits your earnings here; needed before money actually moves.*
+- [ ] **Pick the logo** — choose from `inksent.co/brand` (one-line swap to lock it).
 
 ---
 
-## PHASE 3 — Waiting on others (nothing to do but follow up)
+## 🟡 BEFORE YOU APPROVE / ONBOARD NOTARIES
 
-### 5. Twilio A2P 10DLC
-In manual review (you emailed your DL + CP-575). Until approved, **all SMS is queued** — the business runs on email. Once approved: set the SMS webhook + register the campaign. **Don't wait on this to start recruiting notaries.**
-
----
-
-## PHASE 4 — Business legitimacy (this week)
-
-- [ ] **Business bank account** — Mercury (mercury.com), ~15 min, EIN ready
-- [ ] **E&O + General Liability quote** — Next Insurance (~$500–800/yr); get before title-company orders
-- [ ] **LLC** — talk to a CPA (TN vs CA); not required to start, do once revenue flows
+- [ ] Stripe live (above) — so onboarding → payout connect is seamless
+- [ ] Approve applicants at `inksent.co/notaries` (verify each via one-click NNA/Google links)
+- [ ] Notaries onboard + connect their payout bank
 
 ---
 
-## PHASE 5 — Go to market
+## 🟠 BEFORE YOUR FIRST TITLE-COMPANY ORDER
 
-- [ ] **Recruit notaries** — post `inksent.co/join` in SD notary Facebook/WhatsApp groups; DM contacts
-- [ ] **Review & approve** at `inksent.co/notaries` — verify each via the one-click NNA/Google links
-- [ ] **Get 5+ SD notaries** approved & onboarded (payout bank connected)
-- [ ] **Tell Summit Settlement** you're ready; send `inksent.co/partners`
-- [ ] **First real order** → watch the automated loop run
+- [ ] **E&O + General Liability insurance** — Next Insurance (~$500–800/yr). Title companies will ask. Get it before pitching/taking orders.
+- [ ] 5+ SD notaries approved & onboarded (a real bench)
+- [ ] **Twilio A2P approved** — so job-dispatch texts deliver (you'll likely have this by the time you have orders)
 
 ---
 
-*Built and ready: the entire product. What's left is operational. Knock out Phase 1 today and you're live for notary recruiting immediately.*
+## ⚪ LATER (not blocking launch)
+
+- [ ] **LLC** — talk to a CPA (TN vs CA). Do once revenue flows.
+- [ ] **Virtual business address** — for privacy (Stripe support address, future LLC filings). iPostal1 / Anytime Mailbox, ~$10–30/mo.
+- [ ] **Supabase auth redirect URL** — only matters if you push clients to use the `/portal` login. Low priority.
+
+---
+
+## 🚀 THE SEQUENCE
+
+1. **Today:** recruit notaries (`/join`) + finish Stripe + open Mercury account — in parallel.
+2. **This week:** approve your first batch → they onboard + connect payouts. Get an E&O quote.
+3. **Then:** pitch title companies (`inksent.co/partners`) once you have a bench + E&O.
+4. **First real order** → the automated loop runs hands-off.
+
+*The correct order: recruit notaries FIRST (longest lead time, no dependencies). Bank account before money moves. E&O before title orders. They're parallel tracks, not a strict line.*
