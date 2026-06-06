@@ -86,8 +86,8 @@ create policy "Anon upload signing docs" on storage.objects for insert with chec
 ### 2. Supabase auth redirect URL
 Supabase → Authentication → URL Configuration → Site URL `https://inksent.co`, add redirect `https://inksent.co/portal`.
 
-### 3. DMARC record (email deliverability)
-Cloudflare DNS → add TXT record: name `_dmarc`, value `v=DMARC1; p=quarantine; rua=mailto:orders@inksent.co`
+### 3. DMARC record (email deliverability) — ✅ DONE
+Confirmed live in DNS: `v=DMARC1; p=quarantine; rua=mailto:orders@inksent.co`
 
 ---
 
