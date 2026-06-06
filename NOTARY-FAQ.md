@@ -13,6 +13,10 @@ and **honest** — never overpromise job volume. Accurate to how the system work
 **"How much do I make per signing?"**
 > $90 per completed signing here in San Diego. As we grow we may pay more for complex or longer-distance jobs.
 
+**"Is it the same $90 whether it's 45 pages or 145 pages?"**
+> Yes — $90 is a flat fee per signing, the same regardless of page count. Loan packages tend to run on the larger side anyway, so it's priced with that in mind. If something's ever unusually large or out of the ordinary, I'll flag it and adjust up front — never a surprise to you. 😊
+> *(Internal note: you can bump the fee per-job when you dispatch a monster package or one needing multiple trips — the "flat $90" promise still holds for normal signings.)*
+
 **"How fast do I get paid?"**
 > Payout is released automatically once the client pays for that signing — no waiting on you to invoice or follow up. It deposits straight to your bank.
 
