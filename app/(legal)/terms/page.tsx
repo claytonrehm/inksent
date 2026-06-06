@@ -6,40 +6,55 @@ export default function TermsPage() {
       <h1 className="text-3xl font-black text-gray-900">Terms of Service</h1>
       <p className="text-gray-400">Last updated: June 2026</p>
 
-      <p>These terms govern your use of Inksent Signing Services (&ldquo;Inksent&rdquo;). By placing an order, submitting an application, or using our website, you agree to these terms.</p>
+      <p>These Terms of Service (&ldquo;Terms&rdquo;) govern your access to and use of Inksent Signing Services (&ldquo;Inksent,&rdquo; &ldquo;we,&rdquo; &ldquo;us&rdquo;). <b>By placing an order, submitting an application, checking a box indicating acceptance, or otherwise using our website or services, you agree to these Terms.</b> If you do not agree, do not use the service.</p>
 
-      <H>Our service</H>
-      <p>Inksent coordinates notary signing-agent services by matching independent signing agents to signing appointments requested by clients (title companies, escrow officers, and lenders). Inksent is a dispatch and coordination service.</p>
+      <H>1. What we do</H>
+      <p>Inksent is a <b>dispatch and coordination service</b>. We match independent notary signing agents (&ldquo;Signing Agents&rdquo;) to signing appointments requested by clients (title companies, escrow officers, lenders, and similar parties). <b>Inksent is not a law firm, is not a notary, and does not itself perform notarizations or provide legal, financial, or escrow advice.</b> Signing Agents are independent contractors, not employees or agents of Inksent.</p>
 
-      <H>For clients</H>
+      <H>2. For clients</H>
       <ul className="list-disc pl-5 space-y-1">
-        <li>Our flat fee is $185 per signing unless otherwise agreed in writing.</li>
-        <li>Payment is due within 30 days of a completed signing.</li>
-        <li>You are responsible for providing accurate signing details and documents.</li>
-        <li>We aim to confirm a signing agent quickly but do not guarantee availability in every location at every time.</li>
+        <li>Our fee is as quoted at the time of order (currently a flat rate per signing) unless otherwise agreed in writing.</li>
+        <li>Payment is due within <b>30 days</b> of a completed signing. Past-due amounts may accrue reasonable late fees and collection costs.</li>
+        <li>You are responsible for providing accurate, complete, and lawful signing details, documents, and signer information, and for ensuring you have the right to share them.</li>
+        <li>You are responsible for reviewing executed documents for completeness. Inksent does not prepare, review, or opine on the substance of your documents.</li>
       </ul>
 
-      <H>For signing agents</H>
+      <H>3. Best-efforts service; no guarantee</H>
+      <p>We use commercially reasonable efforts to confirm a Signing Agent quickly and to provide backup coverage if an agent cancels. However, <b>timing estimates (including any &ldquo;30-minute&rdquo; reference), availability, and coverage in a given location or time are targets, not guarantees.</b> We do not guarantee that any particular signing will be staffed, completed, or completed on time. Closings depend on many third parties outside our control.</p>
+
+      <H>4. For Signing Agents</H>
       <ul className="list-disc pl-5 space-y-1">
-        <li>Signing agents are <b>independent contractors</b>, not employees of Inksent. You are responsible for your own taxes, transportation, supplies, and insurance.</li>
-        <li>You must maintain a valid notary commission and any certifications and insurance you represent to us.</li>
-        <li>Compensation is per completed signing, paid by the method you select. Earnings of $600 or more in a calendar year are reported on a Form 1099-NEC; a completed W-9 is required before payment.</li>
-        <li>Accepting a job is a commitment. Repeated cancellations, no-shows, lateness, or unprofessional conduct may result in removal from the network.</li>
+        <li>Signing Agents are <b>independent contractors</b>. You control how and whether you accept and perform work, set your own schedule, use your own equipment and transportation, and are free to work for others. You are responsible for your own taxes, expenses, and insurance.</li>
+        <li>You must maintain a valid notary commission and all certifications, background checks, and insurance you represent to us, and comply with all applicable laws of the jurisdiction in which you are commissioned.</li>
+        <li>Compensation is per completed signing, paid by your selected method. Earnings of $600 or more in a calendar year are reported on Form 1099-NEC; valid tax information is required before payment.</li>
+        <li>Your separate <a href="/notary-agreement" className="text-violet-600 underline">Independent Contractor Agreement</a> also applies and controls in the event of any conflict regarding the Signing Agent relationship.</li>
       </ul>
 
-      <H>Independent professional responsibility</H>
-      <p>Signing agents are solely responsible for performing notarizations in compliance with the laws of the state in which they are commissioned. Inksent does not provide legal advice and is not responsible for the independent professional conduct of signing agents.</p>
+      <H>5. Independent professional responsibility</H>
+      <p>Signing Agents are solely responsible for performing notarizations and signings in compliance with applicable law. Signing Agents must <b>not</b> provide legal advice or engage in the unauthorized practice of law. Inksent is not responsible for the independent professional conduct, acts, errors, or omissions of Signing Agents, who are not employees or agents of Inksent.</p>
 
-      <H>Limitation of liability</H>
-      <p>To the fullest extent permitted by law, Inksent&rsquo;s liability arising from the service is limited to the fees paid for the signing at issue. We are not liable for indirect or consequential damages.</p>
+      <H>6. Disclaimer of warranties</H>
+      <p>The service is provided <b>&ldquo;as is&rdquo; and &ldquo;as available&rdquo;</b> without warranties of any kind, whether express, implied, or statutory, including any implied warranties of merchantability, fitness for a particular purpose, and non-infringement, to the fullest extent permitted by law.</p>
 
-      <H>Changes</H>
-      <p>We may update these terms. Continued use of the service after changes constitutes acceptance.</p>
+      <H>7. Limitation of liability</H>
+      <p>To the fullest extent permitted by law, <b>Inksent&rsquo;s total cumulative liability arising out of or relating to the service or these Terms shall not exceed the fees actually paid to Inksent for the specific signing giving rise to the claim.</b> Inksent shall not be liable for any indirect, incidental, special, consequential, punitive, or exemplary damages, or for lost profits, lost business, delayed or failed closings, or loss of data, even if advised of the possibility. Some jurisdictions do not allow certain limitations; in that case the limitations apply to the maximum extent permitted.</p>
 
-      <H>Contact</H>
+      <H>8. Indemnification</H>
+      <p>You agree to defend, indemnify, and hold harmless Inksent and its owner, contractors, and affiliates from and against any claims, damages, losses, liabilities, and expenses (including reasonable attorneys&rsquo; fees) arising out of or related to: (a) your use of the service; (b) your documents, content, or signer information; (c) your violation of these Terms or applicable law; and (d) for Signing Agents, your acts, errors, omissions, or professional conduct.</p>
+
+      <H>9. Confidentiality &amp; data</H>
+      <p>Both parties will protect non-public personal and transaction information accessed through the service and use it only to perform the signing. Signing Agents must safeguard borrower documents and information and return or destroy them as instructed. Our handling of data is described in our <a href="/privacy" className="text-violet-600 underline">Privacy Policy</a>.</p>
+
+      <H>10. Governing law &amp; disputes</H>
+      <p>These Terms are governed by the laws of the State of California, without regard to conflict-of-law rules. The parties will attempt to resolve disputes informally first; any unresolved dispute will be brought in the state or federal courts located in San Diego County, California, and you consent to that jurisdiction and venue.</p>
+
+      <H>11. Changes</H>
+      <p>We may update these Terms. Material changes take effect when posted; continued use after changes constitutes acceptance.</p>
+
+      <H>12. Contact</H>
       <p>Questions? Email <a href="mailto:support@inksent.co" className="text-violet-600 underline">support@inksent.co</a> or call (619) 949-3361.</p>
 
-      <p className="text-xs text-gray-400 pt-4 border-t border-gray-100">These terms are provided as a general agreement and may be updated. Please review periodically.</p>
+      <p className="text-xs text-gray-400 pt-4 border-t border-gray-100">This is a general agreement and not legal advice. We may update it periodically.</p>
     </div>
   )
 }

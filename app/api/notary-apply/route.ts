@@ -30,6 +30,11 @@ export async function POST(req: NextRequest) {
   const okHuman = await verifyTurnstile(body?.turnstileToken, req.headers.get('x-forwarded-for') ?? undefined)
   if (!okHuman) return NextResponse.json({ error: 'Verification failed. Please try again.' }, { status: 400 })
 
+  // Must accept the Independent Contractor Agreement
+  if (body?.ic_agreement !== true) {
+    return NextResponse.json({ error: 'You must accept the Independent Contractor Agreement to apply.' }, { status: 400 })
+  }
+
   const parsed = schema.safeParse(body)
 
   if (!parsed.success) {

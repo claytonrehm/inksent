@@ -25,6 +25,7 @@ const schema = z.object({
   background_checked: z.enum(['yes', 'no'], { message: 'Please select' }),
   notes: z.string().optional(),
   sms_consent: z.literal(true, { message: 'Required to receive job offers' }),
+  ic_agreement: z.literal(true, { message: 'You must accept the Independent Contractor Agreement to join' }),
 })
 type FormData = z.infer<typeof schema>
 
@@ -277,6 +278,19 @@ export default function NotaryApplyForm() {
           </span>
         </label>
         {errors.sms_consent && <p className="text-xs text-red-500 mt-2 ml-7">{errors.sms_consent.message}</p>}
+      </section>
+
+      {/* Independent Contractor Agreement */}
+      <section className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input type="checkbox" className="mt-0.5 h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
+            {...register('ic_agreement')} />
+          <span className="text-sm text-gray-600">
+            I have read and agree to the{' '}
+            <a href="/notary-agreement" target="_blank" className="text-violet-600 underline">Independent Contractor Agreement</a>. I understand I am an independent contractor (not an employee), I set my own schedule, I&apos;m responsible for my own taxes and insurance, and I maintain a valid notary commission.
+          </span>
+        </label>
+        {errors.ic_agreement && <p className="text-xs text-red-500 mt-2 ml-7">{errors.ic_agreement.message}</p>}
       </section>
 
       {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">{error}</p>}

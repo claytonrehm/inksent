@@ -30,6 +30,15 @@ export default function PrivacyPage() {
       <H>Data retention &amp; security</H>
       <p>We keep information for as long as needed to provide the service and meet legal and tax obligations, then delete or anonymize it. We use reasonable safeguards to protect your data. Sensitive tax documents (such as W-9 forms) are collected by email and handled separately from our application database.</p>
 
+      <H>Financial information (Gramm-Leach-Bliley)</H>
+      <p>In the course of coordinating loan and real-estate signings, we may handle <b>nonpublic personal information (NPI)</b> about borrowers and signers. We collect and use this information solely to facilitate the requested signing, limit access to those who need it to perform the service, require our signing agents to keep it confidential and return or destroy documents as instructed, and maintain administrative, technical, and physical safeguards to protect it. We do not use borrower NPI for marketing and we do not sell it.</p>
+
+      <H>Data security &amp; breach notification</H>
+      <p>We use industry-standard safeguards including encryption in transit, access controls, private document storage with time-limited access links, and restricted administrative access. No system is perfectly secure, but in the event of a data breach affecting your personal information, we will notify affected parties and authorities as required by applicable law.</p>
+
+      <H>California privacy rights (CCPA/CPRA)</H>
+      <p>If you are a California resident, you have the right to know what personal information we collect, to request access or deletion, and to not be discriminated against for exercising these rights. <b>We do not sell or share your personal information</b> for cross-context behavioral advertising. To exercise your rights, email <a href="mailto:support@inksent.co" className="text-violet-600 underline">support@inksent.co</a>.</p>
+
       <H>Your choices</H>
       <p>You may request access to, correction of, or deletion of your information by emailing <a href="mailto:support@inksent.co" className="text-violet-600 underline">support@inksent.co</a>. You can opt out of SMS by replying STOP.</p>
 

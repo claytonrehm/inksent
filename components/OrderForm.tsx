@@ -59,6 +59,7 @@ export default function OrderForm() {
   const [confirmation, setConfirmation] = useState<ConfirmationState | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [captchaToken, setCaptchaToken] = useState('')
+  const [agreed, setAgreed] = useState(false)
 
   const {
     register,
@@ -72,10 +73,14 @@ export default function OrderForm() {
 
   const onSubmit = async (data: OrderSchema) => {
     setSubmitError(null)
+    if (!agreed) {
+      setSubmitError('Please accept the Terms of Service and Privacy Policy to place your order.')
+      return
+    }
     const res = await fetch('/api/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...data, turnstileToken: captchaToken }),
+      body: JSON.stringify({ ...data, turnstileToken: captchaToken, terms_accepted: agreed }),
     })
 
     if (!res.ok) {
@@ -294,6 +299,17 @@ export default function OrderForm() {
           {...register('special_instructions')}
         />
       </section>
+
+      {/* Terms acceptance (clickwrap) */}
+      <label className="flex items-start gap-3 cursor-pointer bg-gray-50 border border-gray-200 rounded-xl p-4">
+        <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)}
+          className="mt-0.5 h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500" />
+        <span className="text-sm text-gray-600">
+          I agree to Inksent&apos;s{' '}
+          <a href="/terms" target="_blank" className="text-violet-600 underline">Terms of Service</a> and{' '}
+          <a href="/privacy" target="_blank" className="text-violet-600 underline">Privacy Policy</a>, and I&apos;m authorized to place this order on behalf of my company.
+        </span>
+      </label>
 
       {submitError && (
         <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">

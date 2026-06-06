@@ -82,6 +82,14 @@ export default function PartnersPage() {
           ))}
         </div>
 
+        {/* Founder credibility — the differentiator vs. faceless platforms */}
+        <div className="bg-gray-50 border border-gray-100 rounded-xl p-6 mb-10 break-inside-avoid">
+          <p className="text-violet-600 font-semibold text-xs uppercase tracking-widest mb-2">Built by a mortgage insider</p>
+          <p className="text-sm text-gray-700 leading-relaxed">
+            Inksent was founded by <b>Clayton Rehm</b>, an active mortgage loan officer with <b>$200M+ in personal production</b> and working relationships with title companies and nationwide lenders. He&rsquo;s sat on your side of the closing table — and built the signing service he always wished existed: one that treats a clean, on-time closing like it matters, because he knows exactly what&rsquo;s riding on it. When you call, you reach someone who lives this work, not a ticket queue.
+          </p>
+        </div>
+
         {/* How it works + pricing */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-10">
           <div className="sm:col-span-2 bg-gray-50 rounded-xl p-6">

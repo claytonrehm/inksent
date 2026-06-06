@@ -22,6 +22,11 @@ export async function POST(req: NextRequest) {
     const okHuman = await verifyTurnstile(body?.turnstileToken, req.headers.get('x-forwarded-for') ?? undefined)
     if (!okHuman) return NextResponse.json({ error: 'Verification failed. Please try again.' }, { status: 400 })
 
+    // Must accept Terms of Service (clickwrap)
+    if (body?.terms_accepted !== true) {
+      return NextResponse.json({ error: 'Please accept the Terms of Service to place your order.' }, { status: 400 })
+    }
+
     const parsed = orderSchema.safeParse(body)
 
     if (!parsed.success) {
