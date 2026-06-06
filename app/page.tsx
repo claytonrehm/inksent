@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { CheckCircle, Clock, DollarSign, MapPin, Phone, Shield, ArrowRight, ShieldCheck, FileCheck2, Eye, Building2, UserRoundCheck } from 'lucide-react'
 import InksentLogo from '@/components/InksentLogo'
 import HeroStats from '@/components/HeroStats'
+import PhoneMockup from '@/components/PhoneMockup'
 import USMap from '@/components/USMap'
 import ScrollReveal from '@/components/ScrollReveal'
 import AuroraBackground from '@/components/AuroraBackground'
@@ -41,42 +42,52 @@ export default function Home() {
         {/* top glow */}
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-500/40 to-transparent" />
 
-        <div className="relative max-w-6xl mx-auto px-5 pt-24 pb-8 text-center">
-          <ScrollReveal>
-            <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-violet-300 text-xs font-semibold px-4 py-2 rounded-full mb-8 backdrop-blur-sm">
-              <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-pulse" />
-              Available Nationwide — All 50 States
+        <div className="relative max-w-6xl mx-auto px-5 pt-24 pb-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left — copy */}
+            <div className="text-center lg:text-left">
+              <ScrollReveal>
+                <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-violet-300 text-xs font-semibold px-4 py-2 rounded-full mb-8 backdrop-blur-sm">
+                  <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-pulse" />
+                  Available Nationwide — All 50 States
+                </div>
+              </ScrollReveal>
+
+              <ScrollReveal delay={100}>
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.05] mb-6 tracking-tight">
+                  Signing Agents,{' '}
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-violet-300">
+                    On Demand
+                  </span>
+                </h1>
+              </ScrollReveal>
+
+              <ScrollReveal delay={200}>
+                <p className="text-lg text-slate-400 max-w-xl mx-auto lg:mx-0 mb-9 leading-relaxed">
+                  Inksent connects title companies, escrow officers, and lenders with vetted NNA-certified signing agents — confirmed in 30 minutes, with an automatic backup if anyone cancels.
+                </p>
+              </ScrollReveal>
+
+              <ScrollReveal delay={300}>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-4">
+                  <Link href="/order" className="group inline-flex items-center justify-center gap-2 bg-violet-600 text-white px-8 py-4 rounded-xl font-bold text-base sm:text-lg hover:bg-violet-500 transition-all shadow-[0_0_40px_-8px_rgba(139,92,246,0.7)] hover:shadow-[0_0_50px_-6px_rgba(139,92,246,0.9)] hover:-translate-y-0.5 w-full sm:w-auto">
+                    Place a Signing Order
+                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                  <a href="tel:+16199493361" className="inline-flex items-center justify-center gap-2 border border-white/15 bg-white/5 text-white px-8 py-4 rounded-xl font-bold text-base sm:text-lg hover:bg-white/10 hover:border-white/25 transition-all w-full sm:w-auto backdrop-blur-sm">
+                    <Phone size={18} />
+                    (619) 949-3361
+                  </a>
+                </div>
+                <p className="text-slate-500 text-sm">No contracts · No minimums · 30-min confirmation</p>
+              </ScrollReveal>
             </div>
-          </ScrollReveal>
 
-          <ScrollReveal delay={100}>
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black leading-[1.05] mb-6 tracking-tight">
-              Signing Agents,{' '}
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-violet-300">
-                On Demand
-              </span>
-            </h1>
-          </ScrollReveal>
-
-          <ScrollReveal delay={200}>
-            <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto mb-9 leading-relaxed">
-              Inksent connects title companies, escrow officers, and lenders with vetted NNA-certified signing agents — confirmed in 30 minutes, with an automatic backup if anyone cancels.
-            </p>
-          </ScrollReveal>
-
-          <ScrollReveal delay={300}>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
-              <Link href="/order" className="group inline-flex items-center justify-center gap-2 bg-violet-600 text-white px-8 py-4 rounded-xl font-bold text-base sm:text-lg hover:bg-violet-500 transition-all shadow-[0_0_40px_-8px_rgba(139,92,246,0.7)] hover:shadow-[0_0_50px_-6px_rgba(139,92,246,0.9)] hover:-translate-y-0.5 w-full sm:w-auto">
-                Place a Signing Order
-                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <a href="tel:+16199493361" className="inline-flex items-center justify-center gap-2 border border-white/15 bg-white/5 text-white px-8 py-4 rounded-xl font-bold text-base sm:text-lg hover:bg-white/10 hover:border-white/25 transition-all w-full sm:w-auto backdrop-blur-sm">
-                <Phone size={18} />
-                (619) 949-3361
-              </a>
+            {/* Right — product visual */}
+            <div className="hidden lg:block">
+              <PhoneMockup />
             </div>
-            <p className="text-slate-500 text-sm">No contracts · No minimums · 30-min confirmation</p>
-          </ScrollReveal>
+          </div>
 
           <ScrollReveal delay={400}>
             <div className="mt-16 border-t border-white/10 pt-10">
@@ -191,7 +202,7 @@ export default function Home() {
                     Built by a mortgage pro who&apos;s been on your side of the table.
                   </h2>
                   <p className="text-slate-400 leading-relaxed mb-4">
-                    San Diego born and raised, Clayton is an active mortgage loan officer with deep roots in the industry — hundreds of millions of dollars in personal production and fundings, and working partnerships with title companies and large nationwide lenders.
+                    San Diego born and raised, Clayton is an active mortgage loan officer with deep roots in the industry — over <span className="text-white font-semibold">$200 million</span> in personal production and fundings, and working partnerships with title companies and large nationwide lenders.
                   </p>
                   <p className="text-slate-400 leading-relaxed">
                     After watching too many closings get derailed by a late notary, a no-show, or a last-minute scramble for coverage, he built the signing service he always wished existed. Inksent isn&apos;t a faceless platform — it&apos;s built by someone who lives this work and knows exactly what a clean closing is worth.
@@ -201,7 +212,7 @@ export default function Home() {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-10">
                 {[
-                  ['$100Ms+', 'In personal production'],
+                  ['$200M+', 'In personal production'],
                   ['Nationwide', 'Lender & title partnerships'],
                   ['Active', 'Loan officer today'],
                 ].map(([big, small]) => (
