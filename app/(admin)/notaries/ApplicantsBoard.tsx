@@ -2,8 +2,8 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { CheckCircle, XCircle, Search, ExternalLink, Phone, Mail, MapPin, ChevronDown, ChevronUp, Filter } from 'lucide-react'
-import { SIGNINGS_LABEL, SIGNINGS_RANK } from '@/lib/notary'
+import { CheckCircle, XCircle, Search, ExternalLink, Phone, Mail, MapPin, ChevronDown, ChevronUp, Filter, RotateCcw, Trash2 } from 'lucide-react'
+import { SIGNINGS_LABEL, SIGNINGS_RANK, vetApplicant } from '@/lib/notary'
 
 export interface Applicant {
   id: string
@@ -20,6 +20,14 @@ export interface Applicant {
   background_checked: boolean
   notes?: string
   created_at: string
+  denied_at?: string
+}
+
+const TIER_STYLES: Record<string, string> = {
+  Strong: 'bg-green-100 text-green-800 border-green-300',
+  Solid: 'bg-violet-100 text-violet-800 border-violet-300',
+  Review: 'bg-amber-100 text-amber-800 border-amber-300',
+  Weak: 'bg-gray-100 text-gray-600 border-gray-300',
 }
 
 const VOL_FILTERS = [
@@ -29,7 +37,7 @@ const VOL_FILTERS = [
   { value: '4', label: '500+ signings' },
 ]
 
-export default function ApplicantsBoard({ applicants }: { applicants: Applicant[] }) {
+export default function ApplicantsBoard({ applicants, mode = 'pending' }: { applicants: Applicant[]; mode?: 'pending' | 'denied' }) {
   const router = useRouter()
   const [search, setSearch] = useState('')
   const [city, setCity] = useState('all')
@@ -37,7 +45,7 @@ export default function ApplicantsBoard({ applicants }: { applicants: Applicant[
   const [minVol, setMinVol] = useState('0')
   const [nna, setNna] = useState('all')
   const [bgc, setBgc] = useState('all')
-  const [sort, setSort] = useState('experience')
+  const [sort, setSort] = useState('score')
   const [busy, setBusy] = useState<string | null>(null)
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [expanded, setExpanded] = useState<string | null>(null)
@@ -61,6 +69,7 @@ export default function ApplicantsBoard({ applicants }: { applicants: Applicant[
       return true
     })
     list = [...list].sort((a, b) => {
+      if (sort === 'score') return vetApplicant(b).score - vetApplicant(a).score
       if (sort === 'experience') return (b.years_experience ?? 0) - (a.years_experience ?? 0)
       if (sort === 'signings') return (SIGNINGS_RANK[b.signings_completed ?? ''] ?? 0) - (SIGNINGS_RANK[a.signings_completed ?? ''] ?? 0)
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime() // newest
@@ -68,25 +77,32 @@ export default function ApplicantsBoard({ applicants }: { applicants: Applicant[
     return list
   }, [applicants, search, city, minYears, minVol, nna, bgc, sort])
 
-  async function act(id: string, approve: boolean) {
+  const approve = (id: string) =>
+    fetch(`/api/notaries/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ active: true, denied_at: null }) })
+  const deny = (id: string) =>
+    fetch(`/api/notaries/${id}/deny`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) })
+  const restore = (id: string) =>
+    fetch(`/api/notaries/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ denied_at: null }) })
+  const remove = (id: string) => fetch(`/api/notaries/${id}`, { method: 'DELETE' })
+
+  async function act(id: string, action: 'approve' | 'deny' | 'restore' | 'delete') {
+    if (action === 'delete' && !confirm('Permanently delete this application? This cannot be undone.')) return
     setBusy(id)
-    if (approve) {
-      await fetch(`/api/notaries/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ active: true }) })
-    } else {
-      await fetch(`/api/notaries/${id}`, { method: 'DELETE' })
-    }
+    if (action === 'approve') await approve(id)
+    else if (action === 'deny') await deny(id)
+    else if (action === 'restore') await restore(id)
+    else if (action === 'delete') await remove(id)
     setBusy(null)
     router.refresh()
   }
 
-  async function bulk(approve: boolean) {
+  async function bulk(action: 'approve' | 'deny' | 'delete') {
     if (selected.size === 0) return
-    if (!approve && !confirm(`Deny and remove ${selected.size} applicant(s)?`)) return
+    if (action === 'deny' && !confirm(`Deny ${selected.size} applicant(s)? They'll be notified and kept on file.`)) return
+    if (action === 'delete' && !confirm(`Permanently delete ${selected.size} application(s)? This cannot be undone.`)) return
     setBusy('bulk')
     await Promise.all(Array.from(selected).map(id =>
-      approve
-        ? fetch(`/api/notaries/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ active: true }) })
-        : fetch(`/api/notaries/${id}`, { method: 'DELETE' })
+      action === 'approve' ? approve(id) : action === 'deny' ? deny(id) : remove(id)
     ))
     setSelected(new Set())
     setBusy(null)
@@ -101,7 +117,7 @@ export default function ApplicantsBoard({ applicants }: { applicants: Applicant[
     })
   }
 
-  const reset = () => { setSearch(''); setCity('all'); setMinYears('0'); setMinVol('0'); setNna('all'); setBgc('all'); setSort('experience') }
+  const reset = () => { setSearch(''); setCity('all'); setMinYears('0'); setMinVol('0'); setNna('all'); setBgc('all'); setSort('score') }
   const activeFilters = [city !== 'all', minYears !== '0', minVol !== '0', nna !== 'all', bgc !== 'all', !!search].filter(Boolean).length
 
   return (
@@ -119,7 +135,7 @@ export default function ApplicantsBoard({ applicants }: { applicants: Applicant[
           <Select value={minVol} onChange={setMinVol} options={VOL_FILTERS.map(v => [v.value, v.label] as [string, string])} />
           <Select value={nna} onChange={setNna} options={[['all', 'NNA: any'], ['yes', 'NNA: yes'], ['no', 'NNA: no']]} />
           <Select value={bgc} onChange={setBgc} options={[['all', 'Bg check: any'], ['yes', 'Bg check: yes'], ['no', 'Bg check: no']]} />
-          <Select value={sort} onChange={setSort} options={[['experience', 'Sort: experience'], ['signings', 'Sort: signings'], ['newest', 'Sort: newest']]} />
+          <Select value={sort} onChange={setSort} options={[['score', 'Sort: AI score'], ['experience', 'Sort: experience'], ['signings', 'Sort: signings'], ['newest', 'Sort: newest']]} />
           {activeFilters > 0 && (
             <button onClick={reset} className="text-xs text-violet-600 hover:underline flex items-center gap-1">
               <Filter size={12} /> Clear ({activeFilters})
@@ -131,14 +147,21 @@ export default function ApplicantsBoard({ applicants }: { applicants: Applicant[
         {selected.size > 0 && (
           <div className="flex items-center gap-3 mt-3 pt-3 border-t border-gray-100">
             <span className="text-sm font-medium text-gray-700">{selected.size} selected</span>
-            <button onClick={() => bulk(true)} disabled={busy === 'bulk'}
+            <button onClick={() => bulk('approve')} disabled={busy === 'bulk'}
               className="flex items-center gap-1.5 bg-green-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-green-700 disabled:opacity-50">
               <CheckCircle size={13} /> Approve all
             </button>
-            <button onClick={() => bulk(false)} disabled={busy === 'bulk'}
-              className="flex items-center gap-1.5 text-red-600 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 disabled:opacity-50">
-              <XCircle size={13} /> Deny all
-            </button>
+            {mode === 'pending' ? (
+              <button onClick={() => bulk('deny')} disabled={busy === 'bulk'}
+                className="flex items-center gap-1.5 text-red-600 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 disabled:opacity-50">
+                <XCircle size={13} /> Deny all
+              </button>
+            ) : (
+              <button onClick={() => bulk('delete')} disabled={busy === 'bulk'}
+                className="flex items-center gap-1.5 text-red-600 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 disabled:opacity-50">
+                <Trash2 size={13} /> Delete all
+              </button>
+            )}
             <button onClick={() => setSelected(new Set())} className="text-xs text-gray-400 hover:underline ml-auto">Clear selection</button>
           </div>
         )}
@@ -152,7 +175,9 @@ export default function ApplicantsBoard({ applicants }: { applicants: Applicant[
           <div className="bg-white rounded-xl border border-gray-200 p-10 text-center text-gray-400">
             No applicants match these filters
           </div>
-        ) : filtered.map(a => (
+        ) : filtered.map(a => {
+          const vet = vetApplicant(a)
+          return (
           <div key={a.id} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="p-4 flex items-start gap-4">
               <input type="checkbox" checked={selected.has(a.id)} onChange={() => toggleSel(a.id)}
@@ -169,16 +194,15 @@ export default function ApplicantsBoard({ applicants }: { applicants: Applicant[
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="font-bold text-gray-900">{a.name}</h3>
+                  <span title={`Automated vetting score ${vet.score}/100`} className={`text-xs font-semibold border px-1.5 py-0.5 rounded ${TIER_STYLES[vet.tier]}`}>{vet.tier} · {vet.score}</span>
                   {a.nna_certified && <span className="text-xs bg-green-50 text-green-700 border border-green-200 px-1.5 py-0.5 rounded">NNA</span>}
                   {a.background_checked && <span className="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-1.5 py-0.5 rounded">Bg ✓</span>}
-                  {((a.years_experience ?? 0) < 2 || (SIGNINGS_RANK[a.signings_completed ?? ''] ?? 0) <= 1) && (
-                    <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-1.5 py-0.5 rounded">Newer</span>
-                  )}
                 </div>
                 <div className="flex flex-wrap gap-x-4 gap-y-0.5 mt-1 text-xs text-gray-500">
                   <span className="flex items-center gap-1"><MapPin size={11} /> {a.coverage_label ?? a.base_zip} · {a.coverage_radius ?? 25}mi</span>
                   <span>{a.years_experience ?? 0} yrs exp</span>
                   <span>{SIGNINGS_LABEL[a.signings_completed ?? ''] ?? '—'} signings</span>
+                  {mode === 'denied' && a.denied_at && <span className="text-red-500">Denied {new Date(a.denied_at).toLocaleDateString()}</span>}
                 </div>
                 <div className="flex flex-wrap gap-x-4 gap-y-0.5 mt-1 text-xs text-gray-400">
                   <a href={`tel:${a.phone}`} className="flex items-center gap-1 hover:text-violet-600"><Phone size={10} /> {a.phone}</a>
@@ -187,14 +211,27 @@ export default function ApplicantsBoard({ applicants }: { applicants: Applicant[
               </div>
 
               <div className="flex flex-col gap-2 shrink-0">
-                <button onClick={() => act(a.id, true)} disabled={busy === a.id}
+                <button onClick={() => act(a.id, 'approve')} disabled={busy === a.id}
                   className="flex items-center gap-1.5 bg-green-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-green-700 disabled:opacity-50 whitespace-nowrap">
                   <CheckCircle size={13} /> Approve
                 </button>
-                <button onClick={() => act(a.id, false)} disabled={busy === a.id}
-                  className="flex items-center gap-1.5 text-red-600 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 disabled:opacity-50 whitespace-nowrap">
-                  <XCircle size={13} /> Deny
-                </button>
+                {mode === 'pending' ? (
+                  <button onClick={() => act(a.id, 'deny')} disabled={busy === a.id}
+                    className="flex items-center gap-1.5 text-red-600 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 disabled:opacity-50 whitespace-nowrap">
+                    <XCircle size={13} /> Deny
+                  </button>
+                ) : (
+                  <>
+                    <button onClick={() => act(a.id, 'restore')} disabled={busy === a.id}
+                      className="flex items-center gap-1.5 text-violet-600 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-violet-50 disabled:opacity-50 whitespace-nowrap">
+                      <RotateCcw size={13} /> Restore
+                    </button>
+                    <button onClick={() => act(a.id, 'delete')} disabled={busy === a.id}
+                      className="flex items-center gap-1.5 text-gray-400 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 hover:text-red-600 disabled:opacity-50 whitespace-nowrap">
+                      <Trash2 size={13} /> Delete
+                    </button>
+                  </>
+                )}
                 <button onClick={() => setExpanded(expanded === a.id ? null : a.id)}
                   className="flex items-center gap-1 text-gray-400 text-xs px-3 py-1 hover:text-gray-600">
                   Vet {expanded === a.id ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
@@ -202,11 +239,15 @@ export default function ApplicantsBoard({ applicants }: { applicants: Applicant[
               </div>
             </div>
 
-            {/* Vetting links */}
+            {/* Vetting detail */}
             {expanded === a.id && (
               <div className="bg-gray-50 border-t border-gray-100 px-4 py-3">
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {vet.pros.map(p => <span key={p} className="text-xs bg-green-50 text-green-700 border border-green-200 px-1.5 py-0.5 rounded">✓ {p}</span>)}
+                  {vet.cons.map(c => <span key={c} className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-1.5 py-0.5 rounded">⚠ {c}</span>)}
+                </div>
                 {a.notes && <p className="text-sm text-gray-600 mb-3"><span className="text-xs text-gray-400">Notes: </span>{a.notes}</p>}
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Verify this applicant</p>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Verify online</p>
                 <div className="flex flex-wrap gap-2">
                   <VetLink label="NNA Directory" href={`https://www.signingagent.com/find-a-signing-agent`} />
                   <VetLink label="Google reviews" href={`https://www.google.com/search?q=${encodeURIComponent(`"${a.name}" notary ${a.coverage_label ?? ''} reviews OR complaints`)}`} />
@@ -214,12 +255,13 @@ export default function ApplicantsBoard({ applicants }: { applicants: Applicant[
                   <VetLink label="LinkedIn" href={`https://www.google.com/search?q=${encodeURIComponent(`${a.name} notary signing agent ${a.coverage_label ?? ''} site:linkedin.com`)}`} />
                 </div>
                 <p className="text-xs text-gray-400 mt-2">
-                  Confirm their certification + background-check date on the NNA directory, then scan for complaints. ~30 seconds.
+                  The score is an automated first pass. Confirm NNA cert + background-check date on the directory, then scan for complaints. ~30 seconds.
                 </p>
               </div>
             )}
           </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )

@@ -310,6 +310,37 @@ export async function sendSigningCompleteEmail(data: {
   })
 }
 
+// ─── Notary Application — not moving forward (kept on file) ───────────────────
+export async function sendNotaryDeniedEmail(data: { name: string; email: string }) {
+  const firstName = data.name.split(' ')[0]
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/>${META}</head>
+  <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111111;margin:0;padding:0;background:#f4f4f5;">
+  <div style="max-width:560px;margin:32px auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+    ${HEADER}
+    <div style="padding:32px;">
+      <p style="font-size:16px;font-weight:700;color:#111111;margin:0 0 12px;">Thank you for applying, ${firstName}.</p>
+      <p style="font-size:14px;color:#555555;margin:0 0 14px;line-height:1.7;">
+        We truly appreciate your interest in joining the Inksent signing network. For now, we&rsquo;ve decided to move forward with other applicants in your area.
+      </p>
+      <p style="font-size:14px;color:#555555;margin:0 0 14px;line-height:1.7;">
+        Please don&rsquo;t take this as a no for good — we&rsquo;re a growing company and we expand our network regularly as demand increases. <strong>We&rsquo;ll keep your application on file</strong> and reach out the moment we open more spots in your area.
+      </p>
+      <p style="font-size:14px;color:#555555;margin:0;line-height:1.7;">
+        Thank you again, and we hope to work together soon.
+      </p>
+      <p style="font-size:14px;color:#555555;margin:18px 0 0;line-height:1.6;">— The Inksent Team</p>
+    </div>
+    ${FOOTER}
+  </div></body></html>`
+
+  return getResend().emails.send({
+    from: 'Clayton at Inksent <orders@inksent.co>',
+    to: data.email,
+    subject: 'Your Inksent application',
+    html,
+  })
+}
+
 // ─── Job Offer to a Notary (email channel — works with or without SMS) ────────
 export async function sendNotaryJobOfferEmail(data: {
   notaryName: string

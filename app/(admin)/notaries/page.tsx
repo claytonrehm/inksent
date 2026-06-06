@@ -24,7 +24,8 @@ export default async function NotariesPage() {
     supabase.from('notary_ratings').select('notary_id, rating, on_time, professional'),
   ])
 
-  const pending = (notaries ?? []).filter(n => !n.active)
+  const pending = (notaries ?? []).filter(n => !n.active && !n.denied_at)
+  const denied = (notaries ?? []).filter(n => !!n.denied_at)
   const active = (notaries ?? []).filter(n => n.active).sort((a, b) => a.name.localeCompare(b.name))
 
   // Financial + job stats
@@ -49,15 +50,17 @@ export default async function NotariesPage() {
     if ((r.rating && r.rating <= 2) || r.on_time === false || r.professional === false) s.concerns++
   }
 
-  // Map pending → Applicant shape for the board
-  const applicants: Applicant[] = pending.map(n => ({
+  // Map notary rows → Applicant shape for the board
+  const toApplicant = (n: (typeof pending)[number]): Applicant => ({
     id: n.id, name: n.name, email: n.email, phone: n.phone,
     photo_url: n.photo_url, base_zip: n.base_zip, coverage_radius: n.coverage_radius,
     coverage_label: coverageLabel(n.base_zip),
     years_experience: n.years_experience, signings_completed: n.signings_completed,
     nna_certified: !!n.nna_certified, background_checked: !!n.background_checked,
-    notes: n.notes, created_at: n.created_at,
-  }))
+    notes: n.notes, created_at: n.created_at, denied_at: n.denied_at,
+  })
+  const applicants: Applicant[] = pending.map(toApplicant)
+  const deniedApplicants: Applicant[] = denied.map(toApplicant)
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl space-y-8">
@@ -162,6 +165,17 @@ export default async function NotariesPage() {
         </div>
         <p className="text-xs text-gray-400 mt-2">Click any agent to see full performance + reviews. &ldquo;Concerns&rdquo; counts low ratings, lateness, or unprofessional flags.</p>
       </section>
+
+      {/* Denied applications (retained for future) */}
+      {denied.length > 0 && (
+        <section>
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-2">
+            <ClipboardList size={14} /> Denied Apps ({denied.length})
+          </h2>
+          <p className="text-xs text-gray-400 mb-3">Kept on file for when you expand. Restore to move back to review, or approve directly.</p>
+          <ApplicantsBoard applicants={deniedApplicants} mode="denied" />
+        </section>
+      )}
 
       <div className="max-w-md">
         <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Add Manually</h2>
