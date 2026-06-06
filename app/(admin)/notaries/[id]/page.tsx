@@ -100,7 +100,7 @@ export default async function NotaryDetailPage({ params }: { params: Promise<{ i
             <Detail label="Background Check" value={[notary.bgc_provider, notary.bgc_date].filter(Boolean).join(' · ') || 'Not provided'} />
             <Detail label="E&O Carrier" value={[notary.eo_carrier, notary.eo_expiry && `exp ${notary.eo_expiry}`].filter(Boolean).join(' · ') || '—'} />
             <Detail label="Dual-Tray Printer" value={notary.has_dual_tray == null ? '—' : notary.has_dual_tray ? 'Yes' : 'No'} />
-            <Detail label="Payment" value={[notary.payment_method, notary.payment_handle].filter(Boolean).join(' · ') || '—'} />
+            <Detail label="Payout (Stripe)" value={notary.payouts_enabled ? '✓ Direct deposit connected' : notary.stripe_account_id ? 'Setup started — not finished' : 'Not connected yet'} />
           </div>
         ) : (
           <p className="text-sm text-gray-500">

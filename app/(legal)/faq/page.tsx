@@ -2,7 +2,7 @@ export const metadata = { title: 'FAQ — Inksent' }
 
 const NOTARY_FAQ = [
   ['How do I get jobs?', 'Once you\'re approved and finish onboarding, we text you whenever a signing opens up in your coverage area. Tap the link to accept — first to respond gets it.'],
-  ['How much do I get paid?', '$90 per completed signing, paid by your chosen method (Zelle, Venmo, PayPal, or check) after the signing is confirmed complete.'],
+  ['How much do I get paid?', '$90 per completed signing, paid by secure direct deposit (via Stripe) after the signing is confirmed complete.'],
   ['How do I get the documents?', 'When you accept a job, you automatically get a secure link to download the document package once the title company uploads it. Print everything and bring it to the signing.'],
   ['What if I can\'t make a job I accepted?', 'Tap "Can\'t make it" as early as possible. We instantly offer it to other agents. Frequent or last-minute cancellations may remove you from the network.'],
   ['How do I finish a signing?', 'After the appointment, tap "Mark Signing Complete" in your assignment email (and upload scan-backs if required). That triggers your payment.'],
@@ -14,7 +14,7 @@ const CLIENT_FAQ = [
   ['How do I send the signing documents?', 'Your confirmation email has an "Upload Documents" link. Upload the package anytime it\'s ready — your assigned agent gets it automatically, even if coverage changes.'],
   ['What if the assigned notary cancels?', 'We automatically re-offer the job to other covering agents and re-route your documents to whoever takes it — you never have to re-send anything or scramble for a replacement.'],
   ['Can I track the status?', 'Yes — your confirmation email includes a live tracking link showing real-time status and your assigned agent.'],
-  ['How much does it cost?', '$185 flat per signing. No contracts, no minimums, no surprise fees. Payment due within 30 days of a completed signing.'],
+  ['How much does it cost?', '$185 flat per signing. No contracts, no minimums, no surprise fees. Pay securely online by card or ACH via Stripe (other methods available for established partners), due within 30 days of completion.'],
   ['Do you cover my area?', 'We dispatch nationwide. Coverage depends on agent availability in a given ZIP — submit an order and we\'ll confirm fast.'],
 ]
 

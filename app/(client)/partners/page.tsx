@@ -36,7 +36,7 @@ const EDGES = [
   {
     icon: <DollarSign size={20} />,
     title: 'Flat $185. No games.',
-    body: 'No contracts, no minimums, no surprise fees. Pay online in one click or by check, net-30. Bilingual agents matched on request.',
+    body: 'No contracts, no minimums, no surprise fees. Pay securely online by card or bank transfer (ACH) via Stripe, net-30 — established partners can arrange other methods. Bilingual agents matched on request.',
   },
 ]
 

@@ -460,7 +460,7 @@ export async function sendNotaryApplicationEmail(notary: {
 
       ${step(3, 'Show up, execute, confirm', `Arrive on time, complete the signing professionally, and let us know when you&rsquo;re done. We handle the client — you focus on the table.`)}
 
-      ${step(4, 'Get paid', `Once the signing is confirmed complete, we process your payment via Zelle, Venmo, or check — whichever you selected on your application.`)}
+      ${step(4, 'Get paid', `Once the signing is confirmed complete, we send your payment by secure direct deposit — automatically, once the client pays.`)}
 
       <hr style="border:none;border-top:1px solid #f0f0f0;margin:24px 0;"/>
 
