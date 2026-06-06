@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
         client_fee: 17500,  // $175.00
         notary_fee: 9000,   // $90.00
       })
-      .select('id, confirmation_number, signing_date, signing_time, signing_type, signer_name, property_city, property_zip, property_address, client_name, client_email, client_company, notary_fee')
+      .select('id, confirmation_number, signing_date, signing_time, signing_type, signer_name, property_city, property_zip, property_address, client_name, client_email, client_company, notary_fee, language_needed')
       .single()
 
     if (error) {
@@ -38,15 +38,28 @@ export async function POST(req: NextRequest) {
     const dateStr = format(new Date(data.signing_date), 'MMM d')
     const typeStr = data.signing_type.replace(/_/g, ' ')
 
-    // Auto-blast active notaries whose coverage radius reaches this property
-    const { blastCount, totalActive } = await blastOrderToCoveringNotaries(supabase, data)
+    // Spam gate: only auto-blast for known clients (a prior released order from this email).
+    // First-time clients are held for a 1-tap review so randoms can't blast your notaries.
+    const { count: priorOrders } = await supabase
+      .from('orders')
+      .select('id', { count: 'exact', head: true })
+      .eq('client_email', data.client_email)
+      .eq('hold_for_review', false)
+      .neq('id', data.id)
+    const knownClient = (priorOrders ?? 0) > 0
 
-    // Notify admin — SMS (needs A2P) + email (always works)
-    const blastNote = blastCount > 0
-      ? `Auto-blasted to ${blastCount} notar${blastCount === 1 ? 'y' : 'ies'} covering ${data.property_zip} — first to accept wins.`
-      : totalActive === 0
-        ? 'No active notaries yet — approve some, then dispatch manually.'
-        : `⚠️ No notary in your network covers ZIP ${data.property_zip}. Dispatch manually or recruit coverage there.`
+    let blastNote: string
+    if (!knownClient) {
+      await supabase.from('orders').update({ hold_for_review: true, status: 'pending' }).eq('id', data.id)
+      blastNote = `🔒 First order from ${data.client_company} — held for your review (not blasted). Release it from the order page to dispatch.`
+    } else {
+      const { blastCount, totalActive } = await blastOrderToCoveringNotaries(supabase, data)
+      blastNote = blastCount > 0
+        ? `Auto-blasted to ${blastCount} notar${blastCount === 1 ? 'y' : 'ies'} covering ${data.property_zip} — first to accept wins.`
+        : totalActive === 0
+          ? 'No active onboarded notaries yet — approve/onboard some, then dispatch manually.'
+          : `⚠️ No onboarded notary covers ZIP ${data.property_zip}. Dispatch manually or recruit coverage there.`
+    }
 
     if (process.env.ADMIN_PHONE) {
       sendSMS(

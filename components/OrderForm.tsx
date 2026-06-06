@@ -255,12 +255,30 @@ export default function OrderForm() {
         </div>
       </section>
 
-      {/* Special Instructions */}
-      <section>
+      {/* Language + Special Instructions */}
+      <section className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label htmlFor="language_needed" className="text-sm font-medium text-gray-700">Language Needed</label>
+            <select
+              id="language_needed"
+              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+              {...register('language_needed')}
+            >
+              <option value="">English (default)</option>
+              <option value="Spanish">Spanish</option>
+              <option value="Mandarin">Mandarin</option>
+              <option value="Vietnamese">Vietnamese</option>
+              <option value="Tagalog">Tagalog</option>
+              <option value="Korean">Korean</option>
+              <option value="Other">Other (note below)</option>
+            </select>
+          </div>
+        </div>
         <Textarea
           id="special_instructions"
           label="Special Instructions"
-          placeholder="Gate code, ID requirements, docs arriving separately, language needs, etc."
+          placeholder="Gate code, ID requirements, docs arriving separately, etc."
           {...register('special_instructions')}
         />
       </section>

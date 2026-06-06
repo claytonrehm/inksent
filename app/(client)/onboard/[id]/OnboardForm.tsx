@@ -25,19 +25,26 @@ const schema = z.object({
 })
 type FormData = z.infer<typeof schema>
 
+const LANGUAGES = ['Spanish', 'Mandarin', 'Vietnamese', 'Tagalog', 'Korean', 'Other']
+
 export default function OnboardForm({ notaryId, notaryName }: { notaryId: string; notaryName: string }) {
   const [done, setDone] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [languages, setLanguages] = useState<string[]>([])
   const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
   })
   const method = watch('payment_method')
 
+  function toggleLang(l: string) {
+    setLanguages((p) => p.includes(l) ? p.filter((x) => x !== l) : [...p, l])
+  }
+
   async function onSubmit(data: FormData) {
     setError(null)
     const res = await fetch(`/api/notaries/${notaryId}/onboard`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify({ ...data, languages }),
     })
     if (!res.ok) { setError('Something went wrong. Please try again or email orders@inksent.co.'); return }
     setDone(true)
@@ -102,6 +109,20 @@ export default function OnboardForm({ notaryId, notaryName }: { notaryId: string
         </select>
         {errors.has_dual_tray && <p className="text-xs text-red-500 mt-1">{errors.has_dual_tray.message}</p>}
         <p className="text-xs text-gray-400 mt-1">Loan packages often need legal + letter paper. Not required, but it widens the jobs you can take.</p>
+      </section>
+
+      {/* Languages */}
+      <section>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Languages you speak fluently (besides English)</label>
+        <p className="text-xs text-gray-400 mb-2">We&apos;ll match you to signings that need these — more jobs for you.</p>
+        <div className="flex flex-wrap gap-2">
+          {LANGUAGES.map((l) => (
+            <button key={l} type="button" onClick={() => toggleLang(l)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${languages.includes(l) ? 'bg-violet-600 text-white border-violet-600' : 'bg-white text-gray-600 border-gray-300 hover:border-violet-300'}`}>
+              {l}
+            </button>
+          ))}
+        </div>
       </section>
 
       {/* Payment */}

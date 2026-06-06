@@ -264,6 +264,7 @@ export default function Home() {
           <div className="mt-8 pt-6 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-600">
             <span>© {new Date().getFullYear()} Inksent Signing Services · All rights reserved</span>
             <div className="flex items-center gap-4">
+              <Link href="/faq" className="hover:text-gray-400 transition-colors">FAQ</Link>
               <Link href="/privacy" className="hover:text-gray-400 transition-colors">Privacy</Link>
               <Link href="/terms" className="hover:text-gray-400 transition-colors">Terms</Link>
               <a href="mailto:orders@inksent.co" className="hover:text-gray-400 transition-colors">Support</a>

@@ -19,6 +19,7 @@ export const orderSchema = z.object({
   client_name: z.string().min(2, 'Contact name is required'),
   client_email: z.string().email('Enter a valid email'),
   client_phone: z.string().min(10, 'Enter a valid phone number'),
+  language_needed: z.string().optional(),
   special_instructions: z.string().optional(),
 })
 

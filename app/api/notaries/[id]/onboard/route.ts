@@ -19,6 +19,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     has_dual_tray: d.has_dual_tray === 'yes',
     payment_method: d.payment_method || null,
     payment_handle: d.payment_handle || null,
+    languages: Array.isArray(d.languages) ? d.languages : [],
     onboarded_at: new Date().toISOString(),
   }).eq('id', id)
 

@@ -13,28 +13,44 @@ interface OrderRow {
   property_city: string
   property_zip: string
   notary_fee: number
+  language_needed?: string | null
 }
 
 /**
- * Blast an order to every active notary whose coverage radius reaches the
- * property ZIP, optionally excluding some notary IDs (e.g. the one who just
- * cancelled). Returns how many were texted and the list of recipients.
+ * Blast an order to active, ONBOARDED notaries whose coverage radius reaches the
+ * property ZIP. If the order needs a specific language and any covering notary
+ * speaks it, the blast is restricted to those. Excludes anyone who already bailed.
  */
 export async function blastOrderToCoveringNotaries(
   supabase: SupabaseClient,
   order: OrderRow,
   opts: { exclude?: string[] } = {}
-): Promise<{ blastCount: number; recipients: string[]; totalActive: number }> {
+): Promise<{ blastCount: number; recipients: string[]; totalActive: number; notOnboarded: number }> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'
   const { data: notaries } = await supabase
     .from('notaries')
-    .select('id, name, phone, base_zip, coverage_radius')
+    .select('id, name, phone, base_zip, coverage_radius, onboarded_at, languages')
     .eq('active', true)
 
   const exclude = new Set(opts.exclude ?? [])
-  const covering = (notaries ?? []).filter(
-    (n) => !exclude.has(n.id) && notaryCoversZip(n.base_zip, n.coverage_radius, order.property_zip)
+  const active = notaries ?? []
+
+  // Only notaries who finished onboarding can be dispatched (we must be able to pay + verify them)
+  const eligible = active.filter(
+    (n) => !exclude.has(n.id) && n.onboarded_at && notaryCoversZip(n.base_zip, n.coverage_radius, order.property_zip)
   )
+  const notOnboarded = active.filter(
+    (n) => !exclude.has(n.id) && !n.onboarded_at && notaryCoversZip(n.base_zip, n.coverage_radius, order.property_zip)
+  ).length
+
+  // Bilingual preference: if a language is needed and someone covering speaks it, restrict to them
+  let covering = eligible
+  if (order.language_needed) {
+    const speakers = eligible.filter((n) => (n.languages ?? []).some(
+      (l: string) => l.toLowerCase() === order.language_needed!.toLowerCase()
+    ))
+    if (speakers.length > 0) covering = speakers
+  }
 
   let blastCount = 0
   if (covering.length > 0) {
@@ -61,9 +77,9 @@ export async function blastOrderToCoveringNotaries(
     blastCount = results.filter((r) => r.status === 'fulfilled').length
     await supabase
       .from('orders')
-      .update({ status: 'dispatching', notary_id: null, dispatched_to: covering.map((n) => n.id) })
+      .update({ status: 'dispatching', notary_id: null, dispatched_to: covering.map((n) => n.id), dispatched_at: new Date().toISOString() })
       .eq('id', order.id)
   }
 
-  return { blastCount, recipients: covering.map((n) => n.id), totalActive: (notaries ?? []).length }
+  return { blastCount, recipients: covering.map((n) => n.id), totalActive: active.length, notOnboarded }
 }

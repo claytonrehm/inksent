@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Send, UserCheck, X, CheckCircle, DollarSign, Zap, Star } from 'lucide-react'
+import { Send, UserCheck, X, CheckCircle, DollarSign, Zap, Star, ShieldAlert } from 'lucide-react'
 
 interface Notary { id: string; name: string; phone: string; covers: boolean; distance: number | null }
 interface Order {
@@ -16,6 +16,8 @@ interface Order {
   notary_fee?: number
   client_fee?: number
   dispatched_to?: string[]
+  hold_for_review?: boolean
+  client_company?: string
   notaries?: { name: string; phone: string; email: string } | null
 }
 
@@ -105,11 +107,34 @@ export default function OrderActions({ order, notaries }: { order: Order; notari
     router.refresh()
   }
 
+  async function releaseOrder() {
+    setLoading('release')
+    await fetch(`/api/orders/${order.id}/release`, { method: 'POST' })
+    setLoading(null)
+    router.refresh()
+  }
+
   const isDone = order.status === 'completed' || order.status === 'cancelled'
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-5">
       <h3 className="font-semibold text-gray-900">Dispatch & Actions</h3>
+
+      {/* First-time client hold (spam gate) */}
+      {order.hold_for_review && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <div className="flex items-start gap-2.5">
+            <ShieldAlert size={18} className="text-amber-600 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-amber-900">First order from {order.client_company || 'this client'} — held for review</p>
+              <p className="text-xs text-amber-700 mt-0.5">We didn&apos;t blast your notaries yet. If this looks legit, release it to dispatch. Future orders from them auto-blast.</p>
+              <Button size="sm" loading={loading === 'release'} onClick={releaseOrder} className="mt-3">
+                <CheckCircle size={14} className="mr-1.5" /> Release &amp; Dispatch
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Currently assigned */}
       {order.notaries && (

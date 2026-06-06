@@ -36,6 +36,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const timeStr = `${h % 12 || 12}:${m} ${h < 12 ? 'AM' : 'PM'}`
   const dateStr = format(new Date(order.signing_date), 'EEEE, MMMM d, yyyy')
 
+  // Borrower heads-up: text the signer who's coming + when (once)
+  if (notary && order.signer_phone && !order.borrower_notified_at) {
+    sendSMS(
+      order.signer_phone,
+      `Hi ${order.signer_name.split(' ')[0]}, this is Inksent Signing Services. Your notary ${notary.name} is confirmed for your signing on ${format(new Date(order.signing_date), 'EEEE, MMM d')} at ${timeStr}. They'll bring everything needed. Questions? (619) 949-3361`
+    ).catch(console.error)
+    await supabase.from('orders').update({ borrower_notified_at: new Date().toISOString() }).eq('id', id)
+  }
+
   // Notify admin
   if (process.env.ADMIN_PHONE && notary) {
     sendSMS(
@@ -61,6 +70,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       specialInstructions: order.special_instructions,
       confirmationNumber: order.confirmation_number,
       fee: order.notary_fee,
+      completeUrl: `${process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'}/complete/${id}?notary=${notary_id}`,
     }).catch(console.error)
 
     sendSMS(

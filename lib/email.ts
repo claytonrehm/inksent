@@ -144,6 +144,7 @@ export async function sendNotaryAssignmentEmail(data: {
   specialInstructions?: string
   confirmationNumber: string
   fee: number
+  completeUrl?: string
 }) {
   const firstName = data.notaryName.split(' ')[0]
   const typeLabel = data.signingType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
@@ -178,8 +179,13 @@ export async function sendNotaryAssignmentEmail(data: {
 
       ${data.specialInstructions ? `<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:12px 16px;font-size:13px;color:#92400e;margin-top:16px;line-height:1.5;"><strong>Special Instructions:</strong> ${data.specialInstructions}</div>` : ''}
 
+      ${data.completeUrl ? `<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:16px;margin-top:20px;text-align:center;">
+        <p style="font-size:13px;color:#166534;margin:0 0 12px;font-weight:600;">When the signing is done, tap below to finish up &amp; get paid:</p>
+        <a href="${data.completeUrl}" style="display:inline-block;background:#16a34a;color:#ffffff;text-decoration:none;font-weight:700;padding:11px 22px;border-radius:8px;font-size:14px;">Mark Signing Complete →</a>
+      </div>` : ''}
+
       <p style="font-size:13px;color:#555555;margin-top:20px;line-height:1.6;">
-        Please arrive a few minutes early and bring all required supplies. When the signing is complete, let us know and we&rsquo;ll process your payment.
+        Please arrive a few minutes early and bring all required supplies.
       </p>
       <p style="font-size:13px;color:#777777;margin:12px 0 0">
         Questions? Call or text <a href="tel:+16199493361" style="color:#7c3aed;text-decoration:none;">(619) 949-3361</a> — Clayton, Inksent
@@ -389,6 +395,8 @@ export async function sendOrderConfirmationEmail(order: {
         <div style="font-size:28px;font-family:monospace;font-weight:800;color:#1f1f1f;margin-top:4px;letter-spacing:1px;">${order.confirmation_number}</div>
         <div style="font-size:12px;color:#999999;margin-top:6px;">Save this for your records</div>
       </div>
+
+      ${order.id ? `<a href="${baseUrl}/track/${order.id}" style="display:block;text-align:center;background:#111111;color:#ffffff;text-decoration:none;font-weight:700;padding:13px;border-radius:10px;margin:0 0 24px;font-size:14px;">📍 Track this signing live →</a>` : ''}
 
       <div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#888888;font-weight:600;margin-bottom:4px;">Signing Summary</div>
       <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
