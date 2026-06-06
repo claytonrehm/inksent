@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendInvoiceEmail, generateInvoiceNumber } from '@/lib/invoice'
+import { sendSigningCompleteEmail } from '@/lib/email'
 import { sendSMS } from '@/lib/sms'
 
 // Notary self-reports the signing complete (+ optional scan-backs).
@@ -29,9 +30,45 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     scan_backs: Array.isArray(scan_backs) && scan_backs.length ? [...(order.scan_backs ?? []), ...scan_backs] : order.scan_backs,
   }).eq('id', id)
 
-  // Invoice the client
+  const hasScanBacks = Array.isArray(scan_backs) && scan_backs.length > 0
+
+  // Look up the notary for the warm messages (name for the client, phone to thank)
+  const { data: notary } = order.notary_id
+    ? await supabase.from('notaries').select('name, phone').eq('id', order.notary_id).single()
+    : { data: null }
+  const notaryName = notary?.name || 'your signing agent'
+
+  // Invoice the client (transactional)
   if (order.client_email) {
     sendInvoiceEmail({ ...order, invoice_number: invoice_id }).catch(console.error)
+  }
+
+  // Warm "signing complete" congratulations to the title company (keep escrow happy)
+  if (order.client_email) {
+    sendSigningCompleteEmail({
+      clientName: order.client_name,
+      clientEmail: order.client_email,
+      notaryName,
+      signerName: order.signer_name,
+      signingType: order.signing_type,
+      confirmationNumber: order.confirmation_number,
+      hasScanBacks,
+    }).catch(console.error)
+  }
+  if (order.client_phone) {
+    sendSMS(
+      order.client_phone,
+      `🎉 ${order.signer_name}'s signing is complete! Executed by ${notaryName}.${hasScanBacks ? ' Scan-backs uploaded.' : ''} Thank you for choosing Inksent. — Clayton`
+    ).catch(console.error)
+  }
+
+  // Thank-you to the notary (appreciation keeps the bench engaged)
+  if (notary?.phone) {
+    const payout = order.notary_fee ? `$${(order.notary_fee / 100).toFixed(0)}` : 'your fee'
+    sendSMS(
+      notary.phone,
+      `Thank you for completing ${order.signer_name}'s signing! 🙏 ${payout} will be paid out automatically once the client pays. We appreciate you — Inksent`
+    ).catch(console.error)
   }
 
   // Nudge admin to rate the notary (quality loop)

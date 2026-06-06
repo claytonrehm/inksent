@@ -266,6 +266,50 @@ export async function sendClientAssignmentEmail(data: {
   })
 }
 
+// ─── Signing Complete — warm congratulations to the title company ─────────────
+export async function sendSigningCompleteEmail(data: {
+  clientName: string
+  clientEmail: string
+  notaryName: string
+  signerName: string
+  signingType: string
+  confirmationNumber: string
+  hasScanBacks?: boolean
+}) {
+  const firstName = data.clientName?.split(' ')[0] || 'there'
+  const typeLabel = data.signingType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/>${META}</head>
+  <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111111;margin:0;padding:0;background:#f4f4f5;">
+  <div style="max-width:560px;margin:32px auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+    ${HEADER}
+    <div style="padding:32px;text-align:center;">
+      <div style="font-size:40px;line-height:1;margin-bottom:8px;">🎉</div>
+      <p style="font-size:18px;font-weight:800;color:#111111;margin:0 0 6px;">Signing complete!</p>
+      <p style="font-size:14px;color:#555555;margin:0;line-height:1.6;">Nice work, ${firstName} — ${data.signerName}&rsquo;s ${typeLabel.toLowerCase()} signing was executed by <strong>${data.notaryName}</strong> and is officially done.</p>
+    </div>
+    <div style="padding:0 32px 28px;">
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:8px 20px;margin:0 0 20px;">
+        <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+          ${detailRow('Signer', data.signerName, { bold: true })}
+          ${detailRow('Service', `${typeLabel} Signing`)}
+          ${detailRow('Signing agent', data.notaryName)}
+          ${detailRow('Confirmation #', `<span style="font-family:monospace;">${data.confirmationNumber}</span>`, { last: true })}
+        </table>
+      </div>
+      <p style="font-size:14px;color:#555555;margin:0 0 4px;line-height:1.6;">${data.hasScanBacks ? 'Scan-backs are uploaded and your invoice is on its way.' : 'Your invoice is on its way separately.'}</p>
+      <p style="font-size:13px;color:#777777;margin:14px 0 0;line-height:1.6;">Thank you for trusting Inksent with your closing. We&rsquo;d love to handle the next one — just reply here or call <a href="tel:+16199493361" style="color:#7c3aed;text-decoration:none;">(619) 949-3361</a>.</p>
+    </div>
+    ${FOOTER}
+  </div></body></html>`
+
+  return getResend().emails.send({
+    from: 'Clayton at Inksent <orders@inksent.co>',
+    to: data.clientEmail,
+    subject: `🎉 Signing complete — ${data.signerName}'s ${typeLabel}`,
+    html,
+  })
+}
+
 const HEADER = `
   <div style="background:#000;padding:24px 32px;">
     <div style="font-size:24px;font-weight:900;letter-spacing:-0.5px;">
