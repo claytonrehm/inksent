@@ -1,11 +1,12 @@
 import Link from 'next/link'
 
 function InksentIcon({ size = 32, dark = false }: { size?: number; dark?: boolean }) {
+  // Ink drop mark (concept #2). To switch to the pen nib (#3), replace the <path>
+  // with: <path d="M20 8L27.5 25L20 31.5L12.5 25L20 8Z" fill="white"/>
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="40" height="40" rx="9" fill={dark ? '#a78bfa' : '#5B4FCF'} />
-      <path d="M20 8 L30 20 L20 27 L10 20 Z" fill="white" opacity="0.95" />
-      <circle cx="20" cy="31" r="2" fill="white" opacity="0.65" />
+      <rect width="40" height="40" rx="9" fill={dark ? '#7c5cff' : '#5B4FCF'} />
+      <path d="M20 7C20 7 29.5 18.5 29.5 25.5C29.5 30.75 25.2 35 20 35C14.8 35 10.5 30.75 10.5 25.5C10.5 18.5 20 7 20 7Z" fill="white" />
     </svg>
   )
 }
