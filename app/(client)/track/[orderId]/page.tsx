@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import { format } from 'date-fns'
 import InksentLogo from '@/components/InksentLogo'
-import { CheckCircle, Circle, Loader2, UserCheck, FileSignature, XCircle } from 'lucide-react'
+import { CheckCircle, Circle, Loader2, UserCheck, FileSignature, XCircle, Navigation } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Track Your Signing — Inksent' }
@@ -11,13 +11,15 @@ const STAGES = [
   { key: 'received', label: 'Order received', icon: CheckCircle },
   { key: 'finding', label: 'Finding your signing agent', icon: UserCheck },
   { key: 'confirmed', label: 'Agent confirmed', icon: UserCheck },
+  { key: 'enroute', label: 'On the way', icon: Navigation },
   { key: 'complete', label: 'Signing complete', icon: FileSignature },
 ]
 
-function stageIndex(status: string): number {
-  if (status === 'completed') return 3
-  if (status === 'assigned' || status === 'confirmed') return 2
-  if (status === 'dispatching' || status === 'pending') return 1
+function stageIndex(o: { status: string; en_route_at?: string | null; arrived_at?: string | null }): number {
+  if (o.status === 'completed') return 4
+  if (o.arrived_at || o.en_route_at) return 3
+  if (o.status === 'assigned' || o.status === 'confirmed') return 2
+  if (o.status === 'dispatching' || o.status === 'pending') return 1
   return 0
 }
 
@@ -26,14 +28,14 @@ export default async function TrackPage({ params }: { params: Promise<{ orderId:
   const supabase = await createClient()
   const { data: order } = await supabase
     .from('orders')
-    .select('id, confirmation_number, status, signing_date, signing_time, signer_name, property_city, property_state, notaries(name, photo_url, nna_certified)')
+    .select('id, confirmation_number, status, signing_date, signing_time, signer_name, property_city, property_state, en_route_at, arrived_at, notaries(name, photo_url, nna_certified)')
     .eq('id', orderId)
     .single()
 
   if (!order) notFound()
 
   const cancelled = order.status === 'cancelled'
-  const current = stageIndex(order.status)
+  const current = stageIndex(order)
   const notaryRaw = order.notaries as unknown
   const notary = (Array.isArray(notaryRaw) ? notaryRaw[0] : notaryRaw) as { name: string; photo_url?: string; nna_certified: boolean } | null
   const [h, m] = order.signing_time.split(':').map(Number)
@@ -82,6 +84,13 @@ export default async function TrackPage({ params }: { params: Promise<{ orderId:
             <div className="space-y-1">
               {STAGES.map((stage, i) => {
                 const state = i < current ? 'done' : i === current ? 'active' : 'pending'
+                // The "on the way" stage shows a live label as the agent progresses
+                let label = stage.label
+                if (stage.key === 'enroute') {
+                  if (order.arrived_at) label = 'Agent has arrived'
+                  else if (order.en_route_at) label = 'Agent is on the way'
+                  else label = 'On the way'
+                }
                 return (
                   <div key={stage.key} className="flex items-center gap-3 py-2">
                     <div className="shrink-0">
@@ -90,7 +99,7 @@ export default async function TrackPage({ params }: { params: Promise<{ orderId:
                         : <Circle size={22} className="text-gray-200" />}
                     </div>
                     <span className={`text-sm ${state === 'pending' ? 'text-gray-300' : state === 'active' ? 'font-semibold text-violet-700' : 'text-gray-700'}`}>
-                      {stage.label}
+                      {label}
                     </span>
                   </div>
                 )

@@ -35,6 +35,15 @@ export default async function NotaryDetailPage({ params }: { params: Promise<{ i
   const owed = completed.filter(o => !o.notary_paid_at).reduce((s, o) => s + o.notary_fee, 0)
   const coverage = lookupZip(notary.base_zip)
 
+  // Credential-expiry protection
+  const today = new Date().toISOString().slice(0, 10)
+  const soon = new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10)
+  const credAlerts: string[] = []
+  if (notary.eo_expiry && notary.eo_expiry < today) credAlerts.push('E&O insurance EXPIRED')
+  else if (notary.eo_expiry && notary.eo_expiry < soon) credAlerts.push('E&O expires within 30 days')
+  if (notary.commission_expiry && notary.commission_expiry < today) credAlerts.push('Commission EXPIRED')
+  else if (notary.commission_expiry && notary.commission_expiry < soon) credAlerts.push('Commission expires within 30 days')
+
   // order lookup for review context
   const orderById = Object.fromEntries(allOrders.map(o => [o.id, o]))
 
@@ -92,6 +101,12 @@ export default async function NotaryDetailPage({ params }: { params: Promise<{ i
             <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Onboarding pending</span>
           )}
         </div>
+        {credAlerts.length > 0 && (
+          <div className="mb-4 flex items-start gap-2 text-sm bg-red-50 border border-red-200 text-red-700 rounded-lg px-3 py-2.5">
+            <span className="shrink-0">⚠️</span>
+            <span><strong>Credential alert:</strong> {credAlerts.join(' · ')}. This agent is automatically excluded from dispatch until it&apos;s renewed.</span>
+          </div>
+        )}
         {notary.onboarded_at ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3 text-sm">
             <Detail label="NNA Number" value={notary.nna_number || '—'} />

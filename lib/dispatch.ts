@@ -30,15 +30,19 @@ export async function blastOrderToCoveringNotaries(
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'
   const { data: notaries } = await supabase
     .from('notaries')
-    .select('id, name, phone, email, base_zip, coverage_radius, onboarded_at, languages')
+    .select('id, name, phone, email, base_zip, coverage_radius, onboarded_at, languages, eo_expiry, commission_expiry')
     .eq('active', true)
 
   const exclude = new Set(opts.exclude ?? [])
   const active = notaries ?? []
+  const today = new Date().toISOString().slice(0, 10)
+  // Never dispatch to an agent whose E&O or commission has lapsed — protects all parties
+  const credsValid = (n: { eo_expiry?: string | null; commission_expiry?: string | null }) =>
+    (!n.eo_expiry || n.eo_expiry >= today) && (!n.commission_expiry || n.commission_expiry >= today)
 
-  // Only notaries who finished onboarding can be dispatched (we must be able to pay + verify them)
+  // Only notaries who finished onboarding + have valid credentials can be dispatched
   const eligible = active.filter(
-    (n) => !exclude.has(n.id) && n.onboarded_at && notaryCoversZip(n.base_zip, n.coverage_radius, order.property_zip)
+    (n) => !exclude.has(n.id) && n.onboarded_at && credsValid(n) && notaryCoversZip(n.base_zip, n.coverage_radius, order.property_zip)
   )
   const notOnboarded = active.filter(
     (n) => !exclude.has(n.id) && !n.onboarded_at && notaryCoversZip(n.base_zip, n.coverage_radius, order.property_zip)

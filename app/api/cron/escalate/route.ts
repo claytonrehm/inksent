@@ -56,6 +56,35 @@ export async function GET(req: NextRequest) {
     await supabase.from('orders').update({ escalated_at: new Date().toISOString() }).eq('id', o.id)
   }
 
+  // 2b. No-show / overdue: an assigned signing whose time has passed but isn't
+  //     marked complete. Alert admin once + nudge the notary.
+  const { data: maybeOverdue } = await supabase
+    .from('orders')
+    .select('id, confirmation_number, signer_name, signing_date, signing_time, notaries(name, phone)')
+    .in('status', ['assigned', 'confirmed'])
+    .lte('signing_date', today)
+    .is('overdue_alerted_at', null)
+
+  for (const o of maybeOverdue ?? []) {
+    const when = new Date(`${o.signing_date}T${o.signing_time}`).getTime()
+    if (now - when < 2 * 3600 * 1000) continue // give it 2h past the scheduled time
+    const nRaw = o.notaries as unknown
+    const n = (Array.isArray(nRaw) ? nRaw[0] : nRaw) as { name: string; phone: string } | null
+    if (process.env.ADMIN_PHONE) {
+      await sendSMS(
+        process.env.ADMIN_PHONE,
+        `🚨 OVERDUE: ${o.signer_name}'s signing (${o.confirmation_number}) was scheduled ${format(new Date(o.signing_date), 'MMM d')} but isn't marked complete. Assigned to ${n?.name ?? 'a notary'}. Check on it.`
+      ).catch(() => {})
+    }
+    if (n?.phone) {
+      await sendSMS(
+        n.phone,
+        `Hi ${(n.name ?? '').split(' ')[0]}, your ${o.signer_name} signing time has passed — please mark it complete or report a problem from your job link. Thanks! — Inksent`
+      ).catch(() => {})
+    }
+    await supabase.from('orders').update({ overdue_alerted_at: new Date().toISOString() }).eq('id', o.id)
+  }
+
   // 3. Auto-chase unpaid invoices so you never have to. Reminders at 7 & 14 days,
   //    final escalation to admin at 30 days.
   const { data: unpaid } = await supabase

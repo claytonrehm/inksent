@@ -50,17 +50,23 @@ export async function sendNotaryApprovedEmail(data: { name: string; email: strin
 
 // ─── Documents Ready for Notary ───────────────────────────────────────────────
 
-export async function sendNotaryDocsEmail(data: { notaryName: string; notaryEmail: string; signerName: string; docsUrl: string }) {
+export async function sendNotaryDocsEmail(data: { notaryName: string; notaryEmail: string; signerName: string; docsUrl: string; updated?: boolean }) {
   const firstName = data.notaryName.split(' ')[0]
+  const badge = data.updated ? '⚠️ Updated Documents' : '📄 Documents Ready'
+  const badgeColors = data.updated ? 'background:#fef3c7;color:#92400e;' : 'background:#ede9fe;color:#5b21b6;'
+  const headline = data.updated ? `Updated documents for ${firstName}` : `Your signing docs are ready, ${firstName}.`
+  const body = data.updated
+    ? `The document package for your <strong>${data.signerName}</strong> signing has been <strong>updated</strong>. Please <strong>discard the previous version</strong> and print only this new package — the old files have been removed.`
+    : `The document package for your <strong>${data.signerName}</strong> signing is available to download. Please print everything and bring it to the appointment.`
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/>${META}</head>
   <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111111;margin:0;padding:0;background:#f4f4f5;">
   <div style="max-width:560px;margin:32px auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
     ${HEADER}
     <div style="padding:32px;">
-      <div style="display:inline-block;background:#ede9fe;color:#5b21b6;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;">📄 Documents Ready</div>
-      <p style="font-size:16px;font-weight:700;color:#111111;margin:0 0 6px;">Your signing docs are ready, ${firstName}.</p>
-      <p style="font-size:14px;color:#555555;line-height:1.6;margin:0 0 22px;">The document package for your <strong>${data.signerName}</strong> signing is available to download. Please print everything and bring it to the appointment.</p>
-      <a href="${data.docsUrl}" style="display:block;text-align:center;background:#7c3aed;color:#ffffff;text-decoration:none;font-weight:700;padding:14px;border-radius:10px;font-size:15px;">View &amp; Download Documents →</a>
+      <div style="display:inline-block;${badgeColors}font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;">${badge}</div>
+      <p style="font-size:16px;font-weight:700;color:#111111;margin:0 0 6px;">${headline}</p>
+      <p style="font-size:14px;color:#555555;line-height:1.6;margin:0 0 22px;">${body}</p>
+      <a href="${data.docsUrl}" style="display:block;text-align:center;background:#7c3aed;color:#ffffff;text-decoration:none;font-weight:700;padding:14px;border-radius:10px;font-size:15px;">View &amp; Download ${data.updated ? 'Updated ' : ''}Documents →</a>
       <p style="font-size:13px;color:#888888;line-height:1.6;margin:20px 0 0;">This is a private link for your assigned signing. Questions? Call or text (619) 949-3361.</p>
     </div>
     ${FOOTER}
@@ -69,7 +75,7 @@ export async function sendNotaryDocsEmail(data: { notaryName: string; notaryEmai
   return getResend().emails.send({
     from: 'Inksent <orders@inksent.co>',
     to: data.notaryEmail,
-    subject: `Documents ready — ${data.signerName} signing`,
+    subject: data.updated ? `⚠️ Updated documents — ${data.signerName} signing` : `Documents ready — ${data.signerName} signing`,
     html,
   })
 }

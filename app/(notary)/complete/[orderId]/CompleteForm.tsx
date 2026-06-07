@@ -11,7 +11,32 @@ export default function CompleteForm({ orderId, notaryId }: { orderId: string; n
   const [submitting, setSubmitting] = useState(false)
   const [scans, setScans] = useState<{ name: string; path: string }[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [milestone, setMilestone] = useState<'en_route' | 'arrived' | null>(null)
+  const [showReport, setShowReport] = useState(false)
+  const [reportReason, setReportReason] = useState('')
+  const [reportNotes, setReportNotes] = useState('')
+  const [reported, setReported] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  function markMilestone(m: 'en_route' | 'arrived') {
+    setMilestone(m)
+    fetch(`/api/orders/${orderId}/progress`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notary_id: notaryId, milestone: m }),
+    }).catch(() => {})
+  }
+
+  async function submitReport() {
+    if (!reportReason) { setError('Please pick what happened.'); return }
+    setSubmitting(true); setError(null)
+    const res = await fetch(`/api/orders/${orderId}/report`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notary_id: notaryId, reason: reportReason, notes: reportNotes }),
+    })
+    setSubmitting(false)
+    if (!res.ok) { setError('Could not send. Please text (619) 949-3361.'); return }
+    setReported(true)
+  }
 
   async function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
@@ -58,6 +83,22 @@ export default function CompleteForm({ orderId, notaryId }: { orderId: string; n
 
   return (
     <div className="space-y-4">
+      {/* Live status — title company sees this in real time */}
+      <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+        <p className="text-sm font-semibold text-gray-700">Update your status</p>
+        <p className="text-xs text-gray-400 mb-3">Tap as you go — the title company watches this live.</p>
+        <div className="grid grid-cols-2 gap-2">
+          <button type="button" onClick={() => markMilestone('en_route')}
+            className={`flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-sm font-medium border transition-colors ${milestone ? 'bg-violet-600 text-white border-violet-600' : 'bg-white text-gray-700 border-gray-300 hover:border-violet-300'}`}>
+            🚗 On my way
+          </button>
+          <button type="button" onClick={() => markMilestone('arrived')}
+            className={`flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-sm font-medium border transition-colors ${milestone === 'arrived' ? 'bg-violet-600 text-white border-violet-600' : 'bg-white text-gray-700 border-gray-300 hover:border-violet-300'}`}>
+            📍 I&apos;ve arrived
+          </button>
+        </div>
+      </div>
+
       <div>
         <p className="text-sm font-medium text-gray-700 mb-1">Scan-backs (optional)</p>
         <p className="text-xs text-gray-400 mb-2">Upload photos or a PDF of the signed documents if required for this signing.</p>
@@ -82,6 +123,34 @@ export default function CompleteForm({ orderId, notaryId }: { orderId: string; n
         <CheckCircle size={16} className="mr-2" /> Mark Signing Complete
       </Button>
       <p className="text-center text-xs text-gray-400">This confirms you completed the signing and notifies our team.</p>
+
+      {/* Report a problem */}
+      {reported ? (
+        <p className="text-center text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5">Issue reported — we&apos;ll reach out right away. Thank you for flagging it.</p>
+      ) : !showReport ? (
+        <button type="button" onClick={() => setShowReport(true)} className="block w-full text-center text-xs text-gray-400 hover:text-gray-600 underline">
+          Something went wrong? Report a problem
+        </button>
+      ) : (
+        <div className="border border-amber-200 bg-amber-50 rounded-xl p-4 space-y-3">
+          <p className="text-sm font-semibold text-gray-800">Report a problem</p>
+          <select value={reportReason} onChange={(e) => setReportReason(e.target.value)}
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white">
+            <option value="">What happened?</option>
+            <option value="Signer not available / no-show">Signer not available / no-show</option>
+            <option value="ID / verification issue">ID / verification issue</option>
+            <option value="Documents missing or incorrect">Documents missing or incorrect</option>
+            <option value="Could not complete — other">Could not complete — other</option>
+          </select>
+          <textarea value={reportNotes} onChange={(e) => setReportNotes(e.target.value)} placeholder="Add any details (optional)..." rows={2}
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
+          <div className="flex gap-2">
+            <button type="button" onClick={submitReport} disabled={submitting}
+              className="flex-1 bg-amber-600 text-white rounded-lg py-2 text-sm font-semibold hover:bg-amber-700 disabled:opacity-50">Report issue</button>
+            <button type="button" onClick={() => setShowReport(false)} className="px-3 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

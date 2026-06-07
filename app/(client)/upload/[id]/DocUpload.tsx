@@ -9,6 +9,13 @@ export default function DocUpload({ orderId, existing }: { orderId: string; exis
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+  const modeRef = useRef<'add' | 'replace'>('add')
+
+  function pick(mode: 'add' | 'replace') {
+    if (mode === 'replace' && !confirm('Replace the entire package? The previous documents will be permanently removed and the new ones sent to the assigned notary. Use this when the lender sends an updated package.')) return
+    modeRef.current = mode
+    fileRef.current?.click()
+  }
 
   async function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
@@ -33,9 +40,10 @@ export default function DocUpload({ orderId, existing }: { orderId: string; exis
       if (newDocs.length > 0) {
         const res = await fetch(`/api/orders/${orderId}/documents`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ documents: newDocs }),
+          body: JSON.stringify({ documents: newDocs, mode: modeRef.current }),
         })
         if (!res.ok) { setError('Uploaded, but could not finalize. Please refresh and check.'); }
+        else if (modeRef.current === 'replace') setUploaded(newDocs.map((d) => ({ name: d.name })))
         else setUploaded((prev) => [...prev, ...newDocs.map((d) => ({ name: d.name }))])
       }
     } catch {
@@ -43,6 +51,7 @@ export default function DocUpload({ orderId, existing }: { orderId: string; exis
     } finally {
       setBusy(false)
       if (fileRef.current) fileRef.current.value = ''
+      modeRef.current = 'add'
     }
   }
 
@@ -62,7 +71,7 @@ export default function DocUpload({ orderId, existing }: { orderId: string; exis
 
       <input ref={fileRef} type="file" accept=".pdf,application/pdf,image/*" multiple onChange={handleFiles} className="hidden" />
       <button
-        onClick={() => fileRef.current?.click()}
+        onClick={() => pick('add')}
         disabled={busy}
         className="w-full border-2 border-dashed border-violet-200 hover:border-violet-400 bg-violet-50/50 rounded-xl py-8 flex flex-col items-center gap-2 transition-colors disabled:opacity-60"
       >
@@ -71,11 +80,17 @@ export default function DocUpload({ orderId, existing }: { orderId: string; exis
         <span className="text-xs text-gray-400">PDF preferred · up to 50MB each · multiple files OK</span>
       </button>
 
+      {uploaded.length > 0 && !busy && (
+        <button onClick={() => pick('replace')} className="w-full mt-2 text-center text-sm font-medium text-gray-500 hover:text-violet-700 underline">
+          Lender sent an update? Replace the entire package
+        </button>
+      )}
+
       {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3 mt-3 flex items-center gap-2"><X size={14} />{error}</p>}
 
       {uploaded.length > 0 && !busy && (
         <p className="text-sm text-green-700 mt-4 text-center font-medium">
-          ✓ Documents received. The assigned notary will get them automatically.
+          ✓ Documents received. The assigned notary gets them automatically — and any replacement instantly swaps the old set.
         </p>
       )}
     </div>
