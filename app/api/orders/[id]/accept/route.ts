@@ -52,7 +52,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   // tap "accept" at the same instant, exactly one wins the row — no double-booking.
   const { data: claimed } = await supabase
     .from('orders')
-    .update({ notary_id, status: 'assigned' })
+    .update({ notary_id, status: 'assigned', accepted_at: new Date().toISOString() })
     .eq('id', id)
     .is('notary_id', null)
     .select('id')
