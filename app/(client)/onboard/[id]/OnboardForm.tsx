@@ -18,7 +18,6 @@ const schema = z.object({
   eo_policy: z.string().optional(),
   eo_expiry: z.string().min(1, 'Required'),
   has_dual_tray: z.enum(['yes', 'no'], { message: 'Please select' }),
-  w9_acknowledged: z.literal(true, { message: 'Required' }),
   ic_acknowledged: z.literal(true, { message: 'Required' }),
 })
 type FormData = z.infer<typeof schema>
@@ -58,7 +57,7 @@ export default function OnboardForm({ notaryId, notaryName }: { notaryId: string
         <a href={`/onboard/${notaryId}/connect`} className="w-full max-w-xs bg-violet-600 text-white font-bold py-3.5 rounded-xl hover:bg-violet-700 transition-colors">
           Set Up Automatic Payouts →
         </a>
-        <p className="text-xs text-gray-400 max-w-sm">Don&apos;t forget to email your signed W-9 to orders@inksent.co before your first signing.</p>
+        <p className="text-xs text-gray-400 max-w-sm">Your tax details (W-9 equivalent) are collected securely by Stripe during payout setup — nothing to email.</p>
       </div>
     )
   }
@@ -134,27 +133,18 @@ export default function OnboardForm({ notaryId, notaryName }: { notaryId: string
         </p>
       </section>
 
-      {/* W-9 */}
+      {/* Tax note */}
       <section className="bg-violet-50 border border-violet-100 rounded-xl p-4">
         <div className="flex items-start gap-3">
           <FileText size={18} className="text-violet-600 shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm font-semibold text-gray-900">W-9 Required</p>
-            <p className="text-sm text-gray-600 mt-0.5">
-              Download, complete, and email your W-9 to <strong>orders@inksent.co</strong> before your first signing.{' '}
-              <a href="https://www.irs.gov/pub/irs-pdf/fw9.pdf" target="_blank" rel="noopener noreferrer" className="text-violet-600 underline font-medium">Download W-9 (IRS)</a>
-            </p>
-          </div>
+          <p className="text-sm text-gray-600">
+            <strong className="text-gray-900">Taxes are handled for you.</strong> Stripe securely collects your tax info during payout setup (no W-9 to email), and issues your 1099-NEC if you earn $600+ in a year.
+          </p>
         </div>
       </section>
 
       {/* Agreements */}
       <section className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-4">
-        <label className="flex items-start gap-3 cursor-pointer">
-          <input type="checkbox" className="mt-0.5 h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500" {...register('w9_acknowledged')} />
-          <span className="text-sm text-gray-600">I will email my completed <strong>W-9</strong> to orders@inksent.co. Earnings of $600+/year are reported on a 1099-NEC.</span>
-        </label>
-        {errors.w9_acknowledged && <p className="text-xs text-red-500 ml-7">{errors.w9_acknowledged.message}</p>}
         <label className="flex items-start gap-3 cursor-pointer">
           <input type="checkbox" className="mt-0.5 h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500" {...register('ic_acknowledged')} />
           <span className="text-sm text-gray-600">I confirm I work as an <strong>independent contractor</strong>, responsible for my own taxes, transportation, supplies, and insurance.</span>
