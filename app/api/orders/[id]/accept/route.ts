@@ -48,10 +48,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: 'You previously declined this signing.' }, { status: 409 })
   }
 
-  await supabase
+  // Atomic claim: only succeeds if the order is STILL unassigned. If two notaries
+  // tap "accept" at the same instant, exactly one wins the row — no double-booking.
+  const { data: claimed } = await supabase
     .from('orders')
     .update({ notary_id, status: 'assigned' })
     .eq('id', id)
+    .is('notary_id', null)
+    .select('id')
+  if (!claimed || claimed.length === 0) {
+    return NextResponse.json({ error: 'This signing was just taken by another agent.' }, { status: 409 })
+  }
 
   const h = parseInt(order.signing_time.split(':')[0])
   const m = order.signing_time.split(':')[1]

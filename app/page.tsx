@@ -3,16 +3,11 @@ import { CheckCircle, Clock, DollarSign, MapPin, Phone, Shield, ArrowRight, Shie
 import InksentLogo from '@/components/InksentLogo'
 import HeroStats from '@/components/HeroStats'
 import PhoneMockup from '@/components/PhoneMockup'
+import ProcessShowcase from '@/components/ProcessShowcase'
 import USMap from '@/components/USMap'
 import ScrollReveal from '@/components/ScrollReveal'
 import AuroraBackground from '@/components/AuroraBackground'
 import NavClient from '@/components/NavClient'
-
-const HOW_IT_WORKS = [
-  { step: '01', title: 'Submit Your Order', desc: 'Fill out our simple online form with property address, signing date, and borrower info. Takes under 2 minutes.', icon: '📋' },
-  { step: '02', title: 'We Dispatch a Notary', desc: 'We alert every vetted, NNA-certified agent in your area at once and confirm coverage within 30 minutes.', icon: '📡' },
-  { step: '03', title: 'Signing Completed', desc: 'Your agent shows up on time, executes the documents, and you get confirmation the moment it\'s done.', icon: '✅' },
-]
 
 const FEATURES = [
   { icon: <ShieldCheck size={22} />, title: 'Never Left Scrambling', desc: 'If your notary cancels, the job instantly re-offers to every other covering agent — automatically — until one sticks.' },
@@ -132,39 +127,17 @@ export default function Home() {
         </div>
       </div>
 
-      {/* How it works */}
+      {/* How it works — dynamic live showcase */}
       <section id="how-it-works" className="px-6 py-16 sm:py-24 relative">
-        <div className="max-w-5xl mx-auto">
-          <ScrollReveal className="text-center mb-16">
-            <p className="text-violet-400 font-semibold text-sm uppercase tracking-widest mb-3">Simple Process</p>
-            <h2 className="text-4xl font-black text-white">How It Works</h2>
+        <div className="max-w-6xl mx-auto">
+          <ScrollReveal className="text-center mb-12">
+            <p className="text-violet-400 font-semibold text-sm uppercase tracking-widest mb-3">How It Works</p>
+            <h2 className="text-4xl font-black text-white">The future of notary assignment.</h2>
+            <p className="text-slate-400 mt-3 max-w-xl mx-auto">Watch a signing go from request to done — automatically.</p>
           </ScrollReveal>
-          <div className="relative">
-            {/* connecting path behind the step nodes (desktop) */}
-            <div className="hidden md:block absolute top-10 left-[16.66%] right-[16.66%] h-px bg-gradient-to-r from-violet-500/0 via-violet-500/60 to-violet-500/0" />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-y-2 md:gap-8 relative">
-              {HOW_IT_WORKS.map(({ step, title, desc, icon }, i) => (
-                <ScrollReveal key={step} delay={i * 150}>
-                  <div className="relative flex flex-col items-center text-center px-4">
-                    {/* node on the path */}
-                    <div className="relative z-10 w-20 h-20 rounded-full bg-[#11111b] border border-violet-400/40 flex items-center justify-center text-3xl shadow-[0_0_40px_-8px_rgba(139,92,246,0.7)]">
-                      {icon}
-                      <span className="absolute -top-1.5 -right-1.5 w-7 h-7 rounded-full bg-violet-600 text-white text-[11px] font-black flex items-center justify-center ring-4 ring-[#07070d]">{step}</span>
-                    </div>
-                    <h3 className="mt-6 text-lg font-bold text-white">{title}</h3>
-                    <p className="mt-2 text-slate-400 text-sm leading-relaxed max-w-xs">{desc}</p>
-                    {/* mobile connector to the next step */}
-                    {i < HOW_IT_WORKS.length - 1 && (
-                      <div className="md:hidden flex flex-col items-center mt-5 mb-1 text-violet-400/50">
-                        <div className="w-px h-6 bg-gradient-to-b from-violet-500/0 to-violet-500/60" />
-                        <ArrowRight size={16} className="rotate-90 -mt-1" />
-                      </div>
-                    )}
-                  </div>
-                </ScrollReveal>
-              ))}
-            </div>
-          </div>
+          <ScrollReveal>
+            <ProcessShowcase />
+          </ScrollReveal>
         </div>
       </section>
 
