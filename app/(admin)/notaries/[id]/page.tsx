@@ -6,6 +6,7 @@ import { formatCurrency } from '@/lib/utils'
 import { lookupZip } from '@/lib/coverage'
 import { SIGNINGS_LABEL } from '@/lib/notary'
 import NotaryDetailActions from './NotaryDetailActions'
+import CoverageMap from '@/components/CoverageMap'
 import { Star, MapPin, Phone, Mail, ArrowLeft, CheckCircle, XCircle } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
@@ -109,6 +110,15 @@ export default async function NotaryDetailPage({ params }: { params: Promise<{ i
           </p>
         )}
       </div>
+
+      {/* Coverage map */}
+      {coverage && (
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+          <h2 className="font-bold text-gray-900 mb-1">Coverage Area</h2>
+          <p className="text-sm text-gray-500 mb-3">{coverage.city}, {coverage.state} · covers ~{notary.coverage_radius ?? 25} miles</p>
+          <CoverageMap lat={coverage.latitude} lng={coverage.longitude} radiusMiles={notary.coverage_radius ?? 25} label={notary.name} />
+        </div>
+      )}
 
       {/* Metrics */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
