@@ -8,7 +8,7 @@ and **honest** — never overpromise job volume. Accurate to how the system work
 ## 💵 Pay
 
 **"How are signings paid?"**
-> You're paid **$90 per completed signing**, sent by **secure direct deposit** straight to your bank — automatically, once the title company pays for that signing. No invoicing or chasing checks. When you're approved, you do a quick 2-minute bank connection through Stripe (our payments partner), and payouts just land after each job. 😊
+> You're paid **$90 per completed signing**, sent by **secure direct deposit** directly to your bank account — automatically, once the title company pays for that signing. No invoicing or chasing checks. When you're approved, you do a quick 2-minute bank connection through Stripe (our payments partner), and payouts just land after each job. 😊
 
 **"How much do I make per signing?"**
 > $90 per completed signing here in San Diego. As we grow we may pay more for complex or longer-distance jobs.
@@ -18,7 +18,7 @@ and **honest** — never overpromise job volume. Accurate to how the system work
 > *(Internal note: you can bump the fee per-job when you dispatch a monster package or one needing multiple trips — the "flat $90" promise still holds for normal signings.)*
 
 **"How fast do I get paid?"**
-> Payout is released automatically once the client pays for that signing — no waiting on you to invoice or follow up. It deposits straight to your bank.
+> Payout is released automatically once the client pays for that signing — no waiting on you to invoice or follow up. It deposits directly to your bank account.
 
 **"Do I get a 1099 / how do taxes work?"**
 > You're a 1099 independent contractor. Stripe handles the tax form automatically, and you'll get a 1099 if you earn $600+ in a year.

@@ -9,7 +9,7 @@ export const metadata = {
 }
 
 const HOW_IT_WORKS = [
-  { icon: <DollarSign size={18} />, title: '$90 per signing', desc: 'Paid straight to your bank after each completed signing. No minimums, no membership fees.' },
+  { icon: <DollarSign size={18} />, title: '$90 per signing', desc: 'Paid directly to your bank account after each completed signing. No minimums, no membership fees.' },
   { icon: <Zap size={18} />, title: 'Jobs come by text', desc: 'When a signing opens up in a ZIP code you cover, we text you the details. Tap to accept — first to respond gets it.' },
   { icon: <Clock size={18} />, title: 'You stay in control', desc: 'Only accept the jobs that fit your schedule. No penalty for passing on one.' },
   { icon: <Star size={18} />, title: 'A real person', desc: 'We\'re a small, local team — not a faceless platform. You always reach an actual person.' },
@@ -53,7 +53,7 @@ export default function ApplyPage() {
             <div className="bg-gradient-to-br from-violet-600 to-violet-800 rounded-2xl p-6 text-white">
               <p className="text-violet-200 text-xs font-semibold uppercase tracking-widest mb-1">Per Signing</p>
               <div className="text-5xl font-black mb-1">$90</div>
-              <p className="text-violet-200 text-sm">paid to your bank</p>
+              <p className="text-violet-200 text-sm">paid directly to your bank account</p>
               <div className="mt-4 pt-4 border-t border-white/20 text-xs text-violet-200">
                 Free to join · No minimums
               </div>

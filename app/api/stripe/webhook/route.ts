@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
           })
           if (ok) {
             await supabase.from('orders').update({ notary_paid_at: new Date().toISOString() }).eq('id', orderId)
-            sendSMS(n.phone, `💵 You've been paid $${(o.notary_fee / 100).toFixed(0)} for the ${o.confirmation_number} signing. It's on its way to your bank. Thanks! — Inksent`).catch(() => {})
+            sendSMS(n.phone, `💵 You've been paid $${(o.notary_fee / 100).toFixed(0)} for the ${o.confirmation_number} signing. It's on its way to your bank account. Thanks! — Inksent`).catch(() => {})
           } else if (process.env.ADMIN_PHONE) {
             sendSMS(process.env.ADMIN_PHONE, `⚠️ Auto-payout to ${n.name} failed for ${o.confirmation_number}. Check Stripe balance/account.`).catch(() => {})
           }

@@ -4,7 +4,7 @@ import PrintButton from '../partners/PrintButton'
 
 export const metadata = {
   title: 'Join the Inksent Notary Network — $90/Signing, Jobs by Text',
-  description: 'Free to join. Get signing jobs by text in your area, $90 per completed signing, paid automatically to your bank.',
+  description: 'Free to join. Get signing jobs by text in your area, $90 per completed signing, paid automatically to your bank account.',
 }
 
 const PERKS = [
@@ -65,7 +65,7 @@ export default function JoinPage() {
             Get signing jobs sent straight to your phone.
           </h1>
           <p className="text-lg text-gray-600 leading-relaxed">
-            Inksent is building a network of professional notary signing agents. Join free, set your coverage area, and we&rsquo;ll text you signings near you — <strong className="text-gray-800">$90 per completed signing, paid automatically to your bank.</strong>
+            Inksent is building a network of professional notary signing agents. Join free, set your coverage area, and we&rsquo;ll text you signings near you — <strong className="text-gray-800">$90 per completed signing, paid automatically to your bank account.</strong>
           </p>
         </div>
 
@@ -103,7 +103,7 @@ export default function JoinPage() {
           <div className="bg-gradient-to-br from-violet-600 to-violet-800 rounded-xl p-6 text-white text-center flex flex-col justify-center">
             <p className="text-violet-200 text-xs font-semibold uppercase tracking-widest mb-1">Per Signing</p>
             <div className="text-5xl font-black">$90</div>
-            <p className="text-violet-200 text-sm mt-1">paid to your bank</p>
+            <p className="text-violet-200 text-sm mt-1">paid directly to your bank account</p>
             <p className="text-violet-100 text-xs mt-3 border-t border-white/20 pt-3">Free to join · No minimums</p>
           </div>
         </div>

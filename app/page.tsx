@@ -254,7 +254,7 @@ export default function Home() {
             <Link href="/join" className="block h-full group rounded-3xl border border-white/10 bg-gradient-to-br from-fuchsia-600/20 to-transparent p-8 hover:border-fuchsia-400/50 transition-all">
               <UserRoundCheck className="text-fuchsia-300 mb-4" size={28} />
               <h3 className="text-2xl font-black text-white mb-2">For Notaries</h3>
-              <p className="text-slate-400 text-sm mb-5 leading-relaxed">Join free, get jobs by text in your area, and earn $90 per signing — paid automatically to your bank.</p>
+              <p className="text-slate-400 text-sm mb-5 leading-relaxed">Join free, get jobs by text in your area, and earn $90 per signing — paid automatically to your bank account.</p>
               <span className="inline-flex items-center gap-1.5 text-fuchsia-300 font-semibold text-sm group-hover:gap-2.5 transition-all">Join the network <ArrowRight size={15} /></span>
             </Link>
           </ScrollReveal>

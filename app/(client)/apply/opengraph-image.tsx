@@ -52,7 +52,7 @@ export default function Image() {
         </div>
         <div style={{ display: 'flex', alignItems: 'baseline', marginTop: 30 }}>
           <div style={{ fontSize: 60, fontWeight: 800, color: '#a78bfa' }}>$90</div>
-          <div style={{ fontSize: 32, color: '#94a3b8', marginLeft: 18 }}>per completed signing · paid to your bank</div>
+          <div style={{ fontSize: 32, color: '#94a3b8', marginLeft: 18 }}>per completed signing · paid to your bank account</div>
         </div>
       </div>
     ),
