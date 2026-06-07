@@ -61,6 +61,9 @@ export async function blastOrderToCoveringNotaries(
   let blastCount = 0
   if (covering.length > 0) {
     const dateLabel = format(new Date(order.signing_date), 'EEEE, MMM d')
+    const [thh, tmm] = order.signing_time.split(':')
+    const th = parseInt(thh)
+    const timeLabel = `${th % 12 || 12}:${tmm} ${th < 12 ? 'AM' : 'PM'}`
     // Reach each covering notary by EMAIL and SMS. Email always works; SMS works
     // once A2P clears. A notary counts as reached if either channel succeeds —
     // so dispatch is fully operational even before Twilio A2P is approved.
@@ -75,7 +78,7 @@ export async function blastOrderToCoveringNotaries(
                 signerName: order.signer_name,
                 signingType: order.signing_type,
                 signingDate: dateLabel,
-                signingTime: order.signing_time,
+                signingTime: timeLabel,
                 propertyAddress: order.property_address,
                 propertyCity: order.property_city,
                 propertyZip: order.property_zip,
@@ -91,7 +94,7 @@ export async function blastOrderToCoveringNotaries(
                   signerName: order.signer_name,
                   signingType: order.signing_type,
                   signingDate: dateLabel,
-                  signingTime: order.signing_time,
+                  signingTime: timeLabel,
                   propertyAddress: order.property_address,
                   propertyCity: order.property_city,
                   propertyZip: order.property_zip,

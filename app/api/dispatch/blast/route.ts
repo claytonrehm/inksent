@@ -26,6 +26,8 @@ export async function POST(req: NextRequest) {
   const order = orderResult.data
   const notaries = notariesResult.data ?? []
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
+  const [bh, bm] = order.signing_time.split(':')
+  const timeLabel = `${parseInt(bh) % 12 || 12}:${bm} ${parseInt(bh) < 12 ? 'AM' : 'PM'}`
 
   // Send to all notaries — first to accept wins
   const results = await Promise.allSettled(
@@ -36,7 +38,7 @@ export async function POST(req: NextRequest) {
         signerName: order.signer_name,
         signingType: order.signing_type,
         signingDate: format(new Date(order.signing_date), 'EEEE, MMM d'),
-        signingTime: order.signing_time,
+        signingTime: timeLabel,
         propertyAddress: order.property_address,
         propertyCity: order.property_city,
         propertyZip: order.property_zip,

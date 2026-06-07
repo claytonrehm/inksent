@@ -11,10 +11,10 @@ import NavClient from '@/components/NavClient'
 
 const FEATURES = [
   { icon: <ShieldCheck size={22} />, title: 'Never Left Scrambling', desc: 'If your notary cancels, the job instantly re-offers to every other covering agent — automatically — until one sticks.' },
-  { icon: <FileCheck2 size={22} />, title: 'Documents Follow the Job', desc: 'Upload your package once. Whoever ends up at the table gets it automatically — even a last-minute backup.' },
-  { icon: <Eye size={22} />, title: 'You Know Who Shows Up', desc: 'Every agent is photographed, credential-verified, background-checked, and rated on punctuality.' },
+  { icon: <FileCheck2 size={22} />, title: 'Documents Follow the Job', desc: 'Upload once; whoever ends up at the table gets it — even a backup. Lender sends an update? The old package is deleted, so no one signs a stale set.' },
+  { icon: <Eye size={22} />, title: 'You Know Who Shows Up', desc: 'NNA-certified, background-checked, E&O-insured, and vetted for real purchase & refi experience. Lapsed credentials are auto-blocked from your closing.' },
   { icon: <Clock size={22} />, title: '30-Minute Confirmation', desc: 'We alert every qualified agent at once; first to accept wins. No phone tag, no waiting hours.' },
-  { icon: <MapPin size={22} />, title: 'Live Tracking', desc: 'Watch real-time status from a link — dispatched, confirmed with agent photo, complete.' },
+  { icon: <MapPin size={22} />, title: 'Live Tracking', desc: 'Watch real-time status from a link — confirmed with agent photo, on the way, arrived, complete.' },
   { icon: <DollarSign size={22} />, title: 'Flat-Rate, No Games', desc: 'No contracts, no minimums, no surprise fees. Pay online in one click or by check.' },
 ]
 

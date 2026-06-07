@@ -1,4 +1,4 @@
-import { ShieldCheck, FileCheck2, MapPin, Clock, Eye, DollarSign, Phone, Mail, ArrowRight } from 'lucide-react'
+import { ShieldCheck, FileCheck2, MapPin, Clock, Eye, DollarSign, Phone, Mail, ArrowRight, Lock } from 'lucide-react'
 import Link from 'next/link'
 import PrintButton from './PrintButton'
 
@@ -16,12 +16,12 @@ const EDGES = [
   {
     icon: <FileCheck2 size={20} />,
     title: 'Documents follow the job',
-    body: 'Upload your package once. Whoever ends up at the table gets it automatically — even a backup who takes over last-minute. You never re-send a thing.',
+    body: 'Upload your package once. Whoever ends up at the table gets it automatically — even a last-minute backup. And when the lender sends an update, the old package is deleted and the agent re-notified — no one ever signs a stale set.',
   },
   {
     icon: <Eye size={20} />,
     title: 'You know who shows up',
-    body: 'Every agent is photographed, credential-verified, background-checked, and rated on punctuality. A vetted professional at your borrower’s door — never a stranger.',
+    body: 'Every agent is NNA-certified, background-checked, E&O-insured, photographed, and vetted for real purchase & refi experience. Anyone whose credentials lapse is automatically blocked from your closing — never a stranger, never a rookie.',
   },
   {
     icon: <Clock size={20} />,
@@ -31,7 +31,12 @@ const EDGES = [
   {
     icon: <MapPin size={20} />,
     title: 'Live tracking + borrower heads-up',
-    body: 'Watch real-time status from a link — dispatched, confirmed (with agent photo), complete. Your borrower even gets a text on who’s coming and when.',
+    body: 'Watch real-time status from a link — confirmed (with agent photo), on the way, arrived, complete. Your borrower even gets a text on who’s coming and when.',
+  },
+  {
+    icon: <Lock size={20} />,
+    title: 'Bank-grade data handling',
+    body: 'Borrower documents are encrypted, access-controlled, and automatically purged after closing (GLBA/CCPA-aligned). Their non-public information never lingers as a liability on anyone’s laptop.',
   },
   {
     icon: <DollarSign size={20} />,

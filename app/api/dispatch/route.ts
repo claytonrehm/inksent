@@ -31,13 +31,15 @@ export async function POST(req: NextRequest) {
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
   const acceptUrl = `${baseUrl}/accept/${order_id}?notary=${notary_id}`
+  const [dh, dm] = order.signing_time.split(':')
+  const timeLabel = `${parseInt(dh) % 12 || 12}:${dm} ${parseInt(dh) < 12 ? 'AM' : 'PM'}`
 
   const message = buildDispatchMessage({
     notaryName: notary.name.split(' ')[0],
     signerName: order.signer_name,
     signingType: order.signing_type,
     signingDate: format(new Date(order.signing_date), 'EEEE, MMM d'),
-    signingTime: order.signing_time,
+    signingTime: timeLabel,
     propertyAddress: order.property_address,
     propertyCity: order.property_city,
     propertyZip: order.property_zip,
