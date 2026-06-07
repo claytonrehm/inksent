@@ -29,15 +29,22 @@ export default async function ConnectPage({
     } catch { /* ignore */ }
   }
 
-  // Generate a fresh onboarding link if not yet enabled
+  // Generate a fresh onboarding link if not yet enabled. If Connect isn't fully
+  // activated yet (e.g. live activation still pending), don't crash — fall back
+  // to a friendly "almost there" message so onboarding is never a dead end.
   let onboardUrl: string | null = null
+  let setupPending = false
   if (!payoutsEnabled && hasStripe()) {
-    const link = await createConnectOnboardingLink({ id: notary.id, email: notary.email, stripe_account_id: notary.stripe_account_id })
-    if (link) {
-      onboardUrl = link.url
-      if (link.accountId !== notary.stripe_account_id) {
-        await supabase.from('notaries').update({ stripe_account_id: link.accountId }).eq('id', id)
+    try {
+      const link = await createConnectOnboardingLink({ id: notary.id, email: notary.email, stripe_account_id: notary.stripe_account_id })
+      if (link) {
+        onboardUrl = link.url
+        if (link.accountId !== notary.stripe_account_id) {
+          await supabase.from('notaries').update({ stripe_account_id: link.accountId }).eq('id', id)
+        }
       }
+    } catch {
+      setupPending = true
     }
   }
 
@@ -53,11 +60,11 @@ export default async function ConnectPage({
             <h1 className="text-xl font-bold text-gray-900 mb-1">Payouts are set up!</h1>
             <p className="text-gray-500 text-sm">You&apos;re fully ready. When you complete a signing, your $90 lands in your bank automatically — no invoicing, no waiting on us.</p>
           </div>
-        ) : !hasStripe() ? (
+        ) : (!hasStripe() || setupPending) ? (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-8 text-center">
             <Clock className="text-amber-500 w-10 h-10 mx-auto mb-3" />
             <h1 className="text-lg font-bold text-gray-900 mb-1">Almost there</h1>
-            <p className="text-gray-500 text-sm">Payout setup is being finalized on our end. We&apos;ll email you a link shortly — you&apos;re still good to receive job offers.</p>
+            <p className="text-gray-500 text-sm">Your profile&apos;s all set! Payout setup is being finalized on our end — we&apos;ll email you a quick link to connect your bank shortly. You&apos;re good to start receiving job offers.</p>
           </div>
         ) : (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-7 text-center">
