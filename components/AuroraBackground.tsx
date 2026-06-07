@@ -19,10 +19,20 @@ export default function AuroraBackground() {
         className="absolute rounded-full"
         style={{
           width: 600, height: 600, bottom: '-18%', left: '-10%',
-          background: 'radial-gradient(circle, rgba(217,70,239,0.18) 0%, transparent 68%)',
+          background: 'radial-gradient(circle, rgba(217,70,239,0.20) 0%, transparent 68%)',
         }}
         animate={{ x: [0, -22, 15, 0], y: [0, -15, -30, 0] }}
         transition={{ duration: 36, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      {/* indigo orb — adds spectrum so it's not just violet */}
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          width: 520, height: 520, top: '28%', left: '36%',
+          background: 'radial-gradient(circle, rgba(99,102,241,0.16) 0%, transparent 70%)',
+        }}
+        animate={{ x: [0, 40, -30, 0], y: [0, -28, 20, 0] }}
+        transition={{ duration: 42, repeat: Infinity, ease: 'easeInOut' }}
       />
       {/* faint dot grid for texture */}
       <div

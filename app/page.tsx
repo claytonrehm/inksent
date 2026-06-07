@@ -23,6 +23,17 @@ const FEATURES = [
   { icon: <DollarSign size={22} />, title: 'Flat-Rate, No Games', desc: 'No contracts, no minimums, no surprise fees. Pay online in one click or by check.' },
 ]
 
+// Cohesive accent spectrum (indigo → violet → fuchsia → sky → pink) so the
+// feature grid feels colorful and alive, not just one purple.
+const ACCENTS = [
+  { ring: 'hover:border-indigo-400/50', glow: 'hover:shadow-[0_18px_50px_-12px_rgba(99,102,241,0.45)]', icon: 'bg-indigo-500/15 text-indigo-300 group-hover:bg-indigo-500/25' },
+  { ring: 'hover:border-violet-400/50', glow: 'hover:shadow-[0_18px_50px_-12px_rgba(139,92,246,0.45)]', icon: 'bg-violet-500/15 text-violet-300 group-hover:bg-violet-500/25' },
+  { ring: 'hover:border-fuchsia-400/50', glow: 'hover:shadow-[0_18px_50px_-12px_rgba(217,70,239,0.45)]', icon: 'bg-fuchsia-500/15 text-fuchsia-300 group-hover:bg-fuchsia-500/25' },
+  { ring: 'hover:border-sky-400/50', glow: 'hover:shadow-[0_18px_50px_-12px_rgba(56,189,248,0.40)]', icon: 'bg-sky-500/15 text-sky-300 group-hover:bg-sky-500/25' },
+  { ring: 'hover:border-pink-400/50', glow: 'hover:shadow-[0_18px_50px_-12px_rgba(236,72,153,0.45)]', icon: 'bg-pink-500/15 text-pink-300 group-hover:bg-pink-500/25' },
+  { ring: 'hover:border-violet-400/50', glow: 'hover:shadow-[0_18px_50px_-12px_rgba(139,92,246,0.45)]', icon: 'bg-violet-500/15 text-violet-300 group-hover:bg-violet-500/25' },
+]
+
 const SIGNING_TYPES = [
   { label: 'Purchase', emoji: '🏠' },
   { label: 'Refinance', emoji: '💰' },
@@ -37,7 +48,7 @@ export default function Home() {
       <NavClient />
 
       {/* Hero */}
-      <section className="relative overflow-hidden pt-10 pb-0">
+      <section className="relative overflow-hidden pt-10 pb-0 grain">
         <AuroraBackground />
         {/* top glow */}
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-500/40 to-transparent" />
@@ -56,7 +67,7 @@ export default function Home() {
               <ScrollReveal delay={100}>
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.05] mb-6 tracking-tight">
                   Signing Agents,{' '}
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-violet-300">
+                  <span className="animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-pink-400">
                     On Demand
                   </span>
                 </h1>
@@ -70,7 +81,7 @@ export default function Home() {
 
               <ScrollReveal delay={300}>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-4">
-                  <Link href="/order" className="group inline-flex items-center justify-center gap-2 bg-violet-600 text-white px-8 py-4 rounded-xl font-bold text-base sm:text-lg hover:bg-violet-500 transition-all shadow-[0_0_40px_-8px_rgba(139,92,246,0.7)] hover:shadow-[0_0_50px_-6px_rgba(139,92,246,0.9)] hover:-translate-y-0.5 w-full sm:w-auto">
+                  <Link href="/order" className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white px-8 py-4 rounded-xl font-bold text-base sm:text-lg hover:from-violet-500 hover:to-fuchsia-500 transition-all shadow-[0_0_40px_-8px_rgba(168,85,247,0.7)] hover:shadow-[0_0_55px_-6px_rgba(217,70,239,0.9)] hover:-translate-y-0.5 w-full sm:w-auto">
                     Place a Signing Order
                     <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                   </Link>
@@ -168,17 +179,20 @@ export default function Home() {
             <h2 className="text-4xl font-black text-white">Reliability the big platforms don&apos;t offer.</h2>
           </ScrollReveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {FEATURES.map(({ icon, title, desc }, i) => (
-              <ScrollReveal key={title} delay={i * 70}>
-                <div className="p-7 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-violet-400/40 hover:bg-white/[0.05] transition-all duration-300 group h-full backdrop-blur-sm">
-                  <div className="bg-violet-500/15 text-violet-300 rounded-2xl p-3 w-fit mb-4 group-hover:bg-violet-500/25 group-hover:scale-110 transition-all">
-                    {icon}
+            {FEATURES.map(({ icon, title, desc }, i) => {
+              const a = ACCENTS[i % ACCENTS.length]
+              return (
+                <ScrollReveal key={title} delay={i * 70}>
+                  <div className={`p-7 rounded-2xl bg-white/[0.03] border border-white/10 ${a.ring} ${a.glow} hover:bg-white/[0.05] hover:-translate-y-1.5 transition-all duration-300 group h-full backdrop-blur-sm`}>
+                    <div className={`${a.icon} rounded-2xl p-3 w-fit mb-4 group-hover:scale-110 transition-all duration-300`}>
+                      {icon}
+                    </div>
+                    <h3 className="font-bold text-white mb-1.5 text-lg">{title}</h3>
+                    <p className="text-sm text-slate-400 leading-relaxed">{desc}</p>
                   </div>
-                  <h3 className="font-bold text-white mb-1.5 text-lg">{title}</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed">{desc}</p>
-                </div>
-              </ScrollReveal>
-            ))}
+                </ScrollReveal>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -290,7 +304,7 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-              <Link href="/order" className="block w-full bg-violet-600 text-white px-6 py-3.5 rounded-xl font-bold text-base hover:bg-violet-500 transition-colors shadow-[0_0_30px_-8px_rgba(139,92,246,0.8)]">
+              <Link href="/order" className="block w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white px-6 py-3.5 rounded-xl font-bold text-base hover:from-violet-500 hover:to-fuchsia-500 transition-all shadow-[0_0_30px_-8px_rgba(217,70,239,0.8)] hover:-translate-y-0.5">
                 Place an Order
               </Link>
             </div>
