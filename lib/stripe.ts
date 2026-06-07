@@ -69,6 +69,23 @@ export async function payoutNotary(params: {
   }
 }
 
+// Safety net: did Stripe actually receive a succeeded payment for this order?
+// Lets us recover a missed/failed webhook so we never dun a client who already paid.
+export async function orderWasPaid(orderId: string): Promise<boolean> {
+  if (!hasStripe()) return false
+  try {
+    const stripe = getStripe()
+    const res = await stripe.paymentIntents.search({
+      query: `metadata['order_id']:'${orderId}' AND status:'succeeded'`,
+      limit: 1,
+    })
+    return res.data.length > 0
+  } catch (e) {
+    console.error('Stripe payment reconciliation search failed:', e)
+    return false
+  }
+}
+
 // Create a (non-expiring) payment link for an invoice, tagged with the order id
 // so the webhook can auto-mark it paid. Returns null if Stripe isn't configured.
 export async function createInvoicePaymentLink(order: {
@@ -88,6 +105,9 @@ export async function createInvoicePaymentLink(order: {
     const link = await stripe.paymentLinks.create({
       line_items: [{ price: price.id, quantity: 1 }],
       metadata: { order_id: order.id, confirmation_number: order.confirmation_number },
+      // Also stamp the order id on the resulting PaymentIntent so we can reconcile
+      // a missed webhook by searching Stripe for a succeeded payment.
+      payment_intent_data: { metadata: { order_id: order.id, confirmation_number: order.confirmation_number } },
       after_completion: { type: 'hosted_confirmation' },
     })
     return link.url

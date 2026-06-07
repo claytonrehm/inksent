@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendSMS } from '@/lib/sms'
 import { sendPaymentReminderEmail } from '@/lib/invoice'
+import { orderWasPaid, payoutNotary, hasStripe } from '@/lib/stripe'
 import { format } from 'date-fns'
 
 // Runs on a schedule (see vercel.json). Surfaces orders that need a human:
@@ -83,6 +84,51 @@ export async function GET(req: NextRequest) {
       ).catch(() => {})
     }
     await supabase.from('orders').update({ overdue_alerted_at: new Date().toISOString() }).eq('id', o.id)
+  }
+
+  // 2c. MONEY SAFETY NET — runs BEFORE dunning so we never chase a paid client.
+  //   (i)  Recover a payment whose webhook was missed (reconcile from Stripe).
+  //   (ii) Retry a payout that failed earlier (e.g. card funds hadn't settled yet).
+  if (hasStripe()) {
+    // (i) Reconcile: completed + unpaid + invoiced, but Stripe shows a succeeded payment
+    const { data: unconfirmed } = await supabase
+      .from('orders')
+      .select('id, confirmation_number, client_company')
+      .eq('status', 'completed')
+      .is('client_paid_at', null)
+      .not('invoice_id', 'is', null)
+    for (const o of unconfirmed ?? []) {
+      if (await orderWasPaid(o.id)) {
+        await supabase.from('orders').update({ client_paid_at: new Date().toISOString() }).eq('id', o.id)
+        if (process.env.ADMIN_PHONE) {
+          await sendSMS(process.env.ADMIN_PHONE, `✅ Recovered a missed payment: ${o.confirmation_number} (${o.client_company}) is actually PAID. Reconciled — paying the notary now.`).catch(() => {})
+        }
+      }
+    }
+
+    // (ii) Retry payouts: client paid, notary not paid yet, notary connected
+    const { data: toPay } = await supabase
+      .from('orders')
+      .select('id, confirmation_number, notary_id, notary_fee, notary_paid_at, notaries(name, phone, stripe_account_id, payouts_enabled)')
+      .not('client_paid_at', 'is', null)
+      .is('notary_paid_at', null)
+      .not('notary_id', 'is', null)
+    for (const o of toPay ?? []) {
+      const nRaw = o.notaries as unknown
+      const n = (Array.isArray(nRaw) ? nRaw[0] : nRaw) as { name: string; phone: string; stripe_account_id?: string; payouts_enabled?: boolean } | null
+      if (!n) continue
+      if (n.stripe_account_id && n.payouts_enabled) {
+        const ok = await payoutNotary({ stripeAccountId: n.stripe_account_id, amount: o.notary_fee, orderId: o.id, confirmationNumber: o.confirmation_number })
+        if (ok) {
+          await supabase.from('orders').update({ notary_paid_at: new Date().toISOString() }).eq('id', o.id)
+          if (n.phone) await sendSMS(n.phone, `💵 You've been paid $${(o.notary_fee / 100).toFixed(0)} for the ${o.confirmation_number} signing — on its way to your bank account. Thanks! — Inksent`).catch(() => {})
+        } else if (process.env.ADMIN_PHONE) {
+          await sendSMS(process.env.ADMIN_PHONE, `⚠️ Payout to ${n.name} for ${o.confirmation_number} is still failing — check your Stripe balance/their account. Auto-retries daily.`).catch(() => {})
+        }
+      } else if (process.env.ADMIN_PHONE) {
+        await sendSMS(process.env.ADMIN_PHONE, `⚠️ ${n?.name ?? 'A notary'} completed ${o.confirmation_number} but isn't payout-connected — nudge them to finish Stripe so they get paid.`).catch(() => {})
+      }
+    }
   }
 
   // 3. Auto-chase unpaid invoices so you never have to. Reminders at 7 & 14 days,
