@@ -51,15 +51,19 @@ export default async function NotariesPage() {
   }
 
   // Map notary rows → Applicant shape for the board
-  const toApplicant = (n: (typeof pending)[number]): Applicant => ({
-    id: n.id, name: n.name, email: n.email, phone: n.phone,
-    photo_url: n.photo_url, base_zip: n.base_zip, coverage_radius: n.coverage_radius,
-    coverage_label: coverageLabel(n.base_zip),
-    years_experience: n.years_experience, signings_completed: n.signings_completed,
-    re_experience: n.re_experience, signing_types: n.signing_types,
-    nna_certified: !!n.nna_certified, background_checked: !!n.background_checked,
-    notes: n.notes, created_at: n.created_at, denied_at: n.denied_at,
-  })
+  const toApplicant = (n: (typeof pending)[number]): Applicant => {
+    const info = n.base_zip ? lookupZip(n.base_zip) : null
+    return {
+      id: n.id, name: n.name, email: n.email, phone: n.phone,
+      photo_url: n.photo_url, base_zip: n.base_zip, coverage_radius: n.coverage_radius,
+      coverage_label: info ? `${info.city}, ${info.state}` : n.base_zip ?? undefined,
+      lat: info?.latitude, lng: info?.longitude,
+      years_experience: n.years_experience, signings_completed: n.signings_completed,
+      re_experience: n.re_experience, signing_types: n.signing_types,
+      nna_certified: !!n.nna_certified, background_checked: !!n.background_checked,
+      notes: n.notes, created_at: n.created_at, denied_at: n.denied_at,
+    }
+  }
   const applicants: Applicant[] = pending.map(toApplicant)
   const deniedApplicants: Applicant[] = denied.map(toApplicant)
 

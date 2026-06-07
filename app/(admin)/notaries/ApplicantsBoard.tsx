@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { CheckCircle, XCircle, Search, ExternalLink, Phone, Mail, MapPin, ChevronDown, ChevronUp, Filter, RotateCcw, Trash2 } from 'lucide-react'
 import { SIGNINGS_LABEL, SIGNINGS_RANK, vetApplicant, RE_EXPERIENCE_LABEL } from '@/lib/notary'
+import CoverageMap from '@/components/CoverageMap'
 
 export interface Applicant {
   id: string
@@ -14,6 +15,8 @@ export interface Applicant {
   base_zip?: string
   coverage_radius?: number
   coverage_label?: string
+  lat?: number
+  lng?: number
   years_experience?: number
   signings_completed?: string
   re_experience?: string
@@ -59,6 +62,7 @@ export default function ApplicantsBoard({ applicants, mode = 'pending' }: { appl
   const [busy, setBusy] = useState<string | null>(null)
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [expanded, setExpanded] = useState<string | null>(null)
+  const [mapOpen, setMapOpen] = useState<string | null>(null)
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
   function copyFinishLink(id: string) {
@@ -265,12 +269,30 @@ export default function ApplicantsBoard({ applicants, mode = 'pending' }: { appl
                     </button>
                   </>
                 )}
-                <button onClick={() => setExpanded(expanded === a.id ? null : a.id)}
-                  className="flex items-center gap-1 text-gray-400 text-xs px-3 py-1 hover:text-gray-600">
-                  Vet {expanded === a.id ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
-                </button>
+                <div className="flex items-center gap-1">
+                  <button onClick={() => setExpanded(expanded === a.id ? null : a.id)}
+                    className="flex items-center gap-1 text-gray-400 text-xs px-2 py-1 hover:text-gray-600">
+                    Vet {expanded === a.id ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+                  </button>
+                  {a.lat != null && a.lng != null && (
+                    <button onClick={() => setMapOpen(mapOpen === a.id ? null : a.id)}
+                      className="flex items-center gap-1 text-gray-400 text-xs px-2 py-1 hover:text-violet-600">
+                      <MapPin size={11} /> Map
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
+
+            {/* Coverage map */}
+            {mapOpen === a.id && a.lat != null && a.lng != null && (
+              <div className="bg-gray-50 border-t border-gray-100 px-4 py-3">
+                <p className="text-xs text-gray-500 mb-2">
+                  <span className="font-semibold">{a.coverage_label ?? a.base_zip}</span> · covers ~{a.coverage_radius ?? 25} miles
+                </p>
+                <CoverageMap lat={a.lat} lng={a.lng} radiusMiles={a.coverage_radius ?? 25} label={a.name} />
+              </div>
+            )}
 
             {/* Vetting detail */}
             {expanded === a.id && (
