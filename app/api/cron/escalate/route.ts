@@ -122,7 +122,7 @@ export async function GET(req: NextRequest) {
         const ok = await payoutNotary({ stripeAccountId: n.stripe_account_id, amount: o.notary_fee, orderId: o.id, confirmationNumber: o.confirmation_number })
         if (ok) {
           await supabase.from('orders').update({ notary_paid_at: new Date().toISOString() }).eq('id', o.id)
-          if (n.phone) await sendSMS(n.phone, `💵 You've been paid $${(o.notary_fee / 100).toFixed(0)} for the ${o.confirmation_number} signing — on its way to your bank account. Thanks! — Inksent`).catch(() => {})
+          if (n.phone) await sendSMS(n.phone, `💵 Payment released: $${(o.notary_fee / 100).toFixed(0)} for the ${o.confirmation_number} signing — on its way to your bank account. Thanks! — Inksent`).catch(() => {})
         } else if (process.env.ADMIN_PHONE) {
           await sendSMS(process.env.ADMIN_PHONE, `⚠️ Payout to ${n.name} for ${o.confirmation_number} is still failing — check your Stripe balance/their account. Auto-retries daily.`).catch(() => {})
         }

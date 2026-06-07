@@ -50,9 +50,9 @@ export async function POST(req: NextRequest) {
           })
           if (ok) {
             await supabase.from('orders').update({ notary_paid_at: new Date().toISOString() }).eq('id', orderId)
-            sendSMS(n.phone, `💵 You've been paid $${(o.notary_fee / 100).toFixed(0)} for the ${o.confirmation_number} signing. It's on its way to your bank account. Thanks! — Inksent`).catch(() => {})
+            sendSMS(n.phone, `💵 Payment released: $${(o.notary_fee / 100).toFixed(0)} for the ${o.confirmation_number} signing — on its way to your bank account. Thanks! — Inksent`).catch(() => {})
           } else if (process.env.ADMIN_PHONE) {
-            sendSMS(process.env.ADMIN_PHONE, `⚠️ Auto-payout to ${n.name} failed for ${o.confirmation_number}. Check Stripe balance/account.`).catch(() => {})
+            sendSMS(process.env.ADMIN_PHONE, `ℹ️ Payout to ${n.name} for ${o.confirmation_number} is queued — card funds usually take ~1–2 days to settle, then it auto-pays. No action needed unless it persists.`).catch(() => {})
           }
         } else if (process.env.ADMIN_PHONE) {
           sendSMS(process.env.ADMIN_PHONE, `⚠️ ${n.name} hasn't connected payouts — can't auto-pay for ${o.confirmation_number}. Nudge them to finish setup.`).catch(() => {})

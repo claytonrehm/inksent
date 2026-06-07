@@ -92,8 +92,10 @@ export default function OrderActions({ order, notaries }: { order: Order; notari
 
   async function markNotaryPaid() {
     setLoading('notary_paid')
-    await fetch(`/api/orders/${order.id}/pay-notary`, { method: 'POST' })
+    const res = await fetch(`/api/orders/${order.id}/pay-notary`, { method: 'POST' })
+    const data = await res.json().catch(() => ({}))
     setLoading(null)
+    if (!res.ok) { alert(data.error || 'Could not pay the notary.'); return }
     router.refresh()
   }
 
@@ -354,7 +356,7 @@ export default function OrderActions({ order, notaries }: { order: Order; notari
               className="w-full bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
             >
               <DollarSign size={14} className="mr-1.5" />
-              Mark Notary Paid (${order.notary_fee ? (order.notary_fee / 100).toFixed(0) : '90'})
+              Pay Notary Now (${order.notary_fee ? (order.notary_fee / 100).toFixed(0) : '90'})
             </Button>
           )}
         </div>
