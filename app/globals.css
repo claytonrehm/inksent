@@ -18,7 +18,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-html { scroll-behavior: smooth; }
+/* Smooth scrolling is handled by Lenis (components/SmoothScroll). */
 
 /* Animated multi-color gradient (for headline text / accents) */
 @keyframes gradient-shift {

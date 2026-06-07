@@ -42,7 +42,7 @@ export default function ProcessShowcase() {
   useEffect(() => { setActive(0) }, [audience])
   useEffect(() => {
     if (!inView) return
-    const t = setInterval(() => setActive((a) => (a + 1) % steps.length), 3400)
+    const t = setInterval(() => setActive((a) => (a + 1) % steps.length), 4000)
     return () => clearInterval(t)
   }, [inView, steps.length, audience])
 
@@ -110,19 +110,22 @@ export default function ProcessShowcase() {
             animate={{ background: `radial-gradient(circle at 50% 35%, ${step.color}33 0%, transparent 60%)` }}
             transition={{ duration: 1.0, ease: 'easeInOut' }}
           />
-          <div className="absolute top-5 left-0 right-0 flex justify-center gap-1.5">
-            {steps.map((s, i) => (
-              <div key={i} className="h-1 rounded-full transition-all duration-500" style={{ width: i === active ? 26 : 8, background: i === active ? s.color : 'rgba(255,255,255,0.15)' }} />
-            ))}
+          {/* continuous journey progress — fills smoothly as the steps advance */}
+          <div className="absolute top-5 left-8 right-8 h-1 rounded-full bg-white/10 overflow-hidden">
+            <motion.div
+              className="h-full rounded-full"
+              animate={{ width: `${((active + 1) / steps.length) * 100}%`, backgroundColor: step.color }}
+              transition={{ width: { duration: 0.9, ease: [0.22, 1, 0.36, 1] }, backgroundColor: { duration: 0.9 } }}
+            />
           </div>
 
           <AnimatePresence mode="wait">
             <motion.div
               key={`${audience}-${active}`}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0, y: 8, scale: 0.99 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.99 }}
+              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
               className="relative flex flex-col items-center"
             >
               <div className="relative mb-6">

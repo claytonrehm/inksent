@@ -62,7 +62,7 @@ export default function Home() {
               <ScrollReveal delay={100}>
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.05] mb-6 tracking-tight">
                   Signing Agents,{' '}
-                  <span className="animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-pink-400">
+                  <span className="animate-gradient bg-clip-text text-transparent bg-gradient-to-r from-violet-300 via-indigo-300 to-violet-400">
                     On Demand
                   </span>
                 </h1>

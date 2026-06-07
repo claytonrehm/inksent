@@ -9,30 +9,30 @@ export default function AuroraBackground() {
       <motion.div
         className="absolute rounded-full"
         style={{
-          width: 720, height: 720, top: '-20%', right: '-12%',
-          background: 'radial-gradient(circle, rgba(139,92,246,0.26) 0%, transparent 68%)',
+          width: 760, height: 760, top: '-22%', right: '-14%',
+          background: 'radial-gradient(circle, rgba(124,108,240,0.16) 0%, transparent 70%)',
         }}
         animate={{ x: [0, 30, -15, 0], y: [0, 25, 40, 0] }}
-        transition={{ duration: 30, repeat: Infinity, ease: 'easeInOut' }}
+        transition={{ duration: 34, repeat: Infinity, ease: 'easeInOut' }}
       />
       <motion.div
         className="absolute rounded-full"
         style={{
-          width: 600, height: 600, bottom: '-18%', left: '-10%',
-          background: 'radial-gradient(circle, rgba(217,70,239,0.20) 0%, transparent 68%)',
+          width: 640, height: 640, bottom: '-20%', left: '-12%',
+          background: 'radial-gradient(circle, rgba(99,102,241,0.14) 0%, transparent 70%)',
         }}
         animate={{ x: [0, -22, 15, 0], y: [0, -15, -30, 0] }}
-        transition={{ duration: 36, repeat: Infinity, ease: 'easeInOut' }}
+        transition={{ duration: 40, repeat: Infinity, ease: 'easeInOut' }}
       />
-      {/* indigo orb — adds spectrum so it's not just violet */}
+      {/* soft slate-violet glow — refined depth, not neon */}
       <motion.div
         className="absolute rounded-full"
         style={{
-          width: 520, height: 520, top: '28%', left: '36%',
-          background: 'radial-gradient(circle, rgba(99,102,241,0.16) 0%, transparent 70%)',
+          width: 560, height: 560, top: '30%', left: '38%',
+          background: 'radial-gradient(circle, rgba(129,140,248,0.10) 0%, transparent 72%)',
         }}
         animate={{ x: [0, 40, -30, 0], y: [0, -28, 20, 0] }}
-        transition={{ duration: 42, repeat: Infinity, ease: 'easeInOut' }}
+        transition={{ duration: 46, repeat: Infinity, ease: 'easeInOut' }}
       />
       {/* faint dot grid for texture */}
       <div
