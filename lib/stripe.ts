@@ -26,7 +26,11 @@ export async function createConnectOnboardingLink(notary: {
     const account = await stripe.accounts.create({
       type: 'express',
       email: notary.email,
-      capabilities: { transfers: { requested: true } },
+      // card_payments is requested alongside transfers so we don't need Stripe's
+      // separate "transfers-without-card_payments" platform approval (which is in
+      // internal review). Notaries only ever receive transfers; card_payments is
+      // unused. Can revert to transfers-only once that approval lands.
+      capabilities: { transfers: { requested: true }, card_payments: { requested: true } },
       business_type: 'individual',
       metadata: { notary_id: notary.id },
     })
