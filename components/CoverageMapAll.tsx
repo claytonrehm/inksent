@@ -57,5 +57,5 @@ export default function CoverageMapAll({ notaries }: { notaries: CoverageNotary[
     return <div className="rounded-xl border border-gray-200 bg-gray-50 p-10 text-center text-gray-400 text-sm">No notaries with a coverage area yet.</div>
   }
 
-  return <div ref={ref} style={{ height: 560, width: '100%' }} className="rounded-2xl overflow-hidden border border-gray-200 z-0" />
+  return <div ref={ref} data-lenis-prevent style={{ height: 560, width: '100%' }} className="rounded-2xl overflow-hidden border border-gray-200 z-0" />
 }

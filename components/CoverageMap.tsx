@@ -37,5 +37,5 @@ export default function CoverageMap({
     }
   }, [lat, lng, radiusMiles, label])
 
-  return <div ref={ref} style={{ height: 280, width: '100%' }} className="rounded-xl overflow-hidden border border-gray-200 z-0" />
+  return <div ref={ref} data-lenis-prevent style={{ height: 280, width: '100%' }} className="rounded-xl overflow-hidden border border-gray-200 z-0" />
 }

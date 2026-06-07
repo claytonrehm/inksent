@@ -18,7 +18,13 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-html { scroll-behavior: smooth; }
+/* Lenis smooth-scroll required styles — without html.lenis{height:auto} the
+   page's height:100% caps the scroll. Touch stays native. */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
 
 /* Animated multi-color gradient (for headline text / accents) */
 @keyframes gradient-shift {
