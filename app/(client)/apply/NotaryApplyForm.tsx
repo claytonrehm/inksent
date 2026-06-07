@@ -21,6 +21,7 @@ const schema = z.object({
   coverage_radius: z.string().min(1, 'Select how far you\'ll travel'),
   years_experience: z.string().min(1, 'Required'),
   signings_completed: z.string().min(1, 'Please select'),
+  re_experience: z.string().min(1, 'Please select your experience level'),
   nna_certified: z.enum(['yes', 'no'], { message: 'Please select' }),
   background_checked: z.enum(['yes', 'no'], { message: 'Please select' }),
   notes: z.string().optional(),
@@ -37,7 +38,12 @@ export default function NotaryApplyForm() {
   const [photoError, setPhotoError] = useState<string | null>(null)
   const [cityLabel, setCityLabel] = useState<string | null>(null)
   const [captchaToken, setCaptchaToken] = useState('')
+  const [signingTypes, setSigningTypes] = useState<string[]>([])
   const fileRef = useRef<HTMLInputElement>(null)
+
+  function toggleSigningType(t: string) {
+    setSigningTypes((p) => p.includes(t) ? p.filter((x) => x !== t) : [...p, t])
+  }
 
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -96,7 +102,7 @@ export default function NotaryApplyForm() {
       const res = await fetch('/api/notary-apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, photo_url, turnstileToken: captchaToken }),
+        body: JSON.stringify({ ...data, photo_url, signing_types: signingTypes, turnstileToken: captchaToken }),
       })
       if (res.status === 409) {
         const j = await res.json().catch(() => ({}))
@@ -235,6 +241,33 @@ export default function NotaryApplyForm() {
             {errors.signings_completed && <p className="text-xs text-red-500 mt-1">{errors.signings_completed.message}</p>}
           </div>
         </div>
+
+        {/* Real-estate competence */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">How experienced are you with real-estate loan signings (purchases &amp; refinances)? *</label>
+          <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+            {...register('re_experience')}>
+            <option value="">Select...</option>
+            <option value="expert">Very experienced — I handle purchases &amp; refinances regularly</option>
+            <option value="comfortable">Comfortable — I&apos;ve completed many full loan packages</option>
+            <option value="some">Some experience — a handful of loan signings</option>
+            <option value="new">New to loan signings</option>
+          </select>
+          {errors.re_experience && <p className="text-xs text-red-500 mt-1">{errors.re_experience.message}</p>}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Which signings are you experienced with? <span className="text-gray-400 font-normal">(select all that apply)</span></label>
+          <div className="flex flex-wrap gap-2 mt-1">
+            {[['purchase', 'Purchase'], ['refinance', 'Refinance'], ['heloc', 'HELOC'], ['reverse_mortgage', 'Reverse Mortgage'], ['loan_mod', 'Loan Modification']].map(([val, label]) => (
+              <button key={val} type="button" onClick={() => toggleSigningType(val)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${signingTypes.includes(val) ? 'bg-violet-600 text-white border-violet-600' : 'bg-white text-gray-600 border-gray-300 hover:border-violet-300'}`}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">NNA Certified? *</label>

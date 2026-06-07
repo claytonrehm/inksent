@@ -76,6 +76,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Could not save application' }, { status: 500 })
   }
 
+  // Best-effort: save real-estate competence fields. Done as a follow-up update
+  // so the application never fails if the migration hasn't been run yet.
+  const reExp = body?.re_experience
+  const signingTypes = Array.isArray(body?.signing_types) ? body.signing_types : []
+  if (reExp || signingTypes.length) {
+    await supabase.from('notaries')
+      .update({ re_experience: reExp || null, signing_types: signingTypes })
+      .eq('email', d.email)
+      .then(({ error }) => { if (error) console.warn('re_experience save skipped:', error.message) })
+  }
+
   // Send onboarding email to the applicant
   sendNotaryApplicationEmail({ name: d.name, email: d.email }).catch(console.error)
 

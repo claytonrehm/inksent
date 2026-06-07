@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { CheckCircle, XCircle, Search, ExternalLink, Phone, Mail, MapPin, ChevronDown, ChevronUp, Filter, RotateCcw, Trash2 } from 'lucide-react'
-import { SIGNINGS_LABEL, SIGNINGS_RANK, vetApplicant } from '@/lib/notary'
+import { SIGNINGS_LABEL, SIGNINGS_RANK, vetApplicant, RE_EXPERIENCE_LABEL } from '@/lib/notary'
 
 export interface Applicant {
   id: string
@@ -16,11 +16,20 @@ export interface Applicant {
   coverage_label?: string
   years_experience?: number
   signings_completed?: string
+  re_experience?: string
+  signing_types?: string[]
   nna_certified: boolean
   background_checked: boolean
   notes?: string
   created_at: string
   denied_at?: string
+}
+
+const RE_EXP_STYLES: Record<string, string> = {
+  expert: 'bg-green-100 text-green-800 border-green-300',
+  comfortable: 'bg-violet-100 text-violet-800 border-violet-300',
+  some: 'bg-amber-100 text-amber-800 border-amber-300',
+  new: 'bg-red-100 text-red-700 border-red-300',
 }
 
 const TIER_STYLES: Record<string, string> = {
@@ -45,6 +54,7 @@ export default function ApplicantsBoard({ applicants, mode = 'pending' }: { appl
   const [minVol, setMinVol] = useState('0')
   const [nna, setNna] = useState('all')
   const [bgc, setBgc] = useState('all')
+  const [exp, setExp] = useState('all')
   const [sort, setSort] = useState('score')
   const [busy, setBusy] = useState<string | null>(null)
   const [selected, setSelected] = useState<Set<string>>(new Set())
@@ -66,6 +76,8 @@ export default function ApplicantsBoard({ applicants, mode = 'pending' }: { appl
       if (nna === 'no' && a.nna_certified) return false
       if (bgc === 'yes' && !a.background_checked) return false
       if (bgc === 'no' && a.background_checked) return false
+      if (exp === 'comfortable' && !['expert', 'comfortable'].includes(a.re_experience ?? '')) return false
+      if (exp === 'expert' && a.re_experience !== 'expert') return false
       return true
     })
     list = [...list].sort((a, b) => {
@@ -75,7 +87,7 @@ export default function ApplicantsBoard({ applicants, mode = 'pending' }: { appl
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime() // newest
     })
     return list
-  }, [applicants, search, city, minYears, minVol, nna, bgc, sort])
+  }, [applicants, search, city, minYears, minVol, nna, bgc, exp, sort])
 
   const approve = (id: string) =>
     fetch(`/api/notaries/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ active: true, denied_at: null }) })
@@ -117,8 +129,8 @@ export default function ApplicantsBoard({ applicants, mode = 'pending' }: { appl
     })
   }
 
-  const reset = () => { setSearch(''); setCity('all'); setMinYears('0'); setMinVol('0'); setNna('all'); setBgc('all'); setSort('score') }
-  const activeFilters = [city !== 'all', minYears !== '0', minVol !== '0', nna !== 'all', bgc !== 'all', !!search].filter(Boolean).length
+  const reset = () => { setSearch(''); setCity('all'); setMinYears('0'); setMinVol('0'); setNna('all'); setBgc('all'); setExp('all'); setSort('score') }
+  const activeFilters = [city !== 'all', minYears !== '0', minVol !== '0', nna !== 'all', bgc !== 'all', exp !== 'all', !!search].filter(Boolean).length
 
   return (
     <div>
@@ -133,6 +145,7 @@ export default function ApplicantsBoard({ applicants, mode = 'pending' }: { appl
           <Select value={city} onChange={setCity} options={[['all', 'All areas'], ...cities.map(c => [c, c] as [string, string])]} />
           <Select value={minYears} onChange={setMinYears} options={[['0', 'Any experience'], ['2', '2+ yrs'], ['5', '5+ yrs'], ['10', '10+ yrs']]} />
           <Select value={minVol} onChange={setMinVol} options={VOL_FILTERS.map(v => [v.value, v.label] as [string, string])} />
+          <Select value={exp} onChange={setExp} options={[['all', 'RE exp: any'], ['comfortable', 'Comfortable+'], ['expert', 'Expert only']]} />
           <Select value={nna} onChange={setNna} options={[['all', 'NNA: any'], ['yes', 'NNA: yes'], ['no', 'NNA: no']]} />
           <Select value={bgc} onChange={setBgc} options={[['all', 'Bg check: any'], ['yes', 'Bg check: yes'], ['no', 'Bg check: no']]} />
           <Select value={sort} onChange={setSort} options={[['score', 'Sort: AI score'], ['experience', 'Sort: experience'], ['signings', 'Sort: signings'], ['newest', 'Sort: newest']]} />
@@ -194,6 +207,7 @@ export default function ApplicantsBoard({ applicants, mode = 'pending' }: { appl
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="font-bold text-gray-900">{a.name}</h3>
                   <span title={`Automated vetting score ${vet.score}/100`} className={`text-xs font-semibold border px-1.5 py-0.5 rounded ${TIER_STYLES[vet.tier]}`}>{vet.tier} · {vet.score}</span>
+                  {a.re_experience && <span title="Real-estate signing experience" className={`text-xs font-semibold border px-1.5 py-0.5 rounded ${RE_EXP_STYLES[a.re_experience]}`}>{RE_EXPERIENCE_LABEL[a.re_experience]}</span>}
                   {a.nna_certified && <span className="text-xs bg-green-50 text-green-700 border border-green-200 px-1.5 py-0.5 rounded">NNA</span>}
                   {a.background_checked && <span className="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-1.5 py-0.5 rounded">Bg ✓</span>}
                 </div>
@@ -201,6 +215,7 @@ export default function ApplicantsBoard({ applicants, mode = 'pending' }: { appl
                   <span className="flex items-center gap-1"><MapPin size={11} /> {a.coverage_label ?? a.base_zip} · {a.coverage_radius ?? 25}mi</span>
                   <span>{a.years_experience ?? 0} yrs exp</span>
                   <span>{SIGNINGS_LABEL[a.signings_completed ?? ''] ?? '—'} signings</span>
+                  {a.signing_types && a.signing_types.length > 0 && <span>Types: {a.signing_types.map(t => t.replace(/_/g, ' ')).join(', ')}</span>}
                   {mode === 'denied' && a.denied_at && <span className="text-red-500">Denied {new Date(a.denied_at).toLocaleDateString()}</span>}
                 </div>
                 <div className="flex flex-wrap gap-x-4 gap-y-0.5 mt-1 text-xs text-gray-400">
