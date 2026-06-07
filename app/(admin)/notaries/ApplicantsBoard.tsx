@@ -59,6 +59,13 @@ export default function ApplicantsBoard({ applicants, mode = 'pending' }: { appl
   const [busy, setBusy] = useState<string | null>(null)
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [expanded, setExpanded] = useState<string | null>(null)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+
+  function copyFinishLink(id: string) {
+    navigator.clipboard?.writeText(`https://inksent.co/finish/${id}`)
+    setCopiedId(id)
+    setTimeout(() => setCopiedId(null), 1500)
+  }
 
   const cities = useMemo(() => {
     const s = new Set<string>()
@@ -222,6 +229,12 @@ export default function ApplicantsBoard({ applicants, mode = 'pending' }: { appl
                   <a href={`tel:${a.phone}`} className="flex items-center gap-1 hover:text-violet-600"><Phone size={10} /> {a.phone}</a>
                   <a href={`mailto:${a.email}`} className="flex items-center gap-1 hover:text-violet-600 truncate"><Mail size={10} /> {a.email}</a>
                 </div>
+                {!a.re_experience && (
+                  <button onClick={() => copyFinishLink(a.id)}
+                    className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2 py-1 rounded-lg hover:bg-amber-100">
+                    {copiedId === a.id ? '✓ Link copied!' : '⧉ Experience not provided — copy follow-up link'}
+                  </button>
+                )}
               </div>
 
               <div className="flex flex-col gap-2 shrink-0">
