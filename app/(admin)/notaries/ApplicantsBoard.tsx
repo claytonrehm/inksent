@@ -283,9 +283,9 @@ export default function ApplicantsBoard({ applicants, mode = 'pending' }: { appl
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Verify online</p>
                 <div className="flex flex-wrap gap-2">
                   <VetLink label="NNA Directory" href={`https://www.signingagent.com/find-a-signing-agent`} />
-                  <VetLink label="Google reviews" href={`https://www.google.com/search?q=${encodeURIComponent(`"${a.name}" notary ${a.coverage_label ?? ''} reviews OR complaints`)}`} />
+                  <VetLink label="Google reviews" href={`https://www.google.com/search?q=${encodeURIComponent(`"${a.name}" notary reviews`)}`} />
                   <VetLink label="BBB" href={`https://www.bbb.org/search?find_text=${encodeURIComponent(a.name)}`} />
-                  <VetLink label="LinkedIn" href={`https://www.google.com/search?q=${encodeURIComponent(`${a.name} notary signing agent ${a.coverage_label ?? ''} site:linkedin.com`)}`} />
+                  <VetLink label="LinkedIn" href={`https://www.google.com/search?q=${encodeURIComponent(`"${a.name}" site:linkedin.com`)}`} />
                 </div>
                 <p className="text-xs text-gray-400 mt-2">
                   The score is an automated first pass. Confirm NNA cert + background-check date on the directory, then scan for complaints. ~30 seconds.
