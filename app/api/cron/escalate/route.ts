@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { sendSMS } from '@/lib/sms'
 import { sendPaymentReminderEmail } from '@/lib/invoice'
 import { orderWasPaid, payoutNotary, hasStripe } from '@/lib/stripe'
+import { createAdminClient, hasServiceRole } from '@/lib/supabase/admin'
 import { format } from 'date-fns'
 
 // Runs on a schedule (see vercel.json). Surfaces orders that need a human:
@@ -165,5 +166,31 @@ export async function GET(req: NextRequest) {
     reminded++
   }
 
-  return NextResponse.json({ ok: true, alerted: toAlert.length, reminded })
+  // 4. DOCUMENT RETENTION — purge borrower loan packages 14 days after completion.
+  //    Aligns with signing-industry practice (NNA: destroy borrower docs promptly)
+  //    + GLBA/CCPA data minimization, with a buffer for redraws/funding/disputes.
+  //    The order record + timestamps remain as the audit trail; only the sensitive
+  //    files are deleted. (Tune RETENTION_DAYS to 7 for a stricter privacy posture.)
+  const RETENTION_DAYS = 14
+  let purged = 0
+  if (hasServiceRole()) {
+    const purgeCutoff = new Date(now - RETENTION_DAYS * 86_400_000).toISOString()
+    const { data: toPurge } = await supabase
+      .from('orders')
+      .select('id, documents, scan_backs')
+      .eq('status', 'completed')
+      .lt('completed_at', purgeCutoff)
+    const admin = createAdminClient()
+    for (const o of toPurge ?? []) {
+      const docs = (o.documents as { path?: string }[]) ?? []
+      const scans = (o.scan_backs as { path?: string }[]) ?? []
+      const paths = [...docs, ...scans].map((d) => d?.path).filter(Boolean) as string[]
+      if (paths.length === 0) continue
+      await admin.storage.from('signing-docs').remove(paths).catch(() => {})
+      await supabase.from('orders').update({ documents: [], scan_backs: [] }).eq('id', o.id)
+      purged++
+    }
+  }
+
+  return NextResponse.json({ ok: true, alerted: toAlert.length, reminded, purged })
 }

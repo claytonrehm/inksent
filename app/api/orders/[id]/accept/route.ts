@@ -48,6 +48,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: 'You previously declined this signing.' }, { status: 409 })
   }
 
+  // Prevent double-booking: reject if this notary already holds another signing within 3h
+  const thisWhen = new Date(`${order.signing_date}T${order.signing_time}`).getTime()
+  const { data: others } = await supabase
+    .from('orders')
+    .select('signing_date, signing_time')
+    .eq('notary_id', notary_id)
+    .in('status', ['assigned', 'confirmed'])
+    .neq('id', id)
+  const conflict = (others ?? []).some((x) => {
+    const w = new Date(`${x.signing_date}T${x.signing_time}`).getTime()
+    return Math.abs(w - thisWhen) < 3 * 3600 * 1000
+  })
+  if (conflict) {
+    return NextResponse.json({ error: 'You already have a signing booked within 3 hours of this one — it would overlap.' }, { status: 409 })
+  }
+
   // Atomic claim: only succeeds if the order is STILL unassigned. If two notaries
   // tap "accept" at the same instant, exactly one wins the row — no double-booking.
   const { data: claimed } = await supabase

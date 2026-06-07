@@ -69,6 +69,25 @@ export async function payoutNotary(params: {
   }
 }
 
+// Refund a client's payment for an order (admin action). Finds the succeeded
+// PaymentIntent by order metadata and refunds it in full.
+export async function refundOrder(orderId: string): Promise<{ ok: boolean; error?: string }> {
+  if (!hasStripe()) return { ok: false, error: 'Stripe not configured' }
+  try {
+    const stripe = getStripe()
+    const res = await stripe.paymentIntents.search({
+      query: `metadata['order_id']:'${orderId}' AND status:'succeeded'`,
+      limit: 1,
+    })
+    const pi = res.data[0]
+    if (!pi) return { ok: false, error: 'No completed payment found for this order to refund.' }
+    await stripe.refunds.create({ payment_intent: pi.id })
+    return { ok: true }
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Refund failed' }
+  }
+}
+
 // Safety net: did Stripe actually receive a succeeded payment for this order?
 // Lets us recover a missed/failed webhook so we never dun a client who already paid.
 export async function orderWasPaid(orderId: string): Promise<boolean> {

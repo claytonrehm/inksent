@@ -15,6 +15,7 @@ interface Order {
   client_paid_at?: string | null
   notary_fee?: number
   client_fee?: number
+  refunded_at?: string | null
   dispatched_to?: string[]
   hold_for_review?: boolean
   client_company?: string
@@ -93,6 +94,17 @@ export default function OrderActions({ order, notaries }: { order: Order; notari
     setLoading('notary_paid')
     await fetch(`/api/orders/${order.id}/pay-notary`, { method: 'POST' })
     setLoading(null)
+    router.refresh()
+  }
+
+  async function refundClient() {
+    if (!confirm("Refund this client's payment via Stripe? This cannot be undone.")) return
+    setLoading('refund')
+    const res = await fetch(`/api/orders/${order.id}/refund`, { method: 'POST' })
+    const data = await res.json().catch(() => ({}))
+    setLoading(null)
+    if (!res.ok) { alert(data.error || 'Refund failed'); return }
+    if (data.notaryAlreadyPaid) alert('Refunded. Note: the notary was already paid for this job — recover that amount separately.')
     router.refresh()
   }
 
@@ -297,9 +309,18 @@ export default function OrderActions({ order, notaries }: { order: Order; notari
       {/* Client payment tracking */}
       {order.status === 'completed' && (
         <div className="pt-2 border-t border-gray-100">
-          {order.client_paid_at ? (
-            <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-2.5">
-              <CheckCircle size={14} /> Client paid ${order.client_fee ? (order.client_fee / 100).toFixed(0) : '185'} on {new Date(order.client_paid_at).toLocaleDateString()}
+          {order.refunded_at ? (
+            <div className="flex items-center gap-2 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2.5">
+              ↩️ Refunded on {new Date(order.refunded_at).toLocaleDateString()}
+            </div>
+          ) : order.client_paid_at ? (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-2.5">
+                <CheckCircle size={14} /> Client paid ${order.client_fee ? (order.client_fee / 100).toFixed(0) : '185'} on {new Date(order.client_paid_at).toLocaleDateString()}
+              </div>
+              <button onClick={refundClient} disabled={loading === 'refund'} className="text-xs text-gray-400 hover:text-red-600 underline disabled:opacity-50">
+                {loading === 'refund' ? 'Refunding…' : 'Refund this payment'}
+              </button>
             </div>
           ) : (
             <Button
