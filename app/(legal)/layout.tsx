@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import InksentLogo from '@/components/InksentLogo'
+import BackLink from '@/components/BackLink'
 
 export default function LegalLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -7,11 +8,11 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
       <div className="bg-white border-b border-gray-100 px-6 py-4">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <InksentLogo size="md" />
-          <Link href="/" className="text-sm text-violet-600 hover:underline">← Home</Link>
+          <BackLink href="/" label="Home" />
         </div>
       </div>
       <div className="max-w-3xl mx-auto px-5 py-12">
-        <article className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 sm:p-10 prose-legal">
+        <article className="bg-white rounded-2xl border border-gray-100 shadow-md p-8 sm:p-10 prose-legal">
           {children}
         </article>
         <div className="text-center mt-6 text-sm text-gray-400">

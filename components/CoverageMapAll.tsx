@@ -29,16 +29,17 @@ export default function CoverageMapAll({ notaries }: { notaries: CoverageNotary[
       const circles: import('leaflet').Layer[] = []
       for (const n of notaries) {
         const isActive = n.status === 'active'
-        const color = isActive ? '#7c3aed' : '#64748b'
+        const stroke = isActive ? '#7c3aed' : '#94a3b8'
+        const fill = isActive ? '#a855f7' : '#94a3b8'
         const circle = L.circle([n.lat, n.lng], {
           radius: n.radiusMiles * 1609.34,
-          color, fillColor: color,
-          fillOpacity: isActive ? 0.10 : 0.05,
-          weight: isActive ? 2 : 1,
+          color: stroke, fillColor: fill,
+          fillOpacity: isActive ? 0.25 : 0.08,
+          weight: isActive ? 3 : 1,
           dashArray: isActive ? undefined : '4',
         }).addTo(map)
         L.circleMarker([n.lat, n.lng], {
-          radius: 5, color: '#ffffff', weight: 2, fillColor: color, fillOpacity: 1,
+          radius: 5, color: '#ffffff', weight: 2, fillColor: fill, fillOpacity: 1,
         }).addTo(map).bindPopup(`${n.name} · ${n.radiusMiles}mi${isActive ? '' : ' (applicant)'}`)
         circles.push(circle)
       }

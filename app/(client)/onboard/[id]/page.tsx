@@ -26,7 +26,7 @@ export default async function OnboardPage({ params }: { params: Promise<{ id: st
 
       <div className="max-w-2xl mx-auto px-4 py-10">
         {notary.onboarded_at ? (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center">
+          <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-10 text-center">
             <div className="bg-green-50 rounded-full p-5 w-fit mx-auto mb-4">
               <CheckCircle className="text-green-500 w-12 h-12" />
             </div>
@@ -46,7 +46,7 @@ export default async function OnboardPage({ params }: { params: Promise<{ id: st
                 One last step before your first job — a few details we need to verify your credentials and pay you. Takes about 3 minutes.
               </p>
             </div>
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+            <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 sm:p-8">
               <OnboardForm notaryId={notary.id} notaryName={notary.name} />
             </div>
             <p className="text-center text-xs text-gray-400 mt-4">

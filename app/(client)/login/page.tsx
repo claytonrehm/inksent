@@ -34,7 +34,7 @@ export default function LoginPage() {
   if (magicSent) {
     return (
       <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 max-w-sm w-full text-center">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-10 max-w-sm w-full text-center">
           <div className="text-4xl mb-4">📬</div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">Check your email</h2>
           <p className="text-gray-500 text-sm">We sent a login link to <strong>{email}</strong>. Click it to access your portal.</p>
@@ -45,7 +45,7 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 max-w-sm w-full">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-8 max-w-sm w-full">
         <div className="flex justify-center mb-8">
           <InksentLogo size="md" href="/" />
         </div>

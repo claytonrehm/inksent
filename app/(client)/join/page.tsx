@@ -72,7 +72,7 @@ export default function JoinPage() {
         {/* Perks grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
           {PERKS.map((p) => (
-            <div key={p.title} className="border border-gray-100 rounded-xl p-5 break-inside-avoid">
+            <div key={p.title} className="border border-gray-100 rounded-xl p-5 break-inside-avoid shadow-sm hover:shadow-md transition-shadow print:shadow-none">
               <div className="flex items-center gap-2.5 mb-2">
                 <span className="bg-violet-50 text-violet-600 rounded-lg p-2">{p.icon}</span>
                 <h3 className="font-bold text-gray-900">{p.title}</h3>

@@ -1,4 +1,5 @@
 import InksentLogo from '@/components/InksentLogo'
+import BackLink from '@/components/BackLink'
 import { isAdminAuthed } from '@/lib/admin-auth'
 import { redirect } from 'next/navigation'
 
@@ -29,7 +30,9 @@ export default async function AdminLogin({ searchParams }: { searchParams: Promi
               {error === 'code' && <p className="text-sm text-red-400 bg-red-500/10 rounded-lg px-3 py-2">Invalid or expired code.</p>}
               <button type="submit" className="w-full bg-violet-600 text-white rounded-lg px-4 py-3 text-sm font-bold hover:bg-violet-500 transition-colors">Verify &amp; Sign In</button>
             </form>
-            <a href="/admin-login" className="block text-center text-xs text-slate-500 mt-6 hover:text-slate-300">← Start over</a>
+            <div className="flex justify-center mt-6">
+              <BackLink href="/admin-login" label="Start over" dark />
+            </div>
           </>
         ) : (
           <>

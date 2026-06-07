@@ -1,13 +1,13 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import { format } from 'date-fns'
-import Link from 'next/link'
 import { formatCurrency } from '@/lib/utils'
 import { lookupZip } from '@/lib/coverage'
 import { SIGNINGS_LABEL } from '@/lib/notary'
 import NotaryDetailActions from './NotaryDetailActions'
 import CoverageMap from '@/components/CoverageMap'
-import { Star, MapPin, Phone, Mail, ArrowLeft, CheckCircle, XCircle } from 'lucide-react'
+import BackLink from '@/components/BackLink'
+import { Star, MapPin, Phone, Mail, CheckCircle, XCircle } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
@@ -40,9 +40,7 @@ export default async function NotaryDetailPage({ params }: { params: Promise<{ i
 
   return (
     <div className="p-6 lg:p-8 max-w-4xl space-y-6">
-      <Link href="/notaries" className="inline-flex items-center gap-1.5 text-sm text-violet-600 hover:underline">
-        <ArrowLeft size={14} /> Back to network
-      </Link>
+      <BackLink href="/notaries" label="Back to network" />
 
       {/* Header */}
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">

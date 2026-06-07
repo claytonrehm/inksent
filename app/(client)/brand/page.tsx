@@ -64,7 +64,7 @@ export default function BrandPage() {
 
         <div className="space-y-4">
           {ICONS.map((ic, i) => (
-            <div key={ic.name} className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <div key={ic.name} className="bg-white rounded-2xl border border-gray-200 shadow-md hover:shadow-lg transition-shadow overflow-hidden">
               <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
                 <span className="font-bold text-gray-900">{i + 1}. {ic.name}</span>
                 <span className="text-xs text-gray-400 hidden sm:block">{ic.note}</span>

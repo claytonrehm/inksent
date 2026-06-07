@@ -35,7 +35,7 @@ export default async function UploadPage({ params }: { params: Promise<{ id: str
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-5">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-6 mb-5">
           <div className="text-xs text-gray-400 uppercase tracking-wide mb-2">Signing</div>
           <div className="grid grid-cols-2 gap-y-1 text-sm">
             <span className="text-gray-500">Confirmation</span><span className="text-right font-mono">{order.confirmation_number}</span>
@@ -45,7 +45,7 @@ export default async function UploadPage({ params }: { params: Promise<{ id: str
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-6">
           <DocUpload orderId={order.id} existing={existing} />
         </div>
 

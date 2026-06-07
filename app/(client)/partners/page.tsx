@@ -72,7 +72,7 @@ export default function PartnersPage() {
         {/* Edges grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
           {EDGES.map((e) => (
-            <div key={e.title} className="border border-gray-100 rounded-xl p-5 break-inside-avoid">
+            <div key={e.title} className="border border-gray-100 rounded-xl p-5 break-inside-avoid shadow-sm hover:shadow-md transition-shadow print:shadow-none">
               <div className="flex items-center gap-2.5 mb-2">
                 <span className="bg-violet-50 text-violet-600 rounded-lg p-2">{e.icon}</span>
                 <h3 className="font-bold text-gray-900">{e.title}</h3>

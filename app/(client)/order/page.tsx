@@ -1,6 +1,6 @@
-import Link from 'next/link'
 import OrderForm from '@/components/OrderForm'
 import InksentLogo from '@/components/InksentLogo'
+import BackLink from '@/components/BackLink'
 
 export const metadata = {
   title: 'Place a Signing Order — Inksent',
@@ -18,14 +18,14 @@ export default function OrderPage() {
 
       <div className="max-w-2xl mx-auto px-4 py-10">
         <div className="mb-8">
-          <Link href="/" className="text-sm text-violet-600 hover:underline font-medium">← Back to home</Link>
+          <BackLink href="/" label="Back to home" />
           <h1 className="text-3xl font-black text-gray-900 mt-4 mb-2">Place a Signing Order</h1>
           <p className="text-gray-500">
             Available in all 50 states. Submit your order and we&apos;ll confirm a signing agent within 30 minutes.
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+        <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 sm:p-8">
           <OrderForm />
         </div>
 

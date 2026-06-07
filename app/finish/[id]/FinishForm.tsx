@@ -35,7 +35,7 @@ export default function FinishForm({ notaryId, notaryName, already }: { notaryId
 
   if (done) {
     return (
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 max-w-md w-full text-center">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-10 max-w-md w-full text-center">
         <div className="text-4xl mb-3">✅</div>
         <h2 className="text-xl font-bold text-gray-900 mb-2">Thank you{notaryName ? `, ${notaryName.split(' ')[0]}` : ''}!</h2>
         <p className="text-gray-500 text-sm">Your application is complete. We&apos;ll be in touch soon.</p>
@@ -44,7 +44,7 @@ export default function FinishForm({ notaryId, notaryName, already }: { notaryId
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 max-w-md w-full">
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-8 max-w-md w-full">
       <h1 className="text-xl font-black text-gray-900 mb-1">One quick question{notaryName ? `, ${notaryName.split(' ')[0]}` : ''}</h1>
       <p className="text-gray-500 text-sm mb-6">This helps us match you to the right signings. Takes 20 seconds.</p>
 

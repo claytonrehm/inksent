@@ -48,19 +48,19 @@ export default async function ConnectPage({
       </div>
       <div className="max-w-md mx-auto px-4 py-10">
         {payoutsEnabled ? (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-8 text-center">
             <CheckCircle className="text-green-500 w-12 h-12 mx-auto mb-3" />
             <h1 className="text-xl font-bold text-gray-900 mb-1">Payouts are set up!</h1>
             <p className="text-gray-500 text-sm">You&apos;re fully ready. When you complete a signing, your $90 lands in your bank automatically — no invoicing, no waiting on us.</p>
           </div>
         ) : !hasStripe() ? (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-8 text-center">
             <Clock className="text-amber-500 w-10 h-10 mx-auto mb-3" />
             <h1 className="text-lg font-bold text-gray-900 mb-1">Almost there</h1>
             <p className="text-gray-500 text-sm">Payout setup is being finalized on our end. We&apos;ll email you a link shortly — you&apos;re still good to receive job offers.</p>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-7 text-center">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-7 text-center">
             <div className="bg-violet-50 rounded-full p-4 w-fit mx-auto mb-4">
               <Landmark className="text-violet-600 w-9 h-9" />
             </div>

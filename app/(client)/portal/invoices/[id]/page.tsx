@@ -2,6 +2,7 @@ import { createClient, createAuthClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import { buildInvoiceHTML } from '@/lib/invoice'
 import PrintButton from './PrintButton'
+import BackLink from '@/components/BackLink'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,7 +27,7 @@ export default async function ClientInvoicePage({ params }: { params: Promise<{ 
   return (
     <div className="min-h-screen bg-gray-100 py-8 print:bg-white print:p-0">
       <div className="flex justify-between max-w-2xl mx-auto mb-4 px-4 print:hidden">
-        <a href="/portal" className="text-sm text-violet-600 hover:underline font-medium">← Back to portal</a>
+        <BackLink href="/portal" label="Back to portal" />
         <PrintButton />
       </div>
       <div dangerouslySetInnerHTML={{ __html: html }} />

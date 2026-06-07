@@ -22,7 +22,7 @@ export default function CoverageMap({
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map)
       const circle = L.circle([lat, lng], {
         radius: radiusMiles * 1609.34,
-        color: '#7c3aed', fillColor: '#7c3aed', fillOpacity: 0.12, weight: 2,
+        color: '#7c3aed', fillColor: '#a855f7', fillOpacity: 0.30, weight: 3,
       }).addTo(map)
       L.circleMarker([lat, lng], {
         radius: 6, color: '#ffffff', weight: 2, fillColor: '#7c3aed', fillOpacity: 1,

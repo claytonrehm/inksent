@@ -1,5 +1,5 @@
-import Link from 'next/link'
 import InksentLogo from '@/components/InksentLogo'
+import BackLink from '@/components/BackLink'
 import NotaryApplyForm from './NotaryApplyForm'
 import { DollarSign, Zap, Clock, Star, Shield, CheckCircle } from 'lucide-react'
 
@@ -32,7 +32,7 @@ export default function ApplyPage() {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 py-10">
-        <Link href="/" className="text-sm text-violet-600 hover:underline font-medium">← Back to home</Link>
+        <BackLink href="/" label="Back to home" />
 
         {/* Hero */}
         <div className="mt-6 mb-10">
@@ -60,7 +60,7 @@ export default function ApplyPage() {
             </div>
 
             {/* How it works */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-5 space-y-4">
               <h3 className="font-bold text-gray-900">How it works</h3>
               {HOW_IT_WORKS.map(({ icon, title, desc }) => (
                 <div key={title} className="flex gap-3">
@@ -74,7 +74,7 @@ export default function ApplyPage() {
             </div>
 
             {/* Requirements */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-5">
               <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2"><Shield size={15} className="text-violet-600" /> Requirements</h3>
               <div className="space-y-2">
                 {REQUIREMENTS.map(r => (
@@ -89,7 +89,7 @@ export default function ApplyPage() {
 
           {/* Right — form */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+            <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 sm:p-8">
               <h2 className="text-xl font-bold text-gray-900 mb-1">Notary Application</h2>
               <p className="text-sm text-gray-500 mb-6">Takes about 1 minute. We review every application personally.</p>
               <NotaryApplyForm />

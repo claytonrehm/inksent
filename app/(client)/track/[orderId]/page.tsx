@@ -53,13 +53,13 @@ export default async function TrackPage({ params }: { params: Promise<{ orderId:
         <p className="text-gray-500 mb-8">{format(new Date(order.signing_date), 'EEEE, MMMM d')} · {timeStr} · {order.property_city}, {order.property_state}</p>
 
         {cancelled ? (
-          <div className="bg-white rounded-2xl border border-red-200 shadow-sm p-8 text-center">
+          <div className="bg-white rounded-2xl border border-red-200 shadow-md p-8 text-center">
             <XCircle className="text-red-500 w-12 h-12 mx-auto mb-3" />
             <h2 className="text-lg font-bold text-gray-900">This order was cancelled</h2>
             <p className="text-gray-500 text-sm mt-1">Questions? Call (619) 949-3361.</p>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-6">
             {/* Assigned agent card */}
             {notary && current >= 2 && (
               <div className="flex items-center gap-4 bg-violet-50 border border-violet-100 rounded-xl p-4 mb-6">

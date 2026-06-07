@@ -58,22 +58,22 @@ export default async function PortalPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+          <div className="bg-white rounded-xl border border-gray-100 shadow-md hover:shadow-lg transition-shadow p-5">
             <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-1">Total Orders</p>
             <p className="text-3xl font-black text-gray-900">{orders?.length ?? 0}</p>
           </div>
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+          <div className="bg-white rounded-xl border border-gray-100 shadow-md hover:shadow-lg transition-shadow p-5">
             <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-1">Completed</p>
             <p className="text-3xl font-black text-gray-900">{orders?.filter(o => o.status === 'completed').length ?? 0}</p>
           </div>
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 col-span-2 sm:col-span-1">
+          <div className="bg-white rounded-xl border border-gray-100 shadow-md hover:shadow-lg transition-shadow p-5 col-span-2 sm:col-span-1">
             <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-1">Total Invoiced</p>
             <p className="text-3xl font-black text-violet-600">{formatCurrency(totalSpend)}</p>
           </div>
         </div>
 
         {/* Orders table */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-md overflow-x-auto">
           <table className="w-full text-sm min-w-[680px]">
             <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
               <tr>
