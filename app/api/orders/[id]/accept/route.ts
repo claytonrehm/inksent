@@ -12,7 +12,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const [orderResult, notaryResult] = await Promise.all([
     supabase.from('orders').select('*').eq('id', id).single(),
-    supabase.from('notaries').select('name, phone, email').eq('id', notary_id).single(),
+    supabase.from('notaries').select('name, phone, email, active, onboarded_at').eq('id', notary_id).single(),
   ])
 
   if (orderResult.error || !orderResult.data) {
@@ -22,8 +22,30 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const order = orderResult.data
   const notary = notaryResult.data
 
+  // Idempotent: this notary already holds it
+  if (order.notary_id === notary_id) {
+    return NextResponse.json({ ok: true, already: true })
+  }
+  // Taken by someone else
   if (order.notary_id && order.notary_id !== notary_id) {
-    return NextResponse.json({ error: 'Already assigned to another notary' }, { status: 409 })
+    return NextResponse.json({ error: 'This signing has already been taken by another agent.' }, { status: 409 })
+  }
+  // Only open orders can be accepted (not completed/cancelled)
+  if (!['pending', 'dispatching'].includes(order.status)) {
+    return NextResponse.json({ error: 'This signing is no longer available.' }, { status: 409 })
+  }
+  // The notary must be a real, active, onboarded agent
+  if (!notary || notaryResult.error || !notary.active || !notary.onboarded_at) {
+    return NextResponse.json({ error: 'Your account isn’t active yet — please finish onboarding first.' }, { status: 403 })
+  }
+  // The notary must have actually been offered this job, and not have declined it
+  const dispatchedTo: string[] = order.dispatched_to ?? []
+  const declinedBy: string[] = order.declined_by ?? []
+  if (dispatchedTo.length > 0 && !dispatchedTo.includes(notary_id)) {
+    return NextResponse.json({ error: 'This signing wasn’t offered to your account.' }, { status: 403 })
+  }
+  if (declinedBy.includes(notary_id)) {
+    return NextResponse.json({ error: 'You previously declined this signing.' }, { status: 409 })
   }
 
   await supabase
