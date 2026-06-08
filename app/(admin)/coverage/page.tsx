@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { lookupZip } from '@/lib/coverage'
 import CoverageMapAll, { type CoverageNotary } from '@/components/CoverageMapAll'
+import TimeCoverage from '@/components/TimeCoverage'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,7 +9,7 @@ export default async function CoveragePage() {
   const supabase = await createClient()
   const { data: notaries } = await supabase
     .from('notaries')
-    .select('name, base_zip, coverage_radius, active, denied_at')
+    .select('name, base_zip, coverage_radius, active, denied_at, availability')
 
   const mapped: CoverageNotary[] = []
   for (const n of notaries ?? []) {
@@ -26,6 +27,9 @@ export default async function CoveragePage() {
 
   const activeCount = mapped.filter(n => n.status === 'active').length
   const pendingCount = mapped.filter(n => n.status === 'pending').length
+
+  // Active bench for the time-coverage heatmap
+  const activeBench = (notaries ?? []).filter(n => n.active && !n.denied_at).map(n => ({ availability: (n.availability as string[] | null) ?? [] }))
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl space-y-5">
@@ -50,6 +54,12 @@ export default async function CoveragePage() {
       <p className="text-xs text-gray-400">
         Circles show each agent&apos;s stated travel radius from their home ZIP. Overlapping violet circles = redundant (resilient) coverage; gaps = areas to recruit.
       </p>
+
+      <div className="pt-4">
+        <h2 className="text-lg font-bold text-gray-900">Time Coverage</h2>
+        <p className="text-gray-500 text-sm mt-1 mb-4">How many active agents are available by day &amp; time. Red cells are gaps to recruit for — green means you can confidently promise a title company that slot.</p>
+        <TimeCoverage notaries={activeBench} />
+      </div>
     </div>
   )
 }
