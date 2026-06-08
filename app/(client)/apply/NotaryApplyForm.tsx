@@ -39,10 +39,15 @@ export default function NotaryApplyForm() {
   const [cityLabel, setCityLabel] = useState<string | null>(null)
   const [captchaToken, setCaptchaToken] = useState('')
   const [signingTypes, setSigningTypes] = useState<string[]>([])
+  const [availability, setAvailability] = useState<string[]>([])
   const fileRef = useRef<HTMLInputElement>(null)
 
   function toggleSigningType(t: string) {
     setSigningTypes((p) => p.includes(t) ? p.filter((x) => x !== t) : [...p, t])
+  }
+
+  function toggleAvailability(t: string) {
+    setAvailability((p) => p.includes(t) ? p.filter((x) => x !== t) : [...p, t])
   }
 
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm<FormData>({
@@ -102,7 +107,7 @@ export default function NotaryApplyForm() {
       const res = await fetch('/api/notary-apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, photo_url, signing_types: signingTypes, turnstileToken: captchaToken }),
+        body: JSON.stringify({ ...data, photo_url, signing_types: signingTypes, availability, turnstileToken: captchaToken }),
       })
       if (res.status === 409) {
         const j = await res.json().catch(() => ({}))
@@ -262,6 +267,18 @@ export default function NotaryApplyForm() {
             {[['purchase', 'Purchase'], ['refinance', 'Refinance'], ['heloc', 'HELOC'], ['reverse_mortgage', 'Reverse Mortgage'], ['loan_mod', 'Loan Modification']].map(([val, label]) => (
               <button key={val} type="button" onClick={() => toggleSigningType(val)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${signingTypes.includes(val) ? 'bg-violet-600 text-white border-violet-600' : 'bg-white text-gray-600 border-gray-300 hover:border-violet-300'}`}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">When are you generally available? <span className="text-gray-400 font-normal">(select all that apply)</span></label>
+          <div className="flex flex-wrap gap-2 mt-1">
+            {[['weekday_day', 'Weekdays (daytime)'], ['weekday_evening', 'Weekday evenings'], ['weekends', 'Weekends'], ['same_day', 'Same-day / last-minute']].map(([val, label]) => (
+              <button key={val} type="button" onClick={() => toggleAvailability(val)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${availability.includes(val) ? 'bg-violet-600 text-white border-violet-600' : 'bg-white text-gray-600 border-gray-300 hover:border-violet-300'}`}>
                 {label}
               </button>
             ))}

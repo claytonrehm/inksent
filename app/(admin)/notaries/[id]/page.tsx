@@ -34,6 +34,8 @@ export default async function NotaryDetailPage({ params }: { params: Promise<{ i
   const ytd = completed.reduce((s, o) => s + o.notary_fee, 0)
   const owed = completed.filter(o => !o.notary_paid_at).reduce((s, o) => s + o.notary_fee, 0)
   const coverage = lookupZip(notary.base_zip)
+  const AVAIL_LABELS: Record<string, string> = { weekday_day: 'Weekdays', weekday_evening: 'Weekday eves', weekends: 'Weekends', same_day: 'Same-day OK' }
+  const avail = (notary.availability as string[] | null) ?? []
 
   // Credential-expiry protection
   const today = new Date().toISOString().slice(0, 10)
@@ -81,6 +83,14 @@ export default async function NotaryDetailPage({ params }: { params: Promise<{ i
               <span>{SIGNINGS_LABEL[notary.signings_completed ?? ''] ?? '—'} signings done</span>
               <span>Joined {format(new Date(notary.created_at), 'MMM d, yyyy')}</span>
             </div>
+            {avail.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                <span className="text-xs text-gray-400">Available:</span>
+                {avail.map((a) => (
+                  <span key={a} className="text-xs bg-violet-50 text-violet-700 border border-violet-200 px-2 py-0.5 rounded-full">{AVAIL_LABELS[a] ?? a}</span>
+                ))}
+              </div>
+            )}
           </div>
           <NotaryDetailActions id={notary.id} active={notary.active} name={notary.name} />
         </div>

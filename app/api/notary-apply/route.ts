@@ -80,11 +80,12 @@ export async function POST(req: NextRequest) {
   // so the application never fails if the migration hasn't been run yet.
   const reExp = body?.re_experience
   const signingTypes = Array.isArray(body?.signing_types) ? body.signing_types : []
-  if (reExp || signingTypes.length) {
+  const availability = Array.isArray(body?.availability) ? body.availability : []
+  if (reExp || signingTypes.length || availability.length) {
     await supabase.from('notaries')
-      .update({ re_experience: reExp || null, signing_types: signingTypes })
+      .update({ re_experience: reExp || null, signing_types: signingTypes, availability })
       .eq('email', d.email)
-      .then(({ error }) => { if (error) console.warn('re_experience save skipped:', error.message) })
+      .then(({ error }) => { if (error) console.warn('re_experience/availability save skipped:', error.message) })
   }
 
   // Send onboarding email to the applicant
