@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { formatCurrency, STATUS_COLORS, STATUS_LABELS } from '@/lib/utils'
 import { format, startOfWeek, startOfMonth } from 'date-fns'
 import Link from 'next/link'
-import { ClipboardList, DollarSign, Clock, CheckCircle, AlertCircle, TrendingUp, Calendar } from 'lucide-react'
+import { ClipboardList, DollarSign, Clock, CheckCircle, AlertCircle, TrendingUp, Calendar, Users, Circle } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,7 +12,7 @@ async function getData() {
   const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 }).toISOString().split('T')[0]
   const monthStart = startOfMonth(new Date()).toISOString().split('T')[0]
 
-  const [allOrders, todaySignings, pendingNotaries] = await Promise.all([
+  const [allOrders, todaySignings, pendingNotaries, activeNotaries] = await Promise.all([
     supabase.from('orders').select('id, status, client_fee, notary_fee, created_at, client_paid_at, notary_paid_at, signing_date'),
     supabase
       .from('orders')
@@ -20,6 +20,7 @@ async function getData() {
       .eq('signing_date', today)
       .order('signing_time'),
     supabase.from('notaries').select('id', { count: 'exact', head: true }).eq('active', false),
+    supabase.from('notaries').select('id, name, onboarded_at, payouts_enabled, created_at').eq('active', true).order('created_at', { ascending: false }),
   ])
 
   const orders = allOrders.data ?? []
@@ -46,7 +47,17 @@ async function getData() {
 
   const active = orders.filter(o => ['pending', 'dispatching', 'assigned', 'confirmed'].includes(o.status)).length
 
+  // Notary bench onboarding status: Approved → Profile (onboarded_at) → Bank (payouts_enabled)
+  const bench = (activeNotaries.data ?? []).map(n => {
+    const profile = !!n.onboarded_at
+    const bank = !!n.payouts_enabled
+    return { id: n.id, name: n.name, profile, bank, stage: profile && bank ? 'active' : profile ? 'bank' : 'profile' }
+  })
+  const fullyActive = bench.filter(b => b.stage === 'active').length
+
   return {
+    bench,
+    fullyActive,
     totalOrders: orders.length,
     completedCount: completed.length,
     activeCount: active,
@@ -147,6 +158,36 @@ export default async function DashboardPage() {
         </div>
       )}
 
+      {/* Notary bench onboarding status */}
+      {data.bench.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 flex items-center justify-between border-b border-gray-100">
+            <div className="flex items-center gap-2">
+              <Users size={16} className="text-violet-600" />
+              <h2 className="font-semibold text-gray-900">Notary Bench</h2>
+              <span className="text-xs text-gray-400">{data.fullyActive} of {data.bench.length} fully active</span>
+            </div>
+            <Link href="/notaries" className="text-sm text-violet-600 hover:underline">Manage</Link>
+          </div>
+          <div className="divide-y divide-gray-100">
+            {data.bench.map((b: any) => (
+              <div key={b.id} className="px-6 py-3 flex items-center justify-between gap-3">
+                <p className="font-medium text-gray-900 text-sm flex-1 min-w-0 truncate">{b.name}</p>
+                <div className="hidden sm:flex items-center gap-3 text-xs">
+                  <Step on label="Approved" />
+                  <Step on={b.profile} label="Profile" />
+                  <Step on={b.bank} label="Bank" />
+                </div>
+                <span className={`shrink-0 inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${b.stage === 'active' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                  {b.stage === 'active' ? '✓ Fully active' : b.stage === 'bank' ? 'Needs bank setup' : 'Needs profile'}
+                </span>
+                <Link href={`/notaries/${b.id}`} className="text-xs text-violet-600 hover:underline shrink-0">View</Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Recent Orders */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 flex items-center justify-between border-b border-gray-100">
@@ -215,6 +256,14 @@ function MiniCard({ label, value, icon, color, sub }: { label: string; value: st
       <p className="text-xl font-bold text-gray-900">{value}</p>
       {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
     </div>
+  )
+}
+
+function Step({ on, label }: { on?: boolean; label: string }) {
+  return (
+    <span className={`flex items-center gap-1 ${on ? 'text-green-600' : 'text-gray-300'}`}>
+      {on ? <CheckCircle size={12} /> : <Circle size={12} />} {label}
+    </span>
   )
 }
 

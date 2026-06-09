@@ -64,7 +64,17 @@ export async function POST(req: NextRequest) {
   if (event.type === 'account.updated') {
     const acct = event.data.object as { id: string; payouts_enabled?: boolean }
     const supabase = await createClient()
-    await supabase.from('notaries').update({ payouts_enabled: !!acct.payouts_enabled }).eq('stripe_account_id', acct.id)
+    const nowEnabled = !!acct.payouts_enabled
+    const { data: n } = await supabase
+      .from('notaries')
+      .select('name, payouts_enabled')
+      .eq('stripe_account_id', acct.id)
+      .single()
+    await supabase.from('notaries').update({ payouts_enabled: nowEnabled }).eq('stripe_account_id', acct.id)
+    // Notify ONCE, on the transition to payout-ready = fully onboarded & dispatchable
+    if (n && nowEnabled && !n.payouts_enabled && process.env.ADMIN_PHONE) {
+      sendSMS(process.env.ADMIN_PHONE, `✅ ${n.name} connected their bank — fully onboarded and ready for jobs!`).catch(() => {})
+    }
   }
 
   return NextResponse.json({ received: true })
