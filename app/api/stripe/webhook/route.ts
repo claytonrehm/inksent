@@ -54,8 +54,16 @@ export async function POST(req: NextRequest) {
           } else if (process.env.ADMIN_PHONE) {
             sendSMS(process.env.ADMIN_PHONE, `ℹ️ Payout to ${n.name} for ${o.confirmation_number} is queued — card funds usually take ~1–2 days to settle, then it auto-pays. No action needed unless it persists.`).catch(() => {})
           }
-        } else if (process.env.ADMIN_PHONE) {
-          sendSMS(process.env.ADMIN_PHONE, `⚠️ ${n.name} hasn't connected payouts — can't auto-pay for ${o.confirmation_number}. Nudge them to finish setup.`).catch(() => {})
+        } else {
+          // Just-in-time payout: their money is waiting. Nudge THE NOTARY with the
+          // strongest possible motivator — their pending pay + a connect link.
+          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'
+          if (n.phone) {
+            sendSMS(n.phone, `💰 Your $${(o.notary_fee / 100).toFixed(0)} for the ${o.confirmation_number} signing is ready! Connect your bank to receive it — 2 min, deposit-only (we can't touch your account): ${baseUrl}/onboard/${o.notary_id}/connect`).catch(() => {})
+          }
+          if (process.env.ADMIN_PHONE) {
+            sendSMS(process.env.ADMIN_PHONE, `ℹ️ ${n.name} completed ${o.confirmation_number} but hasn't connected payouts — we texted them their pending $${(o.notary_fee / 100).toFixed(0)} + connect link. Auto-pays once they connect.`).catch(() => {})
+          }
         }
       }
     }

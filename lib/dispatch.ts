@@ -40,10 +40,14 @@ export async function blastOrderToCoveringNotaries(
   const credsValid = (n: { eo_expiry?: string | null; commission_expiry?: string | null }) =>
     (!n.eo_expiry || n.eo_expiry >= today) && (!n.commission_expiry || n.commission_expiry >= today)
 
-  // Only dispatch to agents who are onboarded, payout-connected (so we can always
-  // auto-pay them), and have valid credentials. Keeps the money loop zero-touch.
+  // Dispatch to agents who finished their profile + have valid credentials.
+  // Bank connection is NOT required to receive jobs — we use "just-in-time"
+  // payouts: once a job is done and the client pays, we nudge the agent to
+  // connect their bank to claim the money waiting for them (strongest motivator),
+  // and the cron auto-pays it the moment they connect. Money is held safely in
+  // our Stripe balance until then — no manual payout, no loss.
   const eligible = active.filter(
-    (n) => !exclude.has(n.id) && n.onboarded_at && n.payouts_enabled && credsValid(n) && notaryCoversZip(n.base_zip, n.coverage_radius, order.property_zip)
+    (n) => !exclude.has(n.id) && n.onboarded_at && credsValid(n) && notaryCoversZip(n.base_zip, n.coverage_radius, order.property_zip)
   )
   const notOnboarded = active.filter(
     (n) => !exclude.has(n.id) && !n.onboarded_at && notaryCoversZip(n.base_zip, n.coverage_radius, order.property_zip)

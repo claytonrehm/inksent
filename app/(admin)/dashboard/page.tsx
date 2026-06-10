@@ -178,8 +178,8 @@ export default async function DashboardPage() {
                   <Step on={b.profile} label="Profile" />
                   <Step on={b.bank} label="Bank" />
                 </div>
-                <span className={`shrink-0 inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${b.stage === 'active' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
-                  {b.stage === 'active' ? '✓ Fully active' : b.stage === 'bank' ? 'Needs bank setup' : 'Needs profile'}
+                <span className={`shrink-0 inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${b.stage === 'active' ? 'bg-green-100 text-green-700' : b.stage === 'bank' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}`}>
+                  {b.stage === 'active' ? '✓ Fully active' : b.stage === 'bank' ? 'Can work · bank pending' : 'Needs profile'}
                 </span>
                 <Link href={`/notaries/${b.id}`} className="text-xs text-violet-600 hover:underline shrink-0">View</Link>
               </div>
