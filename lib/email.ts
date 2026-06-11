@@ -280,7 +280,7 @@ export async function sendClientAssignmentEmail(data: {
           </td>
           <td valign="middle" style="padding:20px;">
             <div style="font-size:16px;font-weight:700;color:#111111;">${data.notaryName}</div>
-            <div style="font-size:13px;color:#555555;margin:2px 0;">NNA-Certified Signing Agent</div>
+            <div style="font-size:12px;color:#16a34a;font-weight:600;margin:2px 0;">&#10003; NNA-Certified &middot; Background-checked &middot; E&amp;O-insured</div>
             <a href="tel:${data.notaryPhone}" style="font-size:13px;color:#7c3aed;font-weight:600;text-decoration:none;">${data.notaryPhone}</a>
           </td>
         </tr>

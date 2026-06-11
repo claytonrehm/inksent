@@ -5,7 +5,7 @@ import ClientCoverageMap, { type CoverageArea } from '@/components/ClientCoverag
 import BrandHeader from './BrandHeader'
 import { createClient } from '@/lib/supabase/server'
 import { lookupZip } from '@/lib/coverage'
-import { CheckCircle2, Clock, MapPin, Truck, FileText, Star, TrendingUp, ArrowRight } from 'lucide-react'
+import { CheckCircle2, Clock, MapPin, Truck, FileText, Star, TrendingUp, ArrowRight, ShieldCheck } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
@@ -122,6 +122,28 @@ export default async function DemoPage({
               <p className="text-[11px] text-gray-500 mt-0.5 leading-tight">{s.label}</p>
             </div>
           ))}
+        </div>
+
+        {/* Trust / compliance — the title company's #1 concern */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-6">
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4 flex items-center gap-2"><ShieldCheck size={15} className="text-violet-600" /> Every agent, every time</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {[
+              ['NNA-Certified', 'Trained, tested loan-signing agents'],
+              ['Background-Checked', 'Current screening on file'],
+              ['E&O-Insured', '$25k+ coverage, verified'],
+              ['Auto-Verified', 'Credentials re-checked before every job'],
+            ].map(([t, d]) => (
+              <div key={t} className="flex flex-col items-center text-center">
+                <CheckCircle2 size={20} className="text-green-500 mb-1.5" />
+                <p className="font-bold text-gray-900 text-sm">{t}</p>
+                <p className="text-xs text-gray-500 mt-0.5 leading-tight">{d}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-gray-500 mt-4 bg-gray-50 rounded-lg px-4 py-3 leading-relaxed">
+            We monitor every agent&apos;s NNA cert, background check, E&amp;O insurance, and commission automatically — an expired credential <strong>auto-removes them from dispatch</strong>, so an uninsured or lapsed agent can never be assigned to your closing. The liability is covered before we ever send someone.
+          </p>
         </div>
 
         {/* Coverage — honest footprint + real-time check */}
