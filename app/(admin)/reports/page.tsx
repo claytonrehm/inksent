@@ -10,7 +10,7 @@ const money = (cents: number) => (cents / 100).toFixed(2)
 export default async function ReportsPage() {
   const supabase = await createClient()
   const [{ data: orders }, { data: notaries }, { data: cancellations }] = await Promise.all([
-    supabase.from('orders').select('id, confirmation_number, status, signing_type, signing_date, signer_name, property_city, property_state, base_zip, client_company, client_email, client_fee, notary_fee, notary_id, created_at, dispatched_at, accepted_at, completed_at, client_paid_at, notary_paid_at, issue_reported_at'),
+    supabase.from('orders').select('id, confirmation_number, status, signing_type, signing_date, signer_name, property_city, property_state, base_zip, client_company, client_email, client_fee, notary_fee, notary_id, created_at, dispatched_at, accepted_at, completed_at, client_paid_at, notary_paid_at, issue_reported_at, client_satisfaction'),
     supabase.from('notaries').select('id, name, email'),
     supabase.from('notary_cancellations').select('id'),
   ])
@@ -31,6 +31,10 @@ export default async function ReportsPage() {
     .map((o) => (new Date(o.accepted_at!).getTime() - new Date(o.dispatched_at!).getTime()) / 60000)
   const avgConfirm = confirmTimes.length ? Math.round(confirmTimes.reduce((s, t) => s + t, 0) / confirmTimes.length) : null
   const issues = O.filter((o) => o.issue_reported_at).length
+  const thumbsUp = O.filter((o) => o.client_satisfaction === 'up').length
+  const thumbsDown = O.filter((o) => o.client_satisfaction === 'down').length
+  const rated = thumbsUp + thumbsDown
+  const satisfaction = rated ? Math.round((thumbsUp / rated) * 100) : null
 
   // ─── By title partner ───────────────────────────────────
   const partnerMap: Record<string, { company: string; orders: number; completed: number; billed: number; collected: number; outstanding: number; last: string }> = {}
@@ -77,6 +81,7 @@ export default async function ReportsPage() {
         <Stat label="Avg confirm time" value={avgConfirm != null ? `${avgConfirm} min` : '—'} />
         <Stat label="Completed (billed)" value={formatCurrency(billedCompleted)} />
         <Stat label="Issues reported" value={String(issues)} warn={issues > 0} />
+        <Stat label="Client satisfaction" value={satisfaction != null ? `${satisfaction}% 👍 (${rated})` : '—'} warn={thumbsDown > 0} />
         <Stat label="Cancellations" value={String((cancellations ?? []).length)} warn={(cancellations ?? []).length > 0} />
         <Stat label="Active notaries" value={String((notaries ?? []).length)} />
       </div>

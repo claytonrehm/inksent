@@ -12,7 +12,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const [orderResult, notaryResult] = await Promise.all([
     supabase.from('orders').select('*').eq('id', id).single(),
-    supabase.from('notaries').select('name, phone, email, active, onboarded_at').eq('id', notary_id).single(),
+    supabase.from('notaries').select('name, phone, email, active, onboarded_at, photo_url').eq('id', notary_id).single(),
   ])
 
   if (orderResult.error || !orderResult.data) {
@@ -137,6 +137,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       propertyAddress: order.property_address,
       propertyCity: order.property_city,
       confirmationNumber: order.confirmation_number,
+      notaryPhotoUrl: notary.photo_url,
     }).catch(console.error)
 
     // If documents are already uploaded, deliver them to whoever just accepted

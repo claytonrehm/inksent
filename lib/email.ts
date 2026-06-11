@@ -256,11 +256,15 @@ export async function sendClientAssignmentEmail(data: {
   propertyAddress: string
   propertyCity: string
   confirmationNumber: string
+  notaryPhotoUrl?: string | null
 }) {
   const firstName = data.clientName.split(' ')[0]
   const typeLabel = data.signingType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 
   const initials = data.notaryName.split(' ').map(w => w[0]).join('').slice(0,2)
+  const avatar = data.notaryPhotoUrl
+    ? `<img src="${data.notaryPhotoUrl}" alt="${data.notaryName}" width="48" height="48" style="width:48px;height:48px;border-radius:24px;object-fit:cover;display:block;" />`
+    : `<div style="width:48px;height:48px;background:#7c3aed;border-radius:24px;color:#ffffff;font-size:18px;font-weight:800;text-align:center;line-height:48px;mso-line-height-rule:exactly;">${initials}</div>`
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/>${META}</head>
   <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111111;margin:0;padding:0;background:#f4f4f5;">
   <div style="max-width:560px;margin:32px auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
@@ -272,7 +276,7 @@ export async function sendClientAssignmentEmail(data: {
       <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:12px;margin:20px 0;">
         <tr>
           <td width="64" valign="middle" style="padding:20px 0 20px 20px;width:64px;">
-            <div style="width:48px;height:48px;background:#7c3aed;border-radius:24px;color:#ffffff;font-size:18px;font-weight:800;text-align:center;line-height:48px;mso-line-height-rule:exactly;">${initials}</div>
+            ${avatar}
           </td>
           <td valign="middle" style="padding:20px;">
             <div style="font-size:16px;font-weight:700;color:#111111;">${data.notaryName}</div>
@@ -315,9 +319,17 @@ export async function sendSigningCompleteEmail(data: {
   signingType: string
   confirmationNumber: string
   hasScanBacks?: boolean
+  orderId?: string
 }) {
   const firstName = data.clientName?.split(' ')[0] || 'there'
   const typeLabel = data.signingType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'
+  const feedback = data.orderId ? `
+      <div style="text-align:center;margin:8px 0 4px;">
+        <p style="font-size:13px;color:#888888;margin:0 0 10px;">How was your experience?</p>
+        <a href="${baseUrl}/api/orders/${data.orderId}/feedback?r=up" style="display:inline-block;text-decoration:none;font-size:22px;border:1px solid #bbf7d0;background:#f0fdf4;border-radius:10px;padding:8px 18px;margin:0 6px;">👍</a>
+        <a href="${baseUrl}/api/orders/${data.orderId}/feedback?r=down" style="display:inline-block;text-decoration:none;font-size:22px;border:1px solid #fecaca;background:#fef2f2;border-radius:10px;padding:8px 18px;margin:0 6px;">👎</a>
+      </div>` : ''
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/>${META}</head>
   <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111111;margin:0;padding:0;background:#f4f4f5;">
   <div style="max-width:560px;margin:32px auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
@@ -336,7 +348,8 @@ export async function sendSigningCompleteEmail(data: {
           ${detailRow('Confirmation #', `<span style="font-family:monospace;">${data.confirmationNumber}</span>`, { last: true })}
         </table>
       </div>
-      <p style="font-size:14px;color:#555555;margin:0 0 4px;line-height:1.6;">${data.hasScanBacks ? 'Scan-backs are uploaded and your invoice is on its way.' : 'Your invoice is on its way separately.'}</p>
+      <p style="font-size:14px;color:#555555;margin:0 0 16px;line-height:1.6;">${data.hasScanBacks ? 'Scan-backs are uploaded and your invoice is on its way.' : 'Your invoice is on its way separately.'}</p>
+      ${feedback}
       <p style="font-size:13px;color:#777777;margin:14px 0 0;line-height:1.6;">Thank you for trusting Inksent with your closing. We&rsquo;d love to handle the next one — just reply here or call <a href="tel:+16199493361" style="color:#7c3aed;text-decoration:none;">(619) 949-3361</a>.</p>
     </div>
     ${FOOTER}

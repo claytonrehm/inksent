@@ -129,8 +129,11 @@ export default function PartnersPage() {
             <Link href="/order" className="no-print inline-flex items-center gap-2 bg-violet-600 text-white font-bold px-7 py-3.5 rounded-xl hover:bg-violet-700 transition-colors">
               Place a Signing Order <ArrowRight size={16} />
             </Link>
-            <span className="text-gray-500 text-sm">or call <a href="tel:+16199493361" className="font-semibold text-gray-800">(619) 949-3361</a></span>
+            <Link href="/partners/apply" className="no-print inline-flex items-center gap-2 border border-violet-200 text-violet-700 font-bold px-7 py-3.5 rounded-xl hover:bg-violet-50 transition-colors">
+              Become a Partner
+            </Link>
           </div>
+          <p className="text-gray-500 text-sm mt-3">or call <a href="tel:+16199493361" className="font-semibold text-gray-800">(619) 949-3361</a></p>
           <p className="text-xs text-gray-400 mt-6">Inksent Signing Services · support@inksent.co · (619) 949-3361 · inksent.co</p>
         </div>
       </div>

@@ -53,6 +53,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       signingType: order.signing_type,
       confirmationNumber: order.confirmation_number,
       hasScanBacks,
+      orderId: id,
     }).catch(console.error)
   }
   if (order.client_phone) {
