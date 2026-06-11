@@ -444,7 +444,7 @@ export async function sendNotaryApplicationEmail(notary: {
     ${HEADER}
     <div style="padding:36px;">
       <h2 style="font-size:20px;font-weight:800;color:#111111;margin:0 0 6px;">You&rsquo;re almost in, ${firstName}! 🎉</h2>
-      <p style="font-size:14px;color:#555555;line-height:1.6;margin:0 0 16px;">Thanks for applying to the Inksent signing network. We review every application personally — you&rsquo;ll hear from us within 7 days.</p>
+      <p style="font-size:14px;color:#555555;line-height:1.6;margin:0 0 16px;">Thanks for applying to the Inksent signing network. We review every application personally — you&rsquo;ll hear from us within 1&ndash;2 business days.</p>
 
       <p style="font-weight:600;color:#111111;font-size:15px;margin:0 0 20px;">Here&rsquo;s exactly how it works once you&rsquo;re approved:</p>
 

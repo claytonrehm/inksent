@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendSMS } from '@/lib/sms'
 import { sendPaymentReminderEmail } from '@/lib/invoice'
+import { sendNotaryApprovedEmail } from '@/lib/email'
 import { orderWasPaid, payoutNotary, hasStripe } from '@/lib/stripe'
 import { createAdminClient, hasServiceRole } from '@/lib/supabase/admin'
 import { format } from 'date-fns'
@@ -85,6 +86,40 @@ export async function GET(req: NextRequest) {
       ).catch(() => {})
     }
     await supabase.from('orders').update({ overdue_alerted_at: new Date().toISOString() }).eq('id', o.id)
+  }
+
+  // 2b-2. ONBOARDING NUDGE — approved notaries who never finished their profile are
+  //   the biggest mid-funnel leak (they sit "approved" but undispatchable). Re-send the
+  //   approval SMS + email a few times, spaced out: first ~1 day after approval, then
+  //   every ~2 days, up to 3 nudges. nudge_count/nudged_at prevent spamming each run.
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'
+  const oneDayAgo = new Date(now - 86_400_000).toISOString()
+  const twoDaysAgo = new Date(now - 2 * 86_400_000).toISOString()
+  const { data: stalledNotaries } = await supabase
+    .from('notaries')
+    .select('id, name, phone, email, approved_at, nudged_at, nudge_count')
+    .eq('active', true)
+    .is('onboarded_at', null)
+    .not('approved_at', 'is', null)
+    .lt('nudge_count', 3)
+  let nudged = 0
+  for (const n of stalledNotaries ?? []) {
+    const neverNudged = !n.nudged_at
+    const due = neverNudged ? n.approved_at < oneDayAgo : n.nudged_at < twoDaysAgo
+    if (!due) continue
+    const onboardUrl = `${baseUrl}/onboard/${n.id}`
+    const firstName = (n.name ?? '').split(' ')[0]
+    if (n.phone) {
+      await sendSMS(
+        n.phone,
+        `Hi ${firstName}, you're approved with Inksent but haven't finished your quick profile yet — it's the last step before we can text you signing jobs ($90 each). Takes ~3 min: ${onboardUrl} — Clayton`
+      ).catch(() => {})
+    }
+    if (n.email) {
+      await sendNotaryApprovedEmail({ name: n.name, email: n.email, onboardUrl }).catch(() => {})
+    }
+    await supabase.from('notaries').update({ nudged_at: new Date().toISOString(), nudge_count: (n.nudge_count ?? 0) + 1 }).eq('id', n.id)
+    nudged++
   }
 
   // 2c. MONEY SAFETY NET — runs BEFORE dunning so we never chase a paid client.
@@ -192,5 +227,5 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ ok: true, alerted: toAlert.length, reminded, purged })
+  return NextResponse.json({ ok: true, alerted: toAlert.length, nudged, reminded, purged })
 }

@@ -78,29 +78,32 @@ export default function NotaryApplyForm() {
   }
 
   async function onSubmit(data: FormData) {
-    if (!photoFile) { setPhotoError('A photo is required so we know who we are dispatching'); return }
     setError(null)
 
-    let photo_url: string
-    try {
-      const supabase = createClient()
-      // Compress/normalize to JPEG before upload (fast + reliable on cellular)
-      const blob = await compressImage(photoFile)
-      const ctype = blob.type || 'image/jpeg'
-      const fext = ctype === 'image/jpeg' ? 'jpg' : (ctype.split('/')[1] || 'jpg')
-      const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fext}`
-      const { error: uploadError } = await supabase.storage
-        .from('notary-photos')
-        .upload(filename, blob, { contentType: ctype, upsert: false })
+    // Photo is optional at the application stage — we collect/require it at onboarding,
+    // once they're approved and invested. Requiring it up front was killing applications.
+    let photo_url: string | undefined
+    if (photoFile) {
+      try {
+        const supabase = createClient()
+        // Compress/normalize to JPEG before upload (fast + reliable on cellular)
+        const blob = await compressImage(photoFile)
+        const ctype = blob.type || 'image/jpeg'
+        const fext = ctype === 'image/jpeg' ? 'jpg' : (ctype.split('/')[1] || 'jpg')
+        const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fext}`
+        const { error: uploadError } = await supabase.storage
+          .from('notary-photos')
+          .upload(filename, blob, { contentType: ctype, upsert: false })
 
-      if (uploadError) {
-        setError('Your photo couldn\'t upload. Please tap "Submit" again, or try a different photo.')
+        if (uploadError) {
+          setError('Your photo couldn\'t upload. Please tap "Submit" again, or remove the photo — you can add it later.')
+          return
+        }
+        photo_url = supabase.storage.from('notary-photos').getPublicUrl(filename).data.publicUrl
+      } catch {
+        setError('Your photo couldn\'t upload. Remove it and submit — you can add it after you\'re approved.')
         return
       }
-      photo_url = supabase.storage.from('notary-photos').getPublicUrl(filename).data.publicUrl
-    } catch {
-      setError('Your photo couldn\'t upload. Please check your connection and tap "Submit" again.')
-      return
     }
 
     try {
@@ -134,7 +137,7 @@ export default function NotaryApplyForm() {
         </div>
         <h2 className="text-2xl font-bold text-gray-900">You&apos;re on the list!</h2>
         <p className="text-gray-500 max-w-sm">
-          We review every application personally and will be in touch within 7 days. Once you&apos;re approved, you&apos;ll start receiving text messages when signings are available in your area.
+          We review every application personally and will be in touch within 1&ndash;2 business days. Once you&apos;re approved, you&apos;ll start receiving text messages when signings are available in your area.
         </p>
       </div>
     )
@@ -145,8 +148,8 @@ export default function NotaryApplyForm() {
 
       {/* Photo */}
       <section>
-        <p className="text-sm font-semibold text-gray-700 mb-1">Your Photo <span className="text-violet-600">*</span></p>
-        <p className="text-xs text-gray-400 mb-3">A clear headshot so we know who&apos;s representing us at the signing table.</p>
+        <p className="text-sm font-semibold text-gray-700 mb-1">Your Photo <span className="text-gray-400 font-normal">(optional)</span></p>
+        <p className="text-xs text-gray-400 mb-3">A clear headshot helps, but it&apos;s not required to apply — you can add it after you&apos;re approved.</p>
         <div className="flex items-start gap-4">
           <div
             onClick={() => fileRef.current?.click()}

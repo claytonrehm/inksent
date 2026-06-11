@@ -1,22 +1,24 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { CheckCircle, FileText } from 'lucide-react'
+import { CheckCircle, FileText, Camera, Upload, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { createClient } from '@/lib/supabase/client'
+import { compressImage } from '@/lib/compress-image'
 
 const schema = z.object({
-  nna_number: z.string().min(3, 'Required'),
+  nna_number: z.string().optional(),
   commission_state_code: z.string().min(2, 'Required'),
   commission_expiry: z.string().min(1, 'Required'),
   bgc_provider: z.string().optional(),
   bgc_date: z.string().optional(),
-  eo_carrier: z.string().min(2, 'Required'),
+  eo_carrier: z.string().optional(),
   eo_policy: z.string().optional(),
-  eo_expiry: z.string().min(1, 'Required'),
+  eo_expiry: z.string().optional(),
   has_dual_tray: z.enum(['yes', 'no'], { message: 'Please select' }),
   ic_acknowledged: z.literal(true, { message: 'Required' }),
 })
@@ -24,10 +26,14 @@ type FormData = z.infer<typeof schema>
 
 const LANGUAGES = ['Spanish', 'Mandarin', 'Vietnamese', 'Tagalog', 'Korean', 'Other']
 
-export default function OnboardForm({ notaryId, notaryName }: { notaryId: string; notaryName: string }) {
+export default function OnboardForm({ notaryId, notaryName, hasPhoto }: { notaryId: string; notaryName: string; hasPhoto: boolean }) {
   const [done, setDone] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [languages, setLanguages] = useState<string[]>([])
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+  const [photoError, setPhotoError] = useState<string | null>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
   })
@@ -36,11 +42,41 @@ export default function OnboardForm({ notaryId, notaryName }: { notaryId: string
     setLanguages((p) => p.includes(l) ? p.filter((x) => x !== l) : [...p, l])
   }
 
+  function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const looksImage = file.type.startsWith('image/') || /\.(jpe?g|png|heic|heif|webp)$/i.test(file.name)
+    if (!looksImage) { setPhotoError('Please choose a photo (JPG, PNG, or HEIC)'); return }
+    if (file.size > 25 * 1024 * 1024) { setPhotoError('That photo is very large — please choose one under 25MB'); return }
+    setPhotoError(null)
+    setPhotoFile(file)
+    setPhotoPreview(URL.createObjectURL(file))
+  }
+
   async function onSubmit(data: FormData) {
     setError(null)
+
+    // Photo is required here only if we don't already have one on file from the application.
+    let photo_url: string | undefined
+    if (!hasPhoto) {
+      if (!photoFile) { setPhotoError('A clear headshot is required before your first job — it\'s who we tell the client to expect.'); return }
+      try {
+        const supabase = createClient()
+        const blob = await compressImage(photoFile)
+        const ctype = blob.type || 'image/jpeg'
+        const fext = ctype === 'image/jpeg' ? 'jpg' : (ctype.split('/')[1] || 'jpg')
+        const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fext}`
+        const { error: uploadError } = await supabase.storage.from('notary-photos').upload(filename, blob, { contentType: ctype, upsert: false })
+        if (uploadError) { setError('Your photo couldn\'t upload. Please tap "Complete My Profile" again, or try a different photo.'); return }
+        photo_url = supabase.storage.from('notary-photos').getPublicUrl(filename).data.publicUrl
+      } catch {
+        setError('Your photo couldn\'t upload. Please check your connection and try again.'); return
+      }
+    }
+
     const res = await fetch(`/api/notaries/${notaryId}/onboard`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...data, languages }),
+      body: JSON.stringify({ ...data, languages, ...(photo_url ? { photo_url } : {}) }),
     })
     if (!res.ok) { setError('Something went wrong. Please try again or email orders@inksent.co.'); return }
     setDone(true)
@@ -64,10 +100,37 @@ export default function OnboardForm({ notaryId, notaryName }: { notaryId: string
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-7">
+      {/* Photo — only when we don't already have one from the application */}
+      {!hasPhoto && (
+        <section>
+          <p className="text-sm font-semibold text-gray-700 mb-1">Your Photo <span className="text-violet-600">*</span></p>
+          <p className="text-xs text-gray-400 mb-3">A clear headshot — it&apos;s who we tell the client to expect at the table.</p>
+          <div className="flex items-start gap-4">
+            <div onClick={() => fileRef.current?.click()}
+              className={`w-24 h-24 rounded-2xl border-2 border-dashed flex items-center justify-center cursor-pointer transition-colors shrink-0 overflow-hidden ${photoPreview ? 'border-violet-300' : 'border-gray-300 hover:border-violet-400 bg-gray-50'}`}>
+              {photoPreview ? <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" /> : <Camera size={24} className="text-gray-400" />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <input ref={fileRef} type="file" accept="image/*" onChange={handlePhoto} className="hidden" />
+              <button type="button" onClick={() => fileRef.current?.click()}
+                className="flex items-center gap-2 text-sm font-medium text-violet-600 hover:text-violet-700 border border-violet-200 bg-violet-50 rounded-lg px-4 py-2.5 transition-colors">
+                <Upload size={14} /> {photoFile ? 'Change Photo' : 'Upload Photo'}
+              </button>
+              <p className="text-xs text-gray-400 mt-2">JPG or PNG. You can take one right now on your phone.</p>
+              {photoFile && <p className="text-xs text-green-600 mt-1 flex items-center gap-1"><CheckCircle size={11} /> Photo added</p>}
+              {photoError && <p className="text-xs text-red-500 mt-1">{photoError}</p>}
+            </div>
+            {photoPreview && (
+              <button type="button" onClick={() => { setPhotoFile(null); setPhotoPreview(null) }} className="text-gray-400 hover:text-gray-600 shrink-0"><X size={16} /></button>
+            )}
+          </div>
+        </section>
+      )}
+
       {/* Commission / NNA */}
       <section className="space-y-4">
         <p className="text-sm font-semibold text-gray-700">Commission &amp; Certification</p>
-        <Input id="nna_number" label="NNA Member Number *" placeholder="12345678"
+        <Input id="nna_number" label="NNA Member Number" placeholder="If you have one (optional)"
           error={errors.nna_number?.message} {...register('nna_number')} />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input id="commission_state_code" label="Commission State *" placeholder="CA"
@@ -89,11 +152,12 @@ export default function OnboardForm({ notaryId, notaryName }: { notaryId: string
       {/* E&O Insurance */}
       <section className="space-y-4">
         <p className="text-sm font-semibold text-gray-700">E&amp;O Insurance</p>
+        <p className="text-xs text-gray-400 -mt-2">Have a policy? Add it here. Don&apos;t carry E&amp;O yet? Leave this blank — you can add it before your first job. It&apos;s strongly recommended and many title clients require it.</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input id="eo_carrier" label="Carrier *" placeholder="Notary Shield, NNA, etc."
+          <Input id="eo_carrier" label="Carrier" placeholder="Notary Shield, NNA, etc."
             error={errors.eo_carrier?.message} {...register('eo_carrier')} />
           <Input id="eo_policy" label="Policy Number" placeholder="(optional)" {...register('eo_policy')} />
-          <Input id="eo_expiry" label="Policy Expires *" type="date"
+          <Input id="eo_expiry" label="Policy Expires" type="date"
             error={errors.eo_expiry?.message} {...register('eo_expiry')} />
         </div>
       </section>

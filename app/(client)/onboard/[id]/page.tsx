@@ -12,7 +12,7 @@ export default async function OnboardPage({ params }: { params: Promise<{ id: st
   const supabase = await createClient()
   const { data: notary } = await supabase
     .from('notaries')
-    .select('id, name, active, onboarded_at')
+    .select('id, name, active, onboarded_at, photo_url')
     .eq('id', id)
     .single()
 
@@ -47,7 +47,7 @@ export default async function OnboardPage({ params }: { params: Promise<{ id: st
               </p>
             </div>
             <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 sm:p-8">
-              <OnboardForm notaryId={notary.id} notaryName={notary.name} />
+              <OnboardForm notaryId={notary.id} notaryName={notary.name} hasPhoto={!!notary.photo_url} />
             </div>
             <p className="text-center text-xs text-gray-400 mt-4">
               Questions? <a href="mailto:orders@inksent.co" className="underline hover:text-gray-600">orders@inksent.co</a>

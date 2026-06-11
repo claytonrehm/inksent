@@ -89,7 +89,7 @@ export default function JoinPage() {
             <ol className="space-y-3">
               {[
                 'Apply in about 2 minutes at inksent.co/apply (have a photo ready).',
-                'We review every application personally and reach out within 7 days.',
+                'We review every application personally and reach out within 1–2 business days.',
                 'Once approved, complete a quick profile and connect your bank for payouts.',
                 'Start receiving signing job texts in your area.',
               ].map((s, i) => (

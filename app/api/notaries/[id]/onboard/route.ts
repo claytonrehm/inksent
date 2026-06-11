@@ -20,6 +20,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     eo_expiry: d.eo_expiry || null,
     has_dual_tray: d.has_dual_tray === 'yes',
     languages: Array.isArray(d.languages) ? d.languages : [],
+    ...(d.photo_url ? { photo_url: d.photo_url } : {}),
     onboarded_at: new Date().toISOString(),
   }).eq('id', id)
 
@@ -28,9 +29,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   // Alert admin that onboarding is complete
   const { data: n } = await supabase.from('notaries').select('name').eq('id', id).single()
   if (process.env.ADMIN_PHONE && n) {
+    const eoNote = d.eo_carrier ? `E&O: ${d.eo_carrier}` : '⚠️ no E&O yet — confirm before first job'
     sendSMS(
       process.env.ADMIN_PHONE,
-      `✅ ${n.name} completed their profile — credentials + E&O on file. Next they connect direct deposit (Stripe).`
+      `✅ ${n.name} completed their profile (${eoNote}). Next they connect direct deposit (Stripe).`
     ).catch(console.error)
   }
 
