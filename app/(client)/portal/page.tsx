@@ -18,13 +18,23 @@ export default async function PortalPage() {
   const supabase = await createClient()
   const { data: orders } = await supabase
     .from('orders')
-    .select('id, confirmation_number, status, signing_date, signing_time, signing_type, signer_name, property_city, property_state, client_fee, invoice_id, created_at, completed_at')
+    .select('id, confirmation_number, status, signing_date, signing_time, signing_type, signer_name, property_city, property_state, client_fee, invoice_id, created_at, completed_at, dispatched_at, accepted_at, client_satisfaction')
     .eq('client_email', user.email)
     .order('created_at', { ascending: false })
 
-  const totalSpend = (orders ?? [])
-    .filter(o => o.status === 'completed')
-    .reduce((sum, o) => sum + o.client_fee, 0)
+  const O = orders ?? []
+  const completedOrders = O.filter(o => o.status === 'completed')
+  const totalSpend = completedOrders.reduce((sum, o) => sum + o.client_fee, 0)
+
+  // Partner-facing scorecard metrics (same view they saw in the demo).
+  const confirmMins = O.filter(o => o.accepted_at && o.dispatched_at)
+    .map(o => (new Date(o.accepted_at as string).getTime() - new Date(o.dispatched_at as string).getTime()) / 60000)
+    .filter(m => m >= 0)
+  const avgConfirm = confirmMins.length ? Math.round(confirmMins.reduce((s, m) => s + m, 0) / confirmMins.length) : null
+  const up = O.filter(o => o.client_satisfaction === 'up').length
+  const rated = up + O.filter(o => o.client_satisfaction === 'down').length
+  const satisfaction = rated ? Math.round((up / rated) * 100) : null
+  const hoursSaved = Math.round(completedOrders.length * 0.75) // ~45 min of coordination saved per signing
 
   function formatTime(t: string) {
     const [h, m] = t.split(':').map(Number)
@@ -57,20 +67,14 @@ export default async function PortalPage() {
           </Link>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white rounded-xl border border-gray-100 shadow-md hover:shadow-lg transition-shadow p-5">
-            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-1">Total Orders</p>
-            <p className="text-3xl font-black text-gray-900">{orders?.length ?? 0}</p>
-          </div>
-          <div className="bg-white rounded-xl border border-gray-100 shadow-md hover:shadow-lg transition-shadow p-5">
-            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-1">Completed</p>
-            <p className="text-3xl font-black text-gray-900">{orders?.filter(o => o.status === 'completed').length ?? 0}</p>
-          </div>
-          <div className="bg-white rounded-xl border border-gray-100 shadow-md hover:shadow-lg transition-shadow p-5 col-span-2 sm:col-span-1">
-            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-1">Total Invoiced</p>
-            <p className="text-3xl font-black text-violet-600">{formatCurrency(totalSpend)}</p>
-          </div>
+        {/* Scorecard */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
+          <Metric label="Total orders" value={String(O.length)} />
+          <Metric label="Completed" value={String(completedOrders.length)} />
+          <Metric label="Avg confirm" value={avgConfirm != null ? `${avgConfirm} min` : '—'} good />
+          <Metric label="Satisfaction" value={satisfaction != null ? `${satisfaction}% 👍` : '—'} good />
+          <Metric label="Total invoiced" value={formatCurrency(totalSpend)} accent />
+          <Metric label="Hours saved" value={hoursSaved > 0 ? `${hoursSaved} hrs` : '—'} />
         </div>
 
         {/* Orders table */}
@@ -133,5 +137,14 @@ export default async function PortalPage() {
         </div>
       </div>
     </main>
+  )
+}
+
+function Metric({ label, value, good, accent }: { label: string; value: string; good?: boolean; accent?: boolean }) {
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 shadow-md p-4">
+      <p className="text-[11px] text-gray-500 font-medium uppercase tracking-wide mb-1 leading-tight">{label}</p>
+      <p className={`text-2xl font-black ${good ? 'text-green-600' : accent ? 'text-violet-600' : 'text-gray-900'}`}>{value}</p>
+    </div>
   )
 }

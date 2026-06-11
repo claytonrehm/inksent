@@ -41,12 +41,17 @@ export default async function DemoPage({
 }) {
   const sp = await searchParams
   const company = sp.co?.trim() || 'Summit Settlement Services'
-  // `name` = full name for the top-right; `contact` is a fallback first name.
-  const fullName = sp.name?.trim() || sp.contact?.trim() || 'Jordan Mathis'
-  const firstName = fullName.split(' ')[0]
   const logo = sp.logo?.trim()
+  // `email` is the source of truth (matches what they'd sign in with). Name comes
+  // from ?name=, else ?contact=, else derived from the email, else a default.
+  const emailParam = sp.email?.trim()
+  const nameFromEmail = emailParam
+    ? emailParam.split('@')[0].replace(/[._-]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+    : ''
+  const fullName = sp.name?.trim() || sp.contact?.trim() || nameFromEmail || 'Jordan Mathis'
+  const firstName = fullName.split(' ')[0]
   const handle = company.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 16) || 'yourtitle'
-  const email = sp.email?.trim() || `${firstName.toLowerCase()}@${handle}.com`
+  const email = emailParam || `${firstName.toLowerCase()}@${handle}.com`
 
   return (
     <main className="min-h-screen bg-gray-50">
