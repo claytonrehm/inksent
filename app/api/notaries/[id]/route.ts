@@ -13,15 +13,18 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   // Get current notary state to detect approval
   const { data: before } = await supabase.from('notaries').select('active, name, phone, email').eq('id', id).single()
 
-  // On newly approved, stamp approved_at so the onboarding-nudge cron has a clock to run off.
   const isNewlyApproved = body.active === true && before && !before.active
-  const update = isNewlyApproved ? { ...body, approved_at: new Date().toISOString() } : body
 
-  const { error } = await supabase.from('notaries').update(update).eq('id', id)
+  const { error } = await supabase.from('notaries').update(body).eq('id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   // On newly approved: send welcome SMS + approval email, both with the onboarding link
   if (isNewlyApproved) {
+    // Stamp approved_at for the onboarding-nudge cron. Best-effort so approval never
+    // fails if the nudges migration hasn't been applied yet.
+    await supabase.from('notaries').update({ approved_at: new Date().toISOString() }).eq('id', id)
+      .then(({ error }) => { if (error) console.warn('approved_at stamp skipped:', error.message) })
+
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'
     const onboardUrl = `${baseUrl}/onboard/${id}`
     const firstName = before.name.split(' ')[0]
