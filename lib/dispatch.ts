@@ -1,6 +1,7 @@
 import { sendSMS, buildDispatchMessage } from '@/lib/sms'
 import { sendNotaryJobOfferEmail } from '@/lib/email'
 import { notaryCoversZip } from '@/lib/coverage'
+import { credentialItems } from '@/lib/credentials'
 import { format } from 'date-fns'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
@@ -30,15 +31,17 @@ export async function blastOrderToCoveringNotaries(
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'
   const { data: notaries } = await supabase
     .from('notaries')
-    .select('id, name, phone, email, base_zip, coverage_radius, onboarded_at, payouts_enabled, languages, eo_expiry, commission_expiry')
+    .select('id, name, phone, email, base_zip, coverage_radius, onboarded_at, payouts_enabled, languages, nna_certified, nna_cert_expiry, background_checked, bgc_date, eo_carrier, eo_expiry, commission_expiry')
     .eq('active', true)
 
   const exclude = new Set(opts.exclude ?? [])
   const active = notaries ?? []
-  const today = new Date().toISOString().slice(0, 10)
-  // Never dispatch to an agent whose E&O or commission has lapsed — protects all parties
-  const credsValid = (n: { eo_expiry?: string | null; commission_expiry?: string | null }) =>
-    (!n.eo_expiry || n.eo_expiry >= today) && (!n.commission_expiry || n.commission_expiry >= today)
+  // Never dispatch to an agent with ANY EXPIRED credential (NNA cert, background
+  // check, E&O, or commission) — this is what makes the "expired = auto-removed
+  // from dispatch" promise to title companies true. Missing-but-not-expired data
+  // does not block (we chase it separately), so the bench isn't starved.
+  const credsValid = (n: Parameters<typeof credentialItems>[0]) =>
+    !credentialItems(n).some((c) => c.status === 'expired')
 
   // Dispatch to agents who finished their profile + have valid credentials.
   // Bank connection is NOT required to receive jobs — we use "just-in-time"
