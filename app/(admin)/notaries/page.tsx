@@ -80,6 +80,8 @@ export default async function NotariesPage() {
       years_experience: n.years_experience, signings_completed: n.signings_completed,
       re_experience: n.re_experience, signing_types: n.signing_types,
       nna_certified: !!n.nna_certified, background_checked: !!n.background_checked,
+      nna_cert_expiry: n.nna_cert_expiry, bgc_date: n.bgc_date,
+      eo_carrier: n.eo_carrier, eo_expiry: n.eo_expiry, commission_expiry: n.commission_expiry,
       notes: n.notes, created_at: n.created_at, denied_at: n.denied_at,
     }
   }

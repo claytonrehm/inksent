@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { CheckCircle, XCircle, Search, ExternalLink, Phone, Mail, MapPin, ChevronDown, ChevronUp, Filter, RotateCcw, Trash2 } from 'lucide-react'
 import { SIGNINGS_LABEL, SIGNINGS_RANK, vetApplicant, RE_EXPERIENCE_LABEL } from '@/lib/notary'
 import CoverageMap from '@/components/CoverageMap'
+import CredentialBadges from '@/components/CredentialBadges'
 
 export interface Applicant {
   id: string
@@ -23,6 +24,11 @@ export interface Applicant {
   signing_types?: string[]
   nna_certified: boolean
   background_checked: boolean
+  nna_cert_expiry?: string | null
+  bgc_date?: string | null
+  eo_carrier?: string | null
+  eo_expiry?: string | null
+  commission_expiry?: string | null
   notes?: string
   created_at: string
   denied_at?: string
@@ -219,8 +225,7 @@ export default function ApplicantsBoard({ applicants, mode = 'pending' }: { appl
                   <h3 className="font-bold text-gray-900">{a.name}</h3>
                   <span title={`Automated vetting score ${vet.score}/100`} className={`text-xs font-semibold border px-1.5 py-0.5 rounded ${TIER_STYLES[vet.tier]}`}>{vet.tier} · {vet.score}</span>
                   {a.re_experience && <span title="Real-estate signing experience" className={`text-xs font-semibold border px-1.5 py-0.5 rounded ${RE_EXP_STYLES[a.re_experience]}`}>{RE_EXPERIENCE_LABEL[a.re_experience]}</span>}
-                  {a.nna_certified && <span className="text-xs bg-green-50 text-green-700 border border-green-200 px-1.5 py-0.5 rounded">NNA</span>}
-                  {a.background_checked && <span className="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-1.5 py-0.5 rounded">Bg ✓</span>}
+                  <CredentialBadges notary={a} />
                 </div>
                 <div className="flex flex-wrap gap-x-4 gap-y-0.5 mt-1 text-xs text-gray-500">
                   <span className="flex items-center gap-1"><MapPin size={11} /> {a.coverage_label ?? a.base_zip} · {a.coverage_radius ?? 25}mi</span>
