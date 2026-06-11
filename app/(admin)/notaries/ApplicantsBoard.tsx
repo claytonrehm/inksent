@@ -233,12 +233,10 @@ export default function ApplicantsBoard({ applicants, mode = 'pending' }: { appl
                   <a href={`tel:${a.phone}`} className="flex items-center gap-1 hover:text-violet-600"><Phone size={10} /> {a.phone}</a>
                   <a href={`mailto:${a.email}`} className="flex items-center gap-1 hover:text-violet-600 truncate"><Mail size={10} /> {a.email}</a>
                 </div>
-                {!a.re_experience && (
-                  <button onClick={() => copyFinishLink(a.id)}
-                    className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2 py-1 rounded-lg hover:bg-amber-100">
-                    {copiedId === a.id ? '✓ Link copied!' : '⧉ Experience not provided — copy follow-up link'}
-                  </button>
-                )}
+                <button onClick={() => copyFinishLink(a.id)}
+                  className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-violet-700 bg-violet-50 border border-violet-200 px-2 py-1 rounded-lg hover:bg-violet-100">
+                  {copiedId === a.id ? '✓ Link copied! Now text/email it to them' : '⧉ Copy credential link (NNA + BG dates) to send them'}
+                </button>
               </div>
 
               <div className="flex flex-col gap-2 shrink-0">
