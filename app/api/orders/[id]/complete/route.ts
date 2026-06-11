@@ -52,6 +52,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       signerName: order.signer_name,
       signingType: order.signing_type,
       confirmationNumber: order.confirmation_number,
+      client_reference: order.client_reference,
       hasScanBacks,
       orderId: id,
     }).catch(console.error)

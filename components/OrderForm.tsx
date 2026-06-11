@@ -152,7 +152,7 @@ export default function OrderForm({ prefill }: { prefill?: OrderPrefill }) {
           <Input
             id="client_reference"
             label="Your file / order # (optional)"
-            placeholder="e.g. ESC-24-1087 — appears in your portal so you can cross-reference"
+            placeholder="e.g. ESC-24-1087 — appears in your portal + email updates so you can cross-reference"
             {...register('client_reference')}
           />
         </div>

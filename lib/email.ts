@@ -318,6 +318,7 @@ export async function sendSigningCompleteEmail(data: {
   signerName: string
   signingType: string
   confirmationNumber: string
+  client_reference?: string | null
   hasScanBacks?: boolean
   orderId?: string
 }) {
@@ -342,6 +343,7 @@ export async function sendSigningCompleteEmail(data: {
     <div style="padding:0 32px 28px;">
       <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:8px 20px;margin:0 0 20px;">
         <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+          ${data.client_reference ? detailRow('Your File #', `<strong>${data.client_reference}</strong>`) : ''}
           ${detailRow('Signer', data.signerName, { bold: true })}
           ${detailRow('Service', `${typeLabel} Signing`)}
           ${detailRow('Signing agent', data.notaryName)}
@@ -541,6 +543,7 @@ export async function sendNotaryApplicationEmail(notary: {
 export async function sendOrderConfirmationEmail(order: {
   id?: string
   confirmation_number: string
+  client_reference?: string | null
   client_name: string
   client_email: string
   signing_type: string
@@ -580,6 +583,7 @@ export async function sendOrderConfirmationEmail(order: {
 
       <div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#888888;font-weight:600;margin-bottom:4px;">Signing Summary</div>
       <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+        ${order.client_reference ? detailRow('Your File #', `<strong>${order.client_reference}</strong>`) : ''}
         ${detailRow('Service', `${typeLabel} Signing`, { bold: true })}
         ${detailRow('Signer / Borrower', order.signer_name)}
         ${detailRow('Date', dateStr)}

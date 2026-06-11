@@ -109,6 +109,7 @@ export async function POST(req: NextRequest) {
     sendOrderConfirmationEmail({
       id: data.id,
       confirmation_number: data.confirmation_number,
+      client_reference,
       client_name: data.client_name,
       client_email: data.client_email,
       signing_type: data.signing_type,
