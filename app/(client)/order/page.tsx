@@ -1,12 +1,41 @@
-import OrderForm from '@/components/OrderForm'
+import OrderForm, { type OrderPrefill } from '@/components/OrderForm'
 import InksentLogo from '@/components/InksentLogo'
 import BackLink from '@/components/BackLink'
+import { createClient, createAuthClient } from '@/lib/supabase/server'
 
 export const metadata = {
   title: 'Place a Signing Order — Inksent',
 }
 
-export default function OrderPage() {
+export const dynamic = 'force-dynamic'
+
+export default async function OrderPage() {
+  // If a partner is signed in, prefill their company/contact from their last order
+  // so repeat orders are a few fields, not a full form.
+  let prefill: OrderPrefill | undefined
+  const auth = await createAuthClient()
+  const { data: { user } } = await auth.auth.getUser()
+  if (user?.email) {
+    const supabase = await createClient()
+    const { data: last } = await supabase
+      .from('orders')
+      .select('client_company, client_name, client_email, client_phone')
+      .eq('client_email', user.email)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+    if (last) {
+      prefill = {
+        client_company: last.client_company ?? undefined,
+        client_name: last.client_name ?? undefined,
+        client_email: last.client_email ?? user.email,
+        client_phone: last.client_phone ?? undefined,
+      }
+    } else {
+      prefill = { client_email: user.email }
+    }
+  }
+
   return (
     <main className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -25,8 +54,14 @@ export default function OrderPage() {
           </p>
         </div>
 
+        {prefill?.client_company && (
+          <div className="mb-4 bg-violet-50 border border-violet-100 text-violet-700 text-sm rounded-xl px-4 py-3">
+            Welcome back{prefill.client_name ? `, ${prefill.client_name.split(' ')[0]}` : ''} — we&apos;ve prefilled your company info. Just add the signing details.
+          </div>
+        )}
+
         <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 sm:p-8">
-          <OrderForm />
+          <OrderForm prefill={prefill} />
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-6">

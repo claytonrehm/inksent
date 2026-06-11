@@ -55,7 +55,14 @@ interface ConfirmationState {
   confirmation_number: string
 }
 
-export default function OrderForm() {
+export interface OrderPrefill {
+  client_company?: string
+  client_name?: string
+  client_email?: string
+  client_phone?: string
+}
+
+export default function OrderForm({ prefill }: { prefill?: OrderPrefill }) {
   const [confirmation, setConfirmation] = useState<ConfirmationState | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [captchaToken, setCaptchaToken] = useState('')
@@ -68,7 +75,7 @@ export default function OrderForm() {
     formState: { errors, isSubmitting },
   } = useForm<OrderSchema>({
     resolver: zodResolver(orderSchema),
-    defaultValues: {},
+    defaultValues: { ...(prefill ?? {}) },
   })
 
   const onSubmit = async (data: OrderSchema) => {
