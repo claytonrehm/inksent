@@ -106,6 +106,12 @@ export async function POST(req: NextRequest) {
       .eq('email', d.email)
       .then(({ error }) => { if (error) console.warn('E&O save skipped:', error.message) })
   }
+  if (body?.commission_state_code || body?.commission_expiry) {
+    await supabase.from('notaries')
+      .update({ commission_state_code: body.commission_state_code || null, commission_expiry: body.commission_expiry || null })
+      .eq('email', d.email)
+      .then(({ error }) => { if (error) console.warn('commission save skipped:', error.message) })
+  }
 
   // Send onboarding email to the applicant
   sendNotaryApplicationEmail({ name: d.name, email: d.email }).catch(console.error)

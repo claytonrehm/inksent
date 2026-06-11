@@ -30,18 +30,21 @@ const schema = z.object({
   eo_carrier: z.string().optional(),
   eo_coverage_amount: z.string().optional(),
   eo_expiry: z.string().optional(),
+  commission_state_code: z.string().min(2, 'Required'),
+  commission_expiry: z.string().min(1, 'Required'),
   notes: z.string().optional(),
   sms_consent: z.literal(true, { message: 'Required to receive job offers' }),
   ic_agreement: z.literal(true, { message: 'You must accept the Independent Contractor Agreement to join' }),
 }).superRefine((d, ctx) => {
-  // If they HAVE a credential, we need its details. If not, nothing required.
-  if (d.nna_certified === 'yes' && !d.nna_cert_expiry) {
-    ctx.addIssue({ code: 'custom', path: ['nna_cert_expiry'], message: 'Enter your NNA cert renewal date' })
-  }
-  if (d.background_checked === 'yes' && !d.bgc_date) {
-    ctx.addIssue({ code: 'custom', path: ['bgc_date'], message: 'Enter your background-check date' })
-  }
-  if (d.eo_insured === 'yes') {
+  // These are the minimum requirements to join — all required.
+  if (d.nna_certified !== 'yes') ctx.addIssue({ code: 'custom', path: ['nna_certified'], message: 'NNA certification is required to join' })
+  else if (!d.nna_cert_expiry) ctx.addIssue({ code: 'custom', path: ['nna_cert_expiry'], message: 'Enter your NNA cert renewal date' })
+
+  if (d.background_checked !== 'yes') ctx.addIssue({ code: 'custom', path: ['background_checked'], message: 'A current background check is required' })
+  else if (!d.bgc_date) ctx.addIssue({ code: 'custom', path: ['bgc_date'], message: 'Enter your background-check date' })
+
+  if (d.eo_insured !== 'yes') ctx.addIssue({ code: 'custom', path: ['eo_insured'], message: 'E&O insurance is required' })
+  else {
     if (!d.eo_carrier) ctx.addIssue({ code: 'custom', path: ['eo_carrier'], message: 'Enter your E&O carrier' })
     if (!d.eo_expiry) ctx.addIssue({ code: 'custom', path: ['eo_expiry'], message: 'Enter your E&O expiry date' })
     const amt = parseInt(d.eo_coverage_amount ?? '', 10)
@@ -319,7 +322,7 @@ export default function NotaryApplyForm() {
               {...register('nna_certified')}>
               <option value="">Select...</option>
               <option value="yes">Yes</option>
-              <option value="no">No — but working on it</option>
+              <option value="no">No</option>
             </select>
             {errors.nna_certified && <p className="text-xs text-red-500 mt-1">{errors.nna_certified.message}</p>}
             {nnaCertified === 'yes' && (
@@ -359,7 +362,7 @@ export default function NotaryApplyForm() {
             {...register('eo_insured')}>
             <option value="">Select...</option>
             <option value="yes">Yes — I carry E&amp;O</option>
-            <option value="no">Not yet — working on it</option>
+            <option value="no">No</option>
           </select>
           {errors.eo_insured && <p className="text-xs text-red-500 mt-1">{errors.eo_insured.message}</p>}
           {eoInsured === 'yes' && (
@@ -384,6 +387,22 @@ export default function NotaryApplyForm() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Notary commission — required */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Commission state *</label>
+            <input maxLength={2} placeholder="CA" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 uppercase"
+              {...register('commission_state_code')} />
+            {errors.commission_state_code && <p className="text-xs text-red-500 mt-1">{errors.commission_state_code.message}</p>}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Commission expires *</label>
+            <input type="date" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+              {...register('commission_expiry')} />
+            {errors.commission_expiry && <p className="text-xs text-red-500 mt-1">{errors.commission_expiry.message}</p>}
+          </div>
         </div>
       </section>
 

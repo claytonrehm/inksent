@@ -235,7 +235,7 @@ export default function ApplicantsBoard({ applicants, mode = 'pending' }: { appl
                 </div>
                 <button onClick={() => copyFinishLink(a.id)}
                   className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-violet-700 bg-violet-50 border border-violet-200 px-2 py-1 rounded-lg hover:bg-violet-100">
-                  {copiedId === a.id ? '✓ Link copied! Now text/email it to them' : '⧉ Copy credential link (NNA + BG dates) to send them'}
+                  {copiedId === a.id ? '✓ Link copied! Now text/email it to them' : '⧉ Copy credential link (NNA, BG, E&O, commission) to send them'}
                 </button>
               </div>
 
