@@ -37,14 +37,16 @@ const TIMELINE = [
 export default async function DemoPage({
   searchParams,
 }: {
-  searchParams: Promise<{ co?: string; contact?: string; logo?: string; email?: string }>
+  searchParams: Promise<{ co?: string; contact?: string; name?: string; logo?: string; email?: string }>
 }) {
   const sp = await searchParams
-  const company = sp.co?.trim() || 'Summit Title Co.'
-  const contact = sp.contact?.trim() || 'Jordan'
+  const company = sp.co?.trim() || 'Summit Settlement Services'
+  // `name` = full name for the top-right; `contact` is a fallback first name.
+  const fullName = sp.name?.trim() || sp.contact?.trim() || 'Jordan Mathis'
+  const firstName = fullName.split(' ')[0]
   const logo = sp.logo?.trim()
   const handle = company.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 16) || 'yourtitle'
-  const email = sp.email?.trim() || `${contact.toLowerCase()}@${handle}.com`
+  const email = sp.email?.trim() || `${firstName.toLowerCase()}@${handle}.com`
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -64,14 +66,17 @@ export default async function DemoPage({
             <span className="text-gray-300">·</span>
             <span className="text-xs text-gray-400 flex items-center gap-1">powered by <InksentLogo size="sm" /></span>
           </div>
-          <span className="text-sm text-gray-500">{email}</span>
+          <div className="text-right leading-tight">
+            <div className="text-sm font-semibold text-gray-800">{fullName}</div>
+            <div className="text-xs text-gray-400">{email}</div>
+          </div>
         </div>
       </div>
 
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
         <div className="flex items-end justify-between flex-wrap gap-3">
           <div>
-            <h1 className="text-2xl font-black text-gray-900">Welcome back, {contact}</h1>
+            <h1 className="text-2xl font-black text-gray-900">Welcome back, {firstName}</h1>
             <p className="text-gray-500 text-sm mt-1">Your signings at a glance</p>
           </div>
           <Link href="/order" className="inline-flex items-center gap-2 bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-violet-700">
