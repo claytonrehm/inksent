@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import { buildInvoiceHTML } from '@/lib/invoice'
+import PrintButton from './PrintButton'
 
 export default async function InvoicePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -9,17 +10,12 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
 
   if (error || !order || !order.invoice_id) notFound()
 
-  const html = buildInvoiceHTML({ ...order, invoice_number: order.invoice_id })
+  const html = buildInvoiceHTML({ ...order, invoice_number: order.invoice_id, pay_url: order.client_paid_at ? null : order.pay_url })
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 print:bg-white print:p-0">
       <div className="flex justify-end max-w-2xl mx-auto mb-4 px-4 print:hidden">
-        <button
-          onClick={() => window.print()}
-          className="bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-violet-700"
-        >
-          Print / Save PDF
-        </button>
+        <PrintButton />
       </div>
       <div dangerouslySetInnerHTML={{ __html: html }} />
     </div>
