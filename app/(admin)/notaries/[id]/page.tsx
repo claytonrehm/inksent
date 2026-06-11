@@ -185,7 +185,7 @@ export default async function NotaryDetailPage({ params }: { params: Promise<{ i
             <Detail label="NNA Number" value={[notary.nna_number, notary.nna_cert_expiry && `renews ${notary.nna_cert_expiry}`].filter(Boolean).join(' · ') || '—'} />
             <Detail label="Commission" value={[notary.commission_state_code, notary.commission_expiry && `exp ${notary.commission_expiry}`].filter(Boolean).join(' · ') || '—'} />
             <Detail label="Background Check" value={[notary.bgc_provider, notary.bgc_date].filter(Boolean).join(' · ') || 'Not provided'} />
-            <Detail label="E&O Carrier" value={[notary.eo_carrier, notary.eo_expiry && `exp ${notary.eo_expiry}`].filter(Boolean).join(' · ') || '—'} />
+            <Detail label="E&O Carrier" value={[notary.eo_carrier, notary.eo_coverage_amount && `$${Math.round(notary.eo_coverage_amount / 1000)}k${notary.eo_coverage_amount >= 100000 ? ' ★' : ''}`, notary.eo_expiry && `exp ${notary.eo_expiry}`].filter(Boolean).join(' · ') || '—'} />
             <Detail label="Dual-Tray Printer" value={notary.has_dual_tray == null ? '—' : notary.has_dual_tray ? 'Yes' : 'No'} />
             <Detail label="Payout (Stripe)" value={notary.payouts_enabled ? '✓ Direct deposit connected' : notary.stripe_account_id ? 'Setup started — not finished' : 'Not connected yet'} />
           </div>

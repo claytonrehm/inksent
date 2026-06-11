@@ -44,6 +44,9 @@ const schema = z.object({
   if (d.eo_insured === 'yes') {
     if (!d.eo_carrier) ctx.addIssue({ code: 'custom', path: ['eo_carrier'], message: 'Enter your E&O carrier' })
     if (!d.eo_expiry) ctx.addIssue({ code: 'custom', path: ['eo_expiry'], message: 'Enter your E&O expiry date' })
+    const amt = parseInt(d.eo_coverage_amount ?? '', 10)
+    if (!d.eo_coverage_amount || Number.isNaN(amt)) ctx.addIssue({ code: 'custom', path: ['eo_coverage_amount'], message: 'Enter your coverage amount' })
+    else if (amt < 25000) ctx.addIssue({ code: 'custom', path: ['eo_coverage_amount'], message: 'Title companies require at least $25,000' })
   }
 })
 type FormData = z.infer<typeof schema>
@@ -368,9 +371,10 @@ export default function NotaryApplyForm() {
                 {errors.eo_carrier && <p className="text-xs text-red-500 mt-1">{errors.eo_carrier.message}</p>}
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Coverage amount ($)</label>
-                <input type="number" min="0" step="5000" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                <label className="block text-xs font-medium text-gray-600 mb-1">Coverage amount ($) * <span className="text-gray-400 font-normal">min $25k</span></label>
+                <input type="number" min="25000" step="5000" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
                   placeholder="25000" {...register('eo_coverage_amount')} />
+                {errors.eo_coverage_amount && <p className="text-xs text-red-500 mt-1">{errors.eo_coverage_amount.message}</p>}
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Expires *</label>

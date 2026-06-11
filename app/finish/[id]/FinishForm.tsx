@@ -39,6 +39,7 @@ export default function FinishForm({
     if (!nnaExpiry) { setError('Please enter your NNA certification renewal date.'); return }
     if (!bgcDate) { setError('Please enter the date your background check was completed.'); return }
     if (!eoCarrier || !eoExpiry) { setError('Please enter your E&O insurance carrier and expiry date.'); return }
+    if (!eoAmount || parseInt(eoAmount, 10) < 25000) { setError('Title companies require at least $25,000 in E&O coverage — please enter your amount.'); return }
     if (!commissionExpiry) { setError('Please enter your notary commission expiry date.'); return }
     if (!hasExperience && !exp) { setError('Please select your experience level.'); return }
     setLoading(true); setError(null)
@@ -91,8 +92,8 @@ export default function FinishForm({
       <input type="text" value={eoCarrier} onChange={(e) => setEoCarrier(e.target.value)} placeholder="NNA, Notary Shield, etc." className={`${input} mb-3`} />
       <div className="grid grid-cols-2 gap-3 mb-5">
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">Coverage amount ($)</label>
-          <input type="number" min="0" step="5000" value={eoAmount} onChange={(e) => setEoAmount(e.target.value)} placeholder="25000" className={input} />
+          <label className="block text-xs font-medium text-gray-600 mb-1">Coverage amount ($) * <span className="text-gray-400 font-normal">min $25k</span></label>
+          <input type="number" min="25000" step="5000" value={eoAmount} onChange={(e) => setEoAmount(e.target.value)} placeholder="25000" className={input} />
         </div>
         <div>
           <label className="block text-xs font-medium text-gray-600 mb-1">E&amp;O expires *</label>
