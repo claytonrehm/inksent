@@ -6,17 +6,34 @@ import { createClient } from '@/lib/supabase/server'
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const body = await req.json().catch(() => ({}))
-  if (!body?.re_experience) {
-    return NextResponse.json({ error: 'Please select your experience level' }, { status: 400 })
+
+  // Accept experience and/or credential dates — at least one must be present.
+  if (!body?.re_experience && !body?.nna_cert_expiry && !body?.bgc_date) {
+    return NextResponse.json({ error: 'Nothing to save.' }, { status: 400 })
   }
+
   const supabase = await createClient()
-  const { error } = await supabase
-    .from('notaries')
-    .update({
-      re_experience: body.re_experience,
-      signing_types: Array.isArray(body.signing_types) ? body.signing_types : [],
-    })
-    .eq('id', id)
-  if (error) return NextResponse.json({ error: 'Could not save — please try again.' }, { status: 500 })
+
+  if (body?.re_experience) {
+    const { error } = await supabase
+      .from('notaries')
+      .update({ re_experience: body.re_experience, signing_types: Array.isArray(body.signing_types) ? body.signing_types : [] })
+      .eq('id', id)
+    if (error) return NextResponse.json({ error: 'Could not save — please try again.' }, { status: 500 })
+  }
+
+  // Credential dates — best-effort so this never fails if a migration lags.
+  if (body?.nna_cert_expiry || body?.bgc_date || body?.bgc_provider) {
+    await supabase
+      .from('notaries')
+      .update({
+        ...(body.nna_cert_expiry ? { nna_cert_expiry: body.nna_cert_expiry } : {}),
+        ...(body.bgc_date ? { bgc_date: body.bgc_date } : {}),
+        ...(body.bgc_provider ? { bgc_provider: body.bgc_provider } : {}),
+      })
+      .eq('id', id)
+      .then(({ error }) => { if (error) console.warn('credential dates save skipped:', error.message) })
+  }
+
   return NextResponse.json({ ok: true })
 }

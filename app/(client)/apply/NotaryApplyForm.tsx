@@ -23,10 +23,20 @@ const schema = z.object({
   signings_completed: z.string().min(1, 'Please select'),
   re_experience: z.string().min(1, 'Please select your experience level'),
   nna_certified: z.enum(['yes', 'no'], { message: 'Please select' }),
+  nna_cert_expiry: z.string().optional(),
   background_checked: z.enum(['yes', 'no'], { message: 'Please select' }),
+  bgc_date: z.string().optional(),
   notes: z.string().optional(),
   sms_consent: z.literal(true, { message: 'Required to receive job offers' }),
   ic_agreement: z.literal(true, { message: 'You must accept the Independent Contractor Agreement to join' }),
+}).superRefine((d, ctx) => {
+  // If they ARE certified / checked, we need the date. If not, no date required.
+  if (d.nna_certified === 'yes' && !d.nna_cert_expiry) {
+    ctx.addIssue({ code: 'custom', path: ['nna_cert_expiry'], message: 'Enter your NNA cert renewal date' })
+  }
+  if (d.background_checked === 'yes' && !d.bgc_date) {
+    ctx.addIssue({ code: 'custom', path: ['bgc_date'], message: 'Enter your background-check date' })
+  }
 })
 type FormData = z.infer<typeof schema>
 
@@ -50,10 +60,12 @@ export default function NotaryApplyForm() {
     setAvailability((p) => p.includes(t) ? p.filter((x) => x !== t) : [...p, t])
   }
 
-  const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm<FormData>({
+  const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { coverage_radius: '20' },
   })
+  const nnaCertified = watch('nna_certified')
+  const bgChecked = watch('background_checked')
 
   async function lookupCity(zip: string) {
     if (!/^\d{5}$/.test(zip)) { setCityLabel(null); return }
@@ -298,6 +310,14 @@ export default function NotaryApplyForm() {
               <option value="no">No — but working on it</option>
             </select>
             {errors.nna_certified && <p className="text-xs text-red-500 mt-1">{errors.nna_certified.message}</p>}
+            {nnaCertified === 'yes' && (
+              <div className="mt-2">
+                <label className="block text-xs font-medium text-gray-600 mb-1">NNA cert renewal date *</label>
+                <input type="date" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  {...register('nna_cert_expiry')} />
+                {errors.nna_cert_expiry && <p className="text-xs text-red-500 mt-1">{errors.nna_cert_expiry.message}</p>}
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Background Checked? *</label>
@@ -308,6 +328,14 @@ export default function NotaryApplyForm() {
               <option value="no">No / not current</option>
             </select>
             {errors.background_checked && <p className="text-xs text-red-500 mt-1">{errors.background_checked.message}</p>}
+            {bgChecked === 'yes' && (
+              <div className="mt-2">
+                <label className="block text-xs font-medium text-gray-600 mb-1">Date completed *</label>
+                <input type="date" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  {...register('bgc_date')} />
+                {errors.bgc_date && <p className="text-xs text-red-500 mt-1">{errors.bgc_date.message}</p>}
+              </div>
+            )}
           </div>
         </div>
       </section>

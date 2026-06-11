@@ -82,8 +82,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Could not save application' }, { status: 500 })
   }
 
-  // Best-effort: save real-estate competence fields. Done as a follow-up update
-  // so the application never fails if the migration hasn't been run yet.
+  // Best-effort: save real-estate competence + credential dates as a follow-up
+  // update so the application never fails if a migration hasn't been run yet.
   const reExp = body?.re_experience
   const signingTypes = Array.isArray(body?.signing_types) ? body.signing_types : []
   const availability = Array.isArray(body?.availability) ? body.availability : []
@@ -92,6 +92,12 @@ export async function POST(req: NextRequest) {
       .update({ re_experience: reExp || null, signing_types: signingTypes, availability })
       .eq('email', d.email)
       .then(({ error }) => { if (error) console.warn('re_experience/availability save skipped:', error.message) })
+  }
+  if (body?.nna_cert_expiry || body?.bgc_date) {
+    await supabase.from('notaries')
+      .update({ nna_cert_expiry: body.nna_cert_expiry || null, bgc_date: body.bgc_date || null })
+      .eq('email', d.email)
+      .then(({ error }) => { if (error) console.warn('credential dates save skipped:', error.message) })
   }
 
   // Send onboarding email to the applicant
