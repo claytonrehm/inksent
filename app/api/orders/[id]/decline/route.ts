@@ -6,7 +6,8 @@ import { format } from 'date-fns'
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const { notary_id } = await req.json()
+  const { notary_id, reason } = await req.json()
+  const declineReason = typeof reason === 'string' ? reason.slice(0, 100) : null
 
   const supabase = await createClient()
 
@@ -41,6 +42,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         hours_before_signing: hoursBefore,
         signer_name: order.signer_name,
         confirmation_number: order.confirmation_number,
+        reason: declineReason,
       })
     } else {
       // Just declined an offer (never committed) — minor signal
@@ -73,9 +75,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const timing = hadAccepted && hoursBefore >= 0
       ? ` (${hoursBefore < 24 ? `only ${hoursBefore}h` : `${Math.round(hoursBefore / 24)}d`} before signing)`
       : ''
+    const reasonNote = declineReason ? ` Reason: "${declineReason}".` : ''
     sendSMS(
       process.env.ADMIN_PHONE,
-      `${flag} ${notaryName} ${verb} the ${dateStr} ${timeStr} signing for ${order.signer_name} in ${order.property_city}${timing}. Conf: ${order.confirmation_number}.${backupNote}`
+      `${flag} ${notaryName} ${verb} the ${dateStr} ${timeStr} signing for ${order.signer_name} in ${order.property_city}${timing}. Conf: ${order.confirmation_number}.${reasonNote}${backupNote}`
     ).catch(console.error)
   }
 

@@ -39,6 +39,16 @@ A running record of what the platform does and what was added. Use this for your
 - **Deny-and-retain** with reasons; restore later. **Ratings** per signing (on-time, docs complete, professional).
 - **Coverage maps** per-agent and network-wide (overlapping radius view).
 
+## Client portal & self-service (title-facing)
+- **Pay invoices from the portal.** The client invoice view shows a Stripe "Pay Invoice Online" button (link minted once and cached on the order; hidden with a "paid — thank you" banner once settled). Auto-reconciled by the webhook.
+- **Self-serve cancel & reschedule.** Open orders have inline Reschedule (pick a new date/time) and Cancel actions in the portal. Cancel frees the notary, auto-refunds if already paid, and alerts the agent + admin; reschedule re-notifies the agent + signer.
+- **Completion visibility.** Completed rows show the completion date; the invoice page lists the notary's scan-backs as short-lived signed download links.
+- **Clearer order flow.** Order form shows the "$185 / signing" summary before submit; confirmation email has a concrete now/30-min/before/after timeline + portal link; invoice badge reads "Payment Due" (not the contradictory "Paid on completion").
+
+## Notary dashboard & self-service
+- **Agent dashboard** at `/agent/[id]` (unguessable-link, no login): upcoming signings, completed history, and earnings (total / paid out / pending), with a connect-your-bank nudge if payouts aren't on. Linked from payout setup + the assignment email.
+- **Decline reasons.** When a notary passes on an offer they pick a reason (already booked / too far / timing / pay / other) — surfaced in the admin alert and stored for matching insight.
+
 ## Notary recruiting funnel (conversion)
 - **Photo moved out of the way up front.** Headshot is now *optional* on the application (it was a hard wall at the top of the form, killing applicants on mobile) and *required at onboarding* instead — once they're approved and invested. Carried forward automatically if they did upload at apply.
 - **E&O + NNA no longer block the profile.** The onboarding form used to require an E&O carrier/expiry + NNA number to submit — but the apply page only calls E&O "preferred," so notaries without a policy got approved then hit a dead end and stalled as "approved but undispatchable." Both are now optional at onboarding (admin gets a "⚠️ no E&O yet" flag); dispatch still enforces credentials downstream.
@@ -60,6 +70,7 @@ A running record of what the platform does and what was added. Use this for your
 - **Fail-closed webhooks/cron.** Stripe webhook now rejects any request without a configured secret + valid signature (no unsigned-JSON fallback — a forged "paid" event can't trigger a payout). Escalate cron rejects if `CRON_SECRET` is unset instead of running open.
 - **Invoice XSS hardened.** All client-supplied order fields (names, company, address) are HTML-escaped before the invoice is rendered via `dangerouslySetInnerHTML` in the admin/client views.
 - **Less PII echoed.** Dispatch API no longer returns the notary's phone number in its response.
+- **Abuse rate-limiting.** Public order + notary-application POSTs are throttled per IP (atomic Postgres limiter, fails open if unavailable) so a script can't flood the database, admin SMS, and dispatch.
 
 ## Site polish & hygiene
 - **Reliable job accept.** The notary accept screen now reads the API response: a "just missed it" state if another agent grabbed it first (409), a retry-able error state otherwise — it can no longer say "confirmed" when the accept actually failed.
