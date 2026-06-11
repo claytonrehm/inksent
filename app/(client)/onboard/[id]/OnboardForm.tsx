@@ -12,6 +12,7 @@ import { compressImage } from '@/lib/compress-image'
 
 const schema = z.object({
   nna_number: z.string().optional(),
+  nna_cert_expiry: z.string().optional(),
   commission_state_code: z.string().min(2, 'Required'),
   commission_expiry: z.string().min(1, 'Required'),
   bgc_provider: z.string().optional(),
@@ -130,8 +131,12 @@ export default function OnboardForm({ notaryId, notaryName, hasPhoto }: { notary
       {/* Commission / NNA */}
       <section className="space-y-4">
         <p className="text-sm font-semibold text-gray-700">Commission &amp; Certification</p>
-        <Input id="nna_number" label="NNA Member Number" placeholder="If you have one (optional)"
-          error={errors.nna_number?.message} {...register('nna_number')} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input id="nna_number" label="NNA Member Number" placeholder="If you have one (optional)"
+            error={errors.nna_number?.message} {...register('nna_number')} />
+          <Input id="nna_cert_expiry" label="NNA Cert Renews" type="date"
+            error={errors.nna_cert_expiry?.message} {...register('nna_cert_expiry')} />
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input id="commission_state_code" label="Commission State *" placeholder="CA"
             error={errors.commission_state_code?.message} {...register('commission_state_code')} />

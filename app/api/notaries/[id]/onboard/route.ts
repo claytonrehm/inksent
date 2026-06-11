@@ -26,6 +26,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
+  // NNA renewal date — best-effort so onboarding never fails on a pre-migration DB.
+  if (d.nna_cert_expiry) {
+    await supabase.from('notaries').update({ nna_cert_expiry: d.nna_cert_expiry }).eq('id', id)
+      .then(({ error }) => { if (error) console.warn('nna_cert_expiry save skipped:', error.message) })
+  }
+
   // Alert admin that onboarding is complete
   const { data: n } = await supabase.from('notaries').select('name').eq('id', id).single()
   if (process.env.ADMIN_PHONE && n) {

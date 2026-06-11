@@ -6,6 +6,7 @@ import { lookupZip } from '@/lib/coverage'
 import { SIGNINGS_LABEL } from '@/lib/notary'
 import NotaryDetailActions from './NotaryDetailActions'
 import CoverageMap from '@/components/CoverageMap'
+import CredentialBadges from '@/components/CredentialBadges'
 import BackLink from '@/components/BackLink'
 import { Star, MapPin, Phone, Mail, CheckCircle, XCircle } from 'lucide-react'
 
@@ -70,9 +71,8 @@ export default async function NotaryDetailPage({ params }: { params: Promise<{ i
               <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${notary.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                 {notary.active ? 'Active' : 'Inactive'}
               </span>
-              {notary.nna_certified && <span className="text-xs bg-green-50 text-green-700 border border-green-200 px-1.5 py-0.5 rounded">NNA</span>}
-              {notary.background_checked && <span className="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-1.5 py-0.5 rounded">Bg ✓</span>}
             </div>
+            <div className="mt-2"><CredentialBadges notary={notary} /></div>
             <div className="flex flex-wrap gap-x-5 gap-y-1 mt-2 text-sm text-gray-500">
               <a href={`tel:${notary.phone}`} className="flex items-center gap-1.5 hover:text-violet-600"><Phone size={13} /> {notary.phone}</a>
               <a href={`mailto:${notary.email}`} className="flex items-center gap-1.5 hover:text-violet-600"><Mail size={13} /> {notary.email}</a>
@@ -119,7 +119,7 @@ export default async function NotaryDetailPage({ params }: { params: Promise<{ i
         )}
         {notary.onboarded_at ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3 text-sm">
-            <Detail label="NNA Number" value={notary.nna_number || '—'} />
+            <Detail label="NNA Number" value={[notary.nna_number, notary.nna_cert_expiry && `renews ${notary.nna_cert_expiry}`].filter(Boolean).join(' · ') || '—'} />
             <Detail label="Commission" value={[notary.commission_state_code, notary.commission_expiry && `exp ${notary.commission_expiry}`].filter(Boolean).join(' · ') || '—'} />
             <Detail label="Background Check" value={[notary.bgc_provider, notary.bgc_date].filter(Boolean).join(' · ') || 'Not provided'} />
             <Detail label="E&O Carrier" value={[notary.eo_carrier, notary.eo_expiry && `exp ${notary.eo_expiry}`].filter(Boolean).join(' · ') || '—'} />

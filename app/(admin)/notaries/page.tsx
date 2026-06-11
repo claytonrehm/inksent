@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import AddNotaryForm from './AddNotaryForm'
 import NotaryActions from './NotaryActions'
 import ApplicantsBoard, { type Applicant } from './ApplicantsBoard'
+import CredentialBadges from '@/components/CredentialBadges'
 import { formatCurrency } from '@/lib/utils'
 import { lookupZip } from '@/lib/coverage'
 import { AlertCircle, Star, Users, ClipboardList } from 'lucide-react'
@@ -139,6 +140,7 @@ export default async function NotariesPage() {
                           <div className="text-xs text-gray-400">{n.phone}</div>
                         </div>
                       </Link>
+                      <div className="mt-1.5"><CredentialBadges notary={n} /></div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="text-sm text-gray-700">{coverageLabel(n.base_zip) ?? '—'}</div>
