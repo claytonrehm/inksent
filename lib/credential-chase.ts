@@ -29,7 +29,7 @@ export async function chaseCredentials(
     if (n.phone) {
       await sendSMS(
         n.phone,
-        `Hi ${firstName}, quick note from Inksent — we need your current ${labels} on file to keep you eligible for signings. Takes ~2 min: ${updateUrl} — Clayton`,
+        `Hi ${firstName} — to remain an active Inksent signing agent, your ${labels} must be current on file. NNA certification, a background check & E&O insurance are required to stay approved. Please update (~2 min): ${updateUrl} — Clayton`,
       ).catch(() => {})
     }
     if (n.email) {

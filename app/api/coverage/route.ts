@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { lookupZip, notaryCoversZip } from '@/lib/coverage'
+import { fullyCredentialed } from '@/lib/credentials'
 
 // Public: is a property ZIP within reach of our active, onboarded agents? Returns
 // an honest coverage signal (count + availability windows) so clients know what we
@@ -13,11 +14,15 @@ export async function GET(req: NextRequest) {
   const supabase = await createClient()
   const { data: notaries } = await supabase
     .from('notaries')
-    .select('base_zip, coverage_radius, availability')
+    .select('base_zip, coverage_radius, availability, nna_certified, nna_cert_expiry, background_checked, bgc_date, eo_carrier, eo_expiry, commission_expiry')
     .eq('active', true)
     .not('onboarded_at', 'is', null)
 
-  const covering = (notaries ?? []).filter((n) => notaryCoversZip(n.base_zip, n.coverage_radius, zip))
+  // Only fully vetted & verified agents (all four credentials green) count toward
+  // the coverage we advertise — never claim coverage we can't actually staff.
+  const covering = (notaries ?? [])
+    .filter((n) => fullyCredentialed(n))
+    .filter((n) => notaryCoversZip(n.base_zip, n.coverage_radius, zip))
   const has = (k: string) => covering.some((n) => Array.isArray(n.availability) && n.availability.includes(k))
 
   return NextResponse.json({

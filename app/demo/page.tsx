@@ -5,6 +5,7 @@ import ClientCoverageMap, { type CoverageArea } from '@/components/ClientCoverag
 import BrandHeader from './BrandHeader'
 import { createClient } from '@/lib/supabase/server'
 import { lookupZip } from '@/lib/coverage'
+import { fullyCredentialed } from '@/lib/credentials'
 import { CheckCircle2, Clock, MapPin, Truck, FileText, Star, TrendingUp, ArrowRight, ShieldCheck } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
@@ -67,12 +68,13 @@ export default async function DemoPage({
   const supabase = await createClient()
   const { data: bench } = await supabase
     .from('notaries')
-    .select('base_zip, coverage_radius')
+    .select('base_zip, coverage_radius, nna_certified, nna_cert_expiry, background_checked, bgc_date, eo_carrier, eo_expiry, commission_expiry')
     .eq('active', true)
     .not('onboarded_at', 'is', null)
   const areas: CoverageArea[] = []
   const cities = new Set<string>()
   for (const n of bench ?? []) {
+    if (!fullyCredentialed(n)) continue // only vetted & verified agents count as coverage
     const info = n.base_zip ? lookupZip(n.base_zip) : null
     if (!info) continue
     areas.push({ lat: info.latitude, lng: info.longitude, radiusMiles: n.coverage_radius ?? 25 })

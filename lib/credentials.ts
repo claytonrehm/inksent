@@ -111,6 +111,13 @@ export function actionableCredentials(n: NotaryCreds): CredItem[] {
   return credentialItems(n).filter((c) => c.status === 'expiring' || c.status === 'expired')
 }
 
+// True only when ALL FOUR credentials are on file and currently valid (green) —
+// i.e. fully vetted & verified. Used to decide who counts toward the coverage we
+// show title companies, so we never advertise coverage from an unverified agent.
+export function fullyCredentialed(n: NotaryCreds): boolean {
+  return credentialItems(n).every((c) => c.status === 'valid')
+}
+
 export interface CredAction extends CredItem { need: 'renew' | 'provide' }
 
 // What to ASK the notary for. NNA cert + background check are required, so we chase
