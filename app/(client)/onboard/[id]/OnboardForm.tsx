@@ -19,6 +19,7 @@ const schema = z.object({
   bgc_date: z.string().min(1, 'Required — when your background check was completed'),
   eo_carrier: z.string().optional(),
   eo_policy: z.string().optional(),
+  eo_coverage_amount: z.string().optional(),
   eo_expiry: z.string().optional(),
   has_dual_tray: z.enum(['yes', 'no'], { message: 'Please select' }),
   ic_acknowledged: z.literal(true, { message: 'Required' }),
@@ -182,6 +183,8 @@ export default function OnboardForm({ notaryId, notaryName, hasPhoto, isUpdate =
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input id="eo_carrier" label="Carrier" placeholder="Notary Shield, NNA, etc."
             error={errors.eo_carrier?.message} {...register('eo_carrier')} />
+          <Input id="eo_coverage_amount" label="Coverage amount ($)" type="number" placeholder="25000"
+            {...register('eo_coverage_amount')} />
           <Input id="eo_policy" label="Policy Number" placeholder="(optional)" {...register('eo_policy')} />
           <Input id="eo_expiry" label="Policy Expires" type="date"
             error={errors.eo_expiry?.message} {...register('eo_expiry')} />

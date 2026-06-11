@@ -117,22 +117,22 @@ export interface CredAction extends CredItem { need: 'renew' | 'provide' }
 // both renewals AND missing dates on those (this is how the existing bench gets
 // asked to supply dates we don't have). E&O + commission are only chased when an
 // actual expiry is approaching/passed — we don't nag about ones never on file.
+const PROVIDE_MSG: Record<string, string> = {
+  nna: 'We need your NNA certification renewal date on file',
+  bgc: 'We need your background-check completion date on file',
+  eo: 'We need your E&O insurance details on file',
+  commission: 'We need your notary commission expiry on file',
+}
+
+// All four credentials are required for an approved agent. Chase any that are
+// missing OR expiring/expired — the goal is all four green for the whole bench.
 export function credentialActionItems(n: NotaryCreds): CredAction[] {
   const out: CredAction[] = []
   for (const c of credentialItems(n)) {
     const expiringOrExpired = c.status === 'expiring' || c.status === 'expired'
     const missingDate = c.status === 'missing' || c.status === 'untracked'
-    if (c.key === 'nna' || c.key === 'bgc') {
-      if (expiringOrExpired) out.push({ ...c, need: 'renew' })
-      else if (missingDate) out.push({
-        ...c, need: 'provide',
-        message: c.key === 'nna'
-          ? 'We need your NNA certification renewal date on file'
-          : 'We need your background-check completion date on file',
-      })
-    } else if (expiringOrExpired) {
-      out.push({ ...c, need: 'renew' })
-    }
+    if (expiringOrExpired) out.push({ ...c, need: 'renew' })
+    else if (missingDate) out.push({ ...c, need: 'provide', message: PROVIDE_MSG[c.key] })
   }
   return out
 }

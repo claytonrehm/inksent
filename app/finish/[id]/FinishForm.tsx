@@ -23,6 +23,10 @@ export default function FinishForm({
   const [nnaExpiry, setNnaExpiry] = useState(defaults.nna_cert_expiry ?? '')
   const [bgcDate, setBgcDate] = useState(defaults.bgc_date ?? '')
   const [bgcProvider, setBgcProvider] = useState('')
+  const [eoCarrier, setEoCarrier] = useState('')
+  const [eoAmount, setEoAmount] = useState('')
+  const [eoExpiry, setEoExpiry] = useState('')
+  const [commissionExpiry, setCommissionExpiry] = useState('')
   const [done, setDone] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -34,6 +38,8 @@ export default function FinishForm({
   async function submit() {
     if (!nnaExpiry) { setError('Please enter your NNA certification renewal date.'); return }
     if (!bgcDate) { setError('Please enter the date your background check was completed.'); return }
+    if (!eoCarrier || !eoExpiry) { setError('Please enter your E&O insurance carrier and expiry date.'); return }
+    if (!commissionExpiry) { setError('Please enter your notary commission expiry date.'); return }
     if (!hasExperience && !exp) { setError('Please select your experience level.'); return }
     setLoading(true); setError(null)
     const res = await fetch(`/api/notaries/${notaryId}/experience`, {
@@ -44,6 +50,10 @@ export default function FinishForm({
         nna_cert_expiry: nnaExpiry,
         bgc_date: bgcDate,
         bgc_provider: bgcProvider || undefined,
+        eo_carrier: eoCarrier,
+        eo_coverage_amount: eoAmount || undefined,
+        eo_expiry: eoExpiry,
+        commission_expiry: commissionExpiry,
       }),
     })
     setLoading(false)
@@ -76,6 +86,22 @@ export default function FinishForm({
       <input type="date" value={bgcDate} onChange={(e) => setBgcDate(e.target.value)} className={`${input} mb-3`} />
       <label className="block text-xs font-medium text-gray-600 mb-1">Who ran it? <span className="text-gray-400 font-normal">(optional)</span></label>
       <input type="text" value={bgcProvider} onChange={(e) => setBgcProvider(e.target.value)} placeholder="NNA, Sterling, etc." className={`${input} mb-5`} />
+
+      <label className="block text-sm font-medium text-gray-700 mb-1">E&amp;O insurance carrier *</label>
+      <input type="text" value={eoCarrier} onChange={(e) => setEoCarrier(e.target.value)} placeholder="NNA, Notary Shield, etc." className={`${input} mb-3`} />
+      <div className="grid grid-cols-2 gap-3 mb-5">
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">Coverage amount ($)</label>
+          <input type="number" min="0" step="5000" value={eoAmount} onChange={(e) => setEoAmount(e.target.value)} placeholder="25000" className={input} />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">E&amp;O expires *</label>
+          <input type="date" value={eoExpiry} onChange={(e) => setEoExpiry(e.target.value)} className={input} />
+        </div>
+      </div>
+
+      <label className="block text-sm font-medium text-gray-700 mb-1">Notary commission expires *</label>
+      <input type="date" value={commissionExpiry} onChange={(e) => setCommissionExpiry(e.target.value)} className={`${input} mb-5`} />
 
       {!hasExperience && (
         <>

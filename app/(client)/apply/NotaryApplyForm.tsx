@@ -26,16 +26,24 @@ const schema = z.object({
   nna_cert_expiry: z.string().optional(),
   background_checked: z.enum(['yes', 'no'], { message: 'Please select' }),
   bgc_date: z.string().optional(),
+  eo_insured: z.enum(['yes', 'no'], { message: 'Please select' }),
+  eo_carrier: z.string().optional(),
+  eo_coverage_amount: z.string().optional(),
+  eo_expiry: z.string().optional(),
   notes: z.string().optional(),
   sms_consent: z.literal(true, { message: 'Required to receive job offers' }),
   ic_agreement: z.literal(true, { message: 'You must accept the Independent Contractor Agreement to join' }),
 }).superRefine((d, ctx) => {
-  // If they ARE certified / checked, we need the date. If not, no date required.
+  // If they HAVE a credential, we need its details. If not, nothing required.
   if (d.nna_certified === 'yes' && !d.nna_cert_expiry) {
     ctx.addIssue({ code: 'custom', path: ['nna_cert_expiry'], message: 'Enter your NNA cert renewal date' })
   }
   if (d.background_checked === 'yes' && !d.bgc_date) {
     ctx.addIssue({ code: 'custom', path: ['bgc_date'], message: 'Enter your background-check date' })
+  }
+  if (d.eo_insured === 'yes') {
+    if (!d.eo_carrier) ctx.addIssue({ code: 'custom', path: ['eo_carrier'], message: 'Enter your E&O carrier' })
+    if (!d.eo_expiry) ctx.addIssue({ code: 'custom', path: ['eo_expiry'], message: 'Enter your E&O expiry date' })
   }
 })
 type FormData = z.infer<typeof schema>
@@ -66,6 +74,7 @@ export default function NotaryApplyForm() {
   })
   const nnaCertified = watch('nna_certified')
   const bgChecked = watch('background_checked')
+  const eoInsured = watch('eo_insured')
 
   async function lookupCity(zip: string) {
     if (!/^\d{5}$/.test(zip)) { setCityLabel(null); return }
@@ -337,6 +346,40 @@ export default function NotaryApplyForm() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* E&O insurance — title companies require it */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">E&amp;O Insurance? *</label>
+          <p className="text-xs text-gray-400 mb-1">Errors &amp; Omissions coverage — required for loan signings.</p>
+          <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+            {...register('eo_insured')}>
+            <option value="">Select...</option>
+            <option value="yes">Yes — I carry E&amp;O</option>
+            <option value="no">Not yet — working on it</option>
+          </select>
+          {errors.eo_insured && <p className="text-xs text-red-500 mt-1">{errors.eo_insured.message}</p>}
+          {eoInsured === 'yes' && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Carrier *</label>
+                <input className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  placeholder="NNA, Notary Shield…" {...register('eo_carrier')} />
+                {errors.eo_carrier && <p className="text-xs text-red-500 mt-1">{errors.eo_carrier.message}</p>}
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Coverage amount ($)</label>
+                <input type="number" min="0" step="5000" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  placeholder="25000" {...register('eo_coverage_amount')} />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Expires *</label>
+                <input type="date" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  {...register('eo_expiry')} />
+                {errors.eo_expiry && <p className="text-xs text-red-500 mt-1">{errors.eo_expiry.message}</p>}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

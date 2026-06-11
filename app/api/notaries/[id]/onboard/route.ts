@@ -26,10 +26,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // NNA renewal date — best-effort so onboarding never fails on a pre-migration DB.
+  // NNA renewal date + E&O coverage amount — best-effort so onboarding never fails
+  // on a pre-migration DB.
   if (d.nna_cert_expiry) {
     await supabase.from('notaries').update({ nna_cert_expiry: d.nna_cert_expiry }).eq('id', id)
       .then(({ error }) => { if (error) console.warn('nna_cert_expiry save skipped:', error.message) })
+  }
+  const eoAmt = parseInt(d.eo_coverage_amount, 10)
+  if (Number.isFinite(eoAmt)) {
+    await supabase.from('notaries').update({ eo_coverage_amount: eoAmt }).eq('id', id)
+      .then(({ error }) => { if (error) console.warn('eo_coverage_amount save skipped:', error.message) })
   }
 
   // Alert admin that onboarding is complete

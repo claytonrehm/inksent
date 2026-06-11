@@ -7,8 +7,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const { id } = await params
   const body = await req.json().catch(() => ({}))
 
-  // Accept experience and/or credential dates — at least one must be present.
-  if (!body?.re_experience && !body?.nna_cert_expiry && !body?.bgc_date) {
+  // Accept experience and/or credential data — at least one must be present.
+  if (!body?.re_experience && !body?.nna_cert_expiry && !body?.bgc_date && !body?.eo_carrier && !body?.commission_expiry) {
     return NextResponse.json({ error: 'Nothing to save.' }, { status: 400 })
   }
 
@@ -22,17 +22,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (error) return NextResponse.json({ error: 'Could not save — please try again.' }, { status: 500 })
   }
 
-  // Credential dates — best-effort so this never fails if a migration lags.
-  if (body?.nna_cert_expiry || body?.bgc_date || body?.bgc_provider) {
-    await supabase
-      .from('notaries')
-      .update({
-        ...(body.nna_cert_expiry ? { nna_cert_expiry: body.nna_cert_expiry } : {}),
-        ...(body.bgc_date ? { bgc_date: body.bgc_date } : {}),
-        ...(body.bgc_provider ? { bgc_provider: body.bgc_provider } : {}),
-      })
-      .eq('id', id)
-      .then(({ error }) => { if (error) console.warn('credential dates save skipped:', error.message) })
+  // Credentials — best-effort so this never fails if a migration lags.
+  const amt = parseInt(body?.eo_coverage_amount, 10)
+  const creds = {
+    ...(body.nna_cert_expiry ? { nna_cert_expiry: body.nna_cert_expiry } : {}),
+    ...(body.bgc_date ? { bgc_date: body.bgc_date } : {}),
+    ...(body.bgc_provider ? { bgc_provider: body.bgc_provider } : {}),
+    ...(body.eo_carrier ? { eo_carrier: body.eo_carrier } : {}),
+    ...(body.eo_expiry ? { eo_expiry: body.eo_expiry } : {}),
+    ...(Number.isFinite(amt) ? { eo_coverage_amount: amt } : {}),
+    ...(body.commission_expiry ? { commission_expiry: body.commission_expiry } : {}),
+  }
+  if (Object.keys(creds).length > 0) {
+    await supabase.from('notaries').update(creds).eq('id', id)
+      .then(({ error }) => { if (error) console.warn('credential save skipped:', error.message) })
   }
 
   return NextResponse.json({ ok: true })

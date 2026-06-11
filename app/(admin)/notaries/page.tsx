@@ -3,6 +3,7 @@ import AddNotaryForm from './AddNotaryForm'
 import NotaryActions from './NotaryActions'
 import ApplicantsBoard, { type Applicant } from './ApplicantsBoard'
 import CredentialBadges from '@/components/CredentialBadges'
+import RequestCredentialsButton from './RequestCredentialsButton'
 import { computePriority } from '@/lib/priority'
 import { formatCurrency } from '@/lib/utils'
 import { lookupZip } from '@/lib/coverage'
@@ -115,9 +116,12 @@ export default async function NotariesPage() {
 
       {/* Active bench */}
       <section>
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-2">
-          <Users size={14} /> Active Bench ({active.length})
-        </h2>
+        <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide flex items-center gap-2">
+            <Users size={14} /> Active Bench ({active.length})
+          </h2>
+          <RequestCredentialsButton />
+        </div>
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
           <table className="w-full text-sm min-w-[820px]">
             <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">

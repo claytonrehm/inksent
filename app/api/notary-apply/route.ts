@@ -99,6 +99,13 @@ export async function POST(req: NextRequest) {
       .eq('email', d.email)
       .then(({ error }) => { if (error) console.warn('credential dates save skipped:', error.message) })
   }
+  if (body?.eo_insured === 'yes' && (body?.eo_carrier || body?.eo_expiry)) {
+    const amt = parseInt(body?.eo_coverage_amount, 10)
+    await supabase.from('notaries')
+      .update({ eo_carrier: body.eo_carrier || null, eo_expiry: body.eo_expiry || null, ...(Number.isFinite(amt) ? { eo_coverage_amount: amt } : {}) })
+      .eq('email', d.email)
+      .then(({ error }) => { if (error) console.warn('E&O save skipped:', error.message) })
+  }
 
   // Send onboarding email to the applicant
   sendNotaryApplicationEmail({ name: d.name, email: d.email }).catch(console.error)
