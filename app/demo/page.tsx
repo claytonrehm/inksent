@@ -1,7 +1,12 @@
 import Link from 'next/link'
 import InksentLogo from '@/components/InksentLogo'
 import CoverageCheck from '@/components/CoverageCheck'
+import ClientCoverageMap, { type CoverageArea } from '@/components/ClientCoverageMap'
+import { createClient } from '@/lib/supabase/server'
+import { lookupZip } from '@/lib/coverage'
 import { CheckCircle2, Clock, MapPin, Truck, FileText, Star, TrendingUp, ArrowRight } from 'lucide-react'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata = {
   title: 'Live Demo — Inksent Title Partner Portal',
@@ -54,6 +59,23 @@ export default async function DemoPage({
   const handle = company.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 16) || 'yourtitle'
   const email = emailParam || `${firstName.toLowerCase()}@${handle}.com`
 
+  // Real (anonymized) coverage footprint for the map + covered-cities list.
+  const supabase = await createClient()
+  const { data: bench } = await supabase
+    .from('notaries')
+    .select('base_zip, coverage_radius')
+    .eq('active', true)
+    .not('onboarded_at', 'is', null)
+  const areas: CoverageArea[] = []
+  const cities = new Set<string>()
+  for (const n of bench ?? []) {
+    const info = n.base_zip ? lookupZip(n.base_zip) : null
+    if (!info) continue
+    areas.push({ lat: info.latitude, lng: info.longitude, radiusMiles: n.coverage_radius ?? 25 })
+    cities.add(`${info.city}, ${info.state}`)
+  }
+  const coveredCities = Array.from(cities).sort()
+
   return (
     <main className="min-h-screen bg-gray-50">
       {/* Demo banner */}
@@ -101,8 +123,31 @@ export default async function DemoPage({
           ))}
         </div>
 
-        {/* Coverage check — honest, real-time */}
-        <CoverageCheck />
+        {/* Coverage — honest footprint + real-time check */}
+        <div>
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-2"><MapPin size={14} className="text-violet-600" /> Where we cover for you</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-3">
+              {areas.length > 0
+                ? <ClientCoverageMap areas={areas} />
+                : <div className="h-72 flex items-center justify-center text-sm text-gray-400">Coverage map appears once agents are active in your region.</div>}
+              {coveredCities.length > 0 && (
+                <div className="px-2 pt-3 pb-1">
+                  <p className="text-xs text-gray-500 mb-1.5">Currently serving:</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {coveredCities.map((c) => (
+                      <span key={c} className="text-xs bg-violet-50 text-violet-700 border border-violet-100 px-2 py-0.5 rounded-full">{c}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="space-y-3">
+              <CoverageCheck />
+              <p className="text-xs text-gray-400 px-1">We&apos;re expanding continuously — if your area isn&apos;t covered yet, tell us and we&apos;ll prioritize building it for {company}.</p>
+            </div>
+          </div>
+        </div>
 
         {/* Live tracking sample */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-6">
