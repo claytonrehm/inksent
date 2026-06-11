@@ -96,7 +96,7 @@ export default async function ConnectPage({
                 Connect Bank Account →
               </a>
             ) : (
-              <p className="text-sm text-red-500 text-center">Couldn&apos;t start setup. Please refresh or email orders@inksent.co.</p>
+              <p className="text-sm text-red-500 text-center">Couldn&apos;t start setup. Please refresh or email support@inksent.co.</p>
             )}
             <p className="text-xs text-gray-400 mt-4 text-center">🔒 Powered by Stripe — bank-level security. You can also finish this later from your welcome email.</p>
           </div>

@@ -39,7 +39,7 @@ export default async function DocsPage({
             </div>
             <h1 className="text-xl font-bold text-gray-900 mb-2">Documents not available</h1>
             <p className="text-gray-500 max-w-sm mx-auto">
-              This signing is assigned to a different agent, or the assignment has changed. If you believe this is an error, contact us at orders@inksent.co.
+              This signing is assigned to a different agent, or the assignment has changed. If you believe this is an error, contact us at support@inksent.co.
             </p>
           </div>
         ) : (
@@ -76,7 +76,7 @@ async function DocsList({ orderId, documents }: { orderId: string; documents: { 
   if (!hasServiceRole()) {
     return (
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
-        Document delivery is being finalized. Please check back shortly or contact orders@inksent.co.
+        Document delivery is being finalized. Please check back shortly or contact support@inksent.co.
       </div>
     )
   }

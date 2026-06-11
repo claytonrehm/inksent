@@ -78,7 +78,7 @@ export default function OnboardForm({ notaryId, notaryName, hasPhoto }: { notary
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...data, languages, ...(photo_url ? { photo_url } : {}) }),
     })
-    if (!res.ok) { setError('Something went wrong. Please try again or email orders@inksent.co.'); return }
+    if (!res.ok) { setError('Something went wrong. Please try again or email support@inksent.co.'); return }
     setDone(true)
   }
 

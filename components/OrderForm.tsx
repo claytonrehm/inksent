@@ -311,6 +311,15 @@ export default function OrderForm() {
         </span>
       </label>
 
+      {/* Pricing summary — no surprises at submit time */}
+      <div className="flex items-center justify-between bg-violet-50 border border-violet-100 rounded-xl px-5 py-4">
+        <div>
+          <p className="font-semibold text-gray-900 text-sm">Flat rate — $185 per signing</p>
+          <p className="text-xs text-gray-500 mt-0.5">NNA-certified agent, background-checked, automatic backup. Invoiced after the signing is completed.</p>
+        </div>
+        <span className="text-2xl font-black text-violet-700 shrink-0 ml-4">$185</span>
+      </div>
+
       {submitError && (
         <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
           {submitError}

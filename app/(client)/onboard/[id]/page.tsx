@@ -50,7 +50,7 @@ export default async function OnboardPage({ params }: { params: Promise<{ id: st
               <OnboardForm notaryId={notary.id} notaryName={notary.name} hasPhoto={!!notary.photo_url} />
             </div>
             <p className="text-center text-xs text-gray-400 mt-4">
-              Questions? <a href="mailto:orders@inksent.co" className="underline hover:text-gray-600">orders@inksent.co</a>
+              Questions? <a href="mailto:support@inksent.co" className="underline hover:text-gray-600">support@inksent.co</a>
             </p>
           </>
         )}

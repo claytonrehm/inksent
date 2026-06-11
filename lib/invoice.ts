@@ -69,7 +69,7 @@ export function buildInvoiceHTML(order: {
     .total-row { display: flex; justify-content: space-between; padding: 14px 0; font-size: 17px; font-weight: 700; }
     .amount { color: #5b21b6; }
     .footer { background: #f7f7f7; padding: 20px 36px; text-align: center; font-size: 12px; color: #999; }
-    .status-badge { display: inline-block; background: #d1fae5; color: #065f46; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .status-badge { display: inline-block; background: #fef3c7; color: #92400e; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
   </style>
 </head>
 <body>
@@ -87,7 +87,7 @@ export function buildInvoiceHTML(order: {
         <div style="text-align:right">
           <div class="label">Date</div>
           <div class="value">${format(new Date(order.created_at), 'MMMM d, yyyy')}</div>
-          <div style="margin-top:8px"><span class="status-badge">Paid on completion</span></div>
+          <div style="margin-top:8px"><span class="status-badge">Payment Due</span></div>
         </div>
       </div>
 

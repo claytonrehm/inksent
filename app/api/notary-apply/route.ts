@@ -7,6 +7,7 @@ import { sendNotaryApplicationEmail } from '@/lib/email'
 import { lookupZip } from '@/lib/coverage'
 import { SIGNINGS_LABEL } from '@/lib/notary'
 import { verifyTurnstile } from '@/lib/turnstile'
+import { checkRateLimit, clientIp } from '@/lib/rate-limit'
 
 const schema = z.object({
   name: z.string().min(2),
@@ -29,6 +30,11 @@ export async function POST(req: NextRequest) {
   // Bot protection (no-op until Turnstile keys are configured)
   const okHuman = await verifyTurnstile(body?.turnstileToken, req.headers.get('x-forwarded-for') ?? undefined)
   if (!okHuman) return NextResponse.json({ error: 'Verification failed. Please try again.' }, { status: 400 })
+
+  // Abuse throttle: cap applications per IP. Fails open if limiter unavailable.
+  if (!(await checkRateLimit(`apply:${clientIp(req)}`, 5, 3600))) {
+    return NextResponse.json({ error: 'Too many applications from this connection. Please wait a bit or email support@inksent.co.' }, { status: 429 })
+  }
 
   // Must accept the Independent Contractor Agreement
   if (body?.ic_agreement !== true) {

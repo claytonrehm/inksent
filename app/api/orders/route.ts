@@ -6,6 +6,7 @@ import { orderSchema } from '@/lib/validations'
 import { sendSMS } from '@/lib/sms'
 import { sendOrderConfirmationEmail, sendAdminOrderAlert } from '@/lib/email'
 import { blastOrderToCoveringNotaries } from '@/lib/dispatch'
+import { checkRateLimit, clientIp } from '@/lib/rate-limit'
 import { format } from 'date-fns'
 
 export async function POST(req: NextRequest) {
@@ -16,6 +17,12 @@ export async function POST(req: NextRequest) {
     // so the bot thinks it worked, but never create or dispatch anything.
     if (body.company_url) {
       return NextResponse.json({ id: 'ok', confirmation_number: 'RECEIVED' })
+    }
+
+    // Abuse throttle: cap orders per IP so a script can't flood the DB + admin SMS
+    // + dispatch. Fails open if the limiter is unavailable.
+    if (!(await checkRateLimit(`order:${clientIp(req)}`, 8, 3600))) {
+      return NextResponse.json({ error: 'Too many orders from this connection. Please wait a bit or call (619) 949-3361.' }, { status: 429 })
     }
 
     // CAPTCHA (no-op until Turnstile keys are configured)

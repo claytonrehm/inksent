@@ -550,12 +550,14 @@ export async function sendOrderConfirmationEmail(order: {
       <div style="background:#f8f8f8;border-radius:10px;padding:16px 20px;margin:24px 0;">
         <div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#888888;font-weight:600;margin-bottom:10px;">What happens next</div>
         <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
-          ${nextItem('We&rsquo;re contacting signing agents in the area right now')}
-          ${nextItem('You&rsquo;ll receive agent confirmation details once assigned')}
-          ${nextItem('Upload your documents anytime — we route them to the agent automatically')}
-          ${nextItem('Invoice will be emailed after the signing is completed')}
+          ${nextItem('<strong>Now:</strong> we&rsquo;re contacting available signing agents in the area')}
+          ${nextItem('<strong>Within ~30 min:</strong> you&rsquo;ll get an email with your assigned agent&rsquo;s name (we&rsquo;ll call you if coverage is tight)')}
+          ${nextItem('<strong>Before the signing:</strong> upload your documents anytime — we route them to the agent automatically')}
+          ${nextItem('<strong>After completion:</strong> your $185 invoice is emailed the same day (pay by card, check, or ACH)')}
         </table>
       </div>
+
+      <p style="font-size:13px;color:#555555;margin:0 0 18px;line-height:1.6;">Track status, view invoices, or place another order anytime in your <a href="${baseUrl}/portal" style="color:#7c3aed;text-decoration:none;font-weight:600;">client portal</a>.</p>
 
       <p style="font-size:13px;color:#777777;margin:0;line-height:1.6;">Need to make changes or have questions?<br/>
       Reply to this email, call <a href="tel:+16199493361" style="color:#7c3aed;text-decoration:none;">(619) 949-3361</a>, or text us anytime.</p>
