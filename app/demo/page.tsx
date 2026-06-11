@@ -2,6 +2,7 @@ import Link from 'next/link'
 import InksentLogo from '@/components/InksentLogo'
 import CoverageCheck from '@/components/CoverageCheck'
 import ClientCoverageMap, { type CoverageArea } from '@/components/ClientCoverageMap'
+import BrandHeader from './BrandHeader'
 import { createClient } from '@/lib/supabase/server'
 import { lookupZip } from '@/lib/coverage'
 import { CheckCircle2, Clock, MapPin, Truck, FileText, Star, TrendingUp, ArrowRight } from 'lucide-react'
@@ -43,11 +44,14 @@ const TIMELINE = [
 export default async function DemoPage({
   searchParams,
 }: {
-  searchParams: Promise<{ co?: string; contact?: string; name?: string; logo?: string; email?: string }>
+  searchParams: Promise<{ co?: string; contact?: string; name?: string; logo?: string; email?: string; domain?: string }>
 }) {
   const sp = await searchParams
   const company = sp.co?.trim() || 'Summit Settlement Services'
   const logo = sp.logo?.trim()
+  // Auto-pull the company's site icon from their domain (no API key needed).
+  const domain = sp.domain?.trim().replace(/^https?:\/\//, '').replace(/\/.*$/, '')
+  const favicon = domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : undefined
   // `email` is the source of truth (matches what they'd sign in with). Name comes
   // from ?name=, else ?contact=, else derived from the email, else a default.
   const emailParam = sp.email?.trim()
@@ -87,10 +91,7 @@ export default async function DemoPage({
       <div className="bg-white border-b border-gray-100 px-6 py-4 shadow-sm">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {logo
-              // eslint-disable-next-line @next/next/no-img-element
-              ? <img src={logo} alt={company} className="h-9 max-w-[180px] object-contain" />
-              : <div className="font-black text-lg text-gray-900">{company}</div>}
+            <BrandHeader logo={logo} favicon={favicon} company={company} />
             <span className="text-gray-300">·</span>
             <span className="text-xs text-gray-400 flex items-center gap-1">powered by <InksentLogo size="sm" /></span>
           </div>
