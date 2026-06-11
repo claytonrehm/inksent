@@ -20,6 +20,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     eo_expiry: d.eo_expiry || null,
     has_dual_tray: d.has_dual_tray === 'yes',
     languages: Array.isArray(d.languages) ? d.languages : [],
+    // Supplying a credential date is the (already-approved) agent attesting to that
+    // credential — flip the verified flags so the badge turns green automatically.
+    // The badge logic needs nna_certified=true and a bgc record, not just the date,
+    // so writing the date alone would otherwise leave the icon grey.
+    ...(d.nna_cert_expiry ? { nna_certified: true } : {}),
+    ...(d.bgc_date ? { background_checked: true } : {}),
     ...(d.photo_url ? { photo_url: d.photo_url } : {}),
     onboarded_at: new Date().toISOString(),
   }).eq('id', id)
