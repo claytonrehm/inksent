@@ -77,6 +77,7 @@ A running record of what the platform does and what was added. Use this for your
 
 ## Team quality / reliability
 - **Reliability block** on each notary's detail page: acceptance rate (accepted ÷ offered), average response time to offers, on-time %, cancellations, and **last-active date** (flags notaries idle >60 days in red) — all computed from existing dispatch/order data.
+- **Priority ranking (v0).** A 0–100 priority/reliability score (Tier A/B/C) ranks the active bench — built from the vetting signal + credential validity + performance (when jobs exist) + a manual **⭐ Preferred** flag the admin can toggle. The bench list is sorted by it and each agent shows their tier/score; the detail page shows the score + Preferred toggle. **Dispatch is unchanged** — every covering agent is still blasted; this only orders the display and sets up a future staggered head-start once real job history accrues.
 
 ## Security
 - Admin login + emailed 2FA; all admin pages + APIs gated.

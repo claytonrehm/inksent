@@ -3,6 +3,7 @@ import AddNotaryForm from './AddNotaryForm'
 import NotaryActions from './NotaryActions'
 import ApplicantsBoard, { type Applicant } from './ApplicantsBoard'
 import CredentialBadges from '@/components/CredentialBadges'
+import { computePriority } from '@/lib/priority'
 import { formatCurrency } from '@/lib/utils'
 import { lookupZip } from '@/lib/coverage'
 import { AlertCircle, Star, Users, ClipboardList } from 'lucide-react'
@@ -50,6 +51,22 @@ export default async function NotariesPage() {
     if (r.on_time) s.onTime++
     if ((r.rating && r.rating <= 2) || r.on_time === false || r.professional === false) s.concerns++
   }
+
+  // Priority/reliability score per active notary, then rank the bench by it.
+  // Everyone is still blasted at dispatch — this only orders the display (v0).
+  const priorityOf: Record<string, ReturnType<typeof computePriority>> = {}
+  for (const n of active) {
+    const rs = rstat[n.id]
+    priorityOf[n.id] = computePriority({
+      ...n,
+      jobsCompleted: stats[n.id]?.count ?? 0,
+      onTimePct: rs && rs.n ? Math.round((rs.onTime / rs.n) * 100) : null,
+      timesCancelled: n.times_cancelled,
+    })
+  }
+  const activeRanked = [...active].sort((a, b) =>
+    (priorityOf[b.id].score - priorityOf[a.id].score) || a.name.localeCompare(b.name)
+  )
 
   // Map notary rows → Applicant shape for the board
   const toApplicant = (n: (typeof pending)[number]): Applicant => {
@@ -118,11 +135,12 @@ export default async function NotariesPage() {
             <tbody className="divide-y divide-gray-100">
               {active.length === 0 ? (
                 <tr><td colSpan={8} className="px-4 py-10 text-center text-gray-400">No active notaries yet — approve an applicant above</td></tr>
-              ) : active.map((n) => {
+              ) : activeRanked.map((n) => {
                 const s = stats[n.id]
                 const rs = rstat[n.id]
                 const avg = rs && rs.n ? rs.sum / rs.n : null
                 const onTimePct = rs && rs.n ? Math.round((rs.onTime / rs.n) * 100) : null
+                const prio = priorityOf[n.id]
                 return (
                   <tr key={n.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
@@ -136,7 +154,13 @@ export default async function NotariesPage() {
                           </div>
                         )}
                         <div>
-                          <div className="font-medium text-gray-900 text-sm whitespace-nowrap group-hover:text-violet-600">{n.name}</div>
+                          <div className="font-medium text-gray-900 text-sm whitespace-nowrap group-hover:text-violet-600 flex items-center gap-1.5">
+                            {prio?.preferred && <Star size={12} className="fill-amber-400 text-amber-400 shrink-0" />}
+                            {n.name}
+                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded leading-none ${prio?.tier === 'A' ? 'bg-green-100 text-green-700' : prio?.tier === 'B' ? 'bg-gray-100 text-gray-600' : 'bg-gray-100 text-gray-400'}`} title={`Priority score ${prio?.score ?? 0}/100`}>
+                              {prio?.tier ?? '—'} {prio?.score ?? ''}
+                            </span>
+                          </div>
                           <div className="text-xs text-gray-400">{n.phone}</div>
                         </div>
                       </Link>
