@@ -129,9 +129,11 @@ export async function GET(req: NextRequest) {
   // 2b-3. CREDENTIAL CHASE — keep the whole bench at four green checks automatically.
   //   For every active notary, request any of the four credentials that are missing
   //   or expiring (NNA cert, background check, E&O, commission) via one combined
-  //   SMS + email with an update link. Throttled to ~every 14 days. Shared with the
-  //   admin "send now" button.
-  const credRemind = await chaseCredentials(supabase, { baseUrl, throttleMs: 14 * 86_400_000, adminPhone: process.env.ADMIN_PHONE })
+  //   SMS + email with an update link. Presses them every ~3 days until complete
+  //   (no cap — it stops on its own once they're fully credentialed). Bank/payout is
+  //   intentionally NOT chased here; it's required only to get paid (JIT payout flow).
+  //   Shared with the admin "Request missing credentials" button.
+  const credRemind = await chaseCredentials(supabase, { baseUrl, throttleMs: 3 * 86_400_000, adminPhone: process.env.ADMIN_PHONE })
 
   // 2c. MONEY SAFETY NET — runs BEFORE dunning so we never chase a paid client.
   //   (i)  Recover a payment whose webhook was missed (reconcile from Stripe).
