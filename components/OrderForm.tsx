@@ -67,6 +67,16 @@ export default function OrderForm({ prefill }: { prefill?: OrderPrefill }) {
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [captchaToken, setCaptchaToken] = useState('')
   const [agreed, setAgreed] = useState(false)
+  const [coverage, setCoverage] = useState<{ covered: boolean; city?: string; state?: string; agentCount?: number; sameDay?: boolean } | null>(null)
+
+  async function checkCoverage(zip: string) {
+    if (!/^\d{5}$/.test(zip)) { setCoverage(null); return }
+    try {
+      const r = await fetch(`/api/coverage?zip=${zip}`)
+      const d = await r.json()
+      setCoverage(d.found ? d : null)
+    } catch { setCoverage(null) }
+  }
 
   const {
     register,
@@ -200,9 +210,20 @@ export default function OrderForm({ prefill }: { prefill?: OrderPrefill }) {
               placeholder="85001"
               maxLength={5}
               error={errors.property_zip?.message}
-              {...register('property_zip')}
+              {...register('property_zip', { onChange: (e) => checkCoverage(e.target.value) })}
             />
           </div>
+          {coverage && (
+            coverage.covered ? (
+              <p className="text-xs text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                ✓ Covered in {coverage.city}, {coverage.state} — {coverage.agentCount} agent{coverage.agentCount === 1 ? '' : 's'} in range{coverage.sameDay ? ', same-day available' : ''}.
+              </p>
+            ) : (
+              <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                ⚠️ {coverage.city}, {coverage.state} is a newer area for us. Go ahead and submit — we&apos;ll work to staff it and tell you quickly if we can&apos;t, no charge.
+              </p>
+            )
+          )}
         </div>
       </section>
 

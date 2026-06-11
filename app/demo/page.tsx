@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import InksentLogo from '@/components/InksentLogo'
+import CoverageCheck from '@/components/CoverageCheck'
 import { CheckCircle2, Clock, MapPin, Truck, FileText, Star, TrendingUp, ArrowRight } from 'lucide-react'
 
 export const metadata = {
@@ -99,6 +100,9 @@ export default async function DemoPage({
             </div>
           ))}
         </div>
+
+        {/* Coverage check — honest, real-time */}
+        <CoverageCheck />
 
         {/* Live tracking sample */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-6">

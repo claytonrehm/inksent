@@ -1,6 +1,7 @@
 import InksentLogo from '@/components/InksentLogo'
 import BackLink from '@/components/BackLink'
 import PartnerApplyForm from './PartnerApplyForm'
+import CoverageCheck from '@/components/CoverageCheck'
 import { CheckCircle } from 'lucide-react'
 
 export const metadata = {
@@ -29,12 +30,15 @@ export default function PartnerApplyPage() {
           <p className="text-gray-500 text-lg max-w-2xl">Tell us a bit about your title company and we&apos;ll get you set up — usually within one business day.</p>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-          <div className="lg:col-span-2 space-y-3">
-            {PERKS.map((p) => (
-              <div key={p} className="flex items-start gap-2.5 text-sm text-gray-600">
-                <CheckCircle size={16} className="text-violet-600 shrink-0 mt-0.5" /> {p}
-              </div>
-            ))}
+          <div className="lg:col-span-2 space-y-5">
+            <div className="space-y-3">
+              {PERKS.map((p) => (
+                <div key={p} className="flex items-start gap-2.5 text-sm text-gray-600">
+                  <CheckCircle size={16} className="text-violet-600 shrink-0 mt-0.5" /> {p}
+                </div>
+              ))}
+            </div>
+            <CoverageCheck />
           </div>
           <div className="lg:col-span-3"><PartnerApplyForm /></div>
         </div>
