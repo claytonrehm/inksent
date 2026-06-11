@@ -17,11 +17,13 @@ export default async function NotaryDetailPage({ params }: { params: Promise<{ i
   const { id } = await params
   const supabase = await createClient()
 
-  const [{ data: notary }, { data: orders }, { data: ratings }, { data: cancellations }] = await Promise.all([
+  const [{ data: notary }, { data: orders }, { data: ratings }, { data: cancellations }, { data: offered }] = await Promise.all([
     supabase.from('notaries').select('*').eq('id', id).single(),
-    supabase.from('orders').select('id, confirmation_number, signing_date, signer_name, property_city, status, notary_fee, notary_paid_at').eq('notary_id', id).order('signing_date', { ascending: false }),
+    supabase.from('orders').select('id, confirmation_number, signing_date, signer_name, property_city, status, notary_fee, notary_paid_at, dispatched_at, accepted_at, completed_at').eq('notary_id', id).order('signing_date', { ascending: false }),
     supabase.from('notary_ratings').select('*').eq('notary_id', id).order('created_at', { ascending: false }),
     supabase.from('notary_cancellations').select('*').eq('notary_id', id).order('created_at', { ascending: false }),
+    // Every order this notary was OFFERED (blasted), for acceptance-rate.
+    supabase.from('orders').select('id, notary_id').contains('dispatched_to', [id]),
   ])
 
   if (!notary) notFound()
@@ -35,6 +37,20 @@ export default async function NotaryDetailPage({ params }: { params: Promise<{ i
   const concerns = allRatings.filter(r => (r.rating && r.rating <= 2) || r.on_time === false || r.professional === false).length
   const ytd = completed.reduce((s, o) => s + o.notary_fee, 0)
   const owed = completed.filter(o => !o.notary_paid_at).reduce((s, o) => s + o.notary_fee, 0)
+
+  // ── Reliability metrics (computed from existing data) ──
+  const offeredCount = (offered ?? []).length
+  const acceptedCount = (offered ?? []).filter(o => o.notary_id === id).length
+  const acceptanceRate = offeredCount ? Math.round((acceptedCount / offeredCount) * 100) : null
+  const respTimes = allOrders
+    .filter(o => o.accepted_at && o.dispatched_at)
+    .map(o => (new Date(o.accepted_at as string).getTime() - new Date(o.dispatched_at as string).getTime()) / 60000)
+    .filter(m => m >= 0)
+  const avgResponseMin = respTimes.length ? Math.round(respTimes.reduce((s, m) => s + m, 0) / respTimes.length) : null
+  const completedDates = completed.map(o => o.completed_at).filter(Boolean) as string[]
+  const lastActive = completedDates.length ? completedDates.sort().slice(-1)[0] : null
+  const daysSinceActive = lastActive ? Math.floor((Date.now() - new Date(lastActive).getTime()) / 86_400_000) : null
+
   const coverage = lookupZip(notary.base_zip)
   const AVAIL_LABELS: Record<string, string> = { weekday_day: 'Weekdays', weekday_evening: 'Weekday eves', weekends: 'Weekends', same_day: 'Same-day OK' }
   const avail = (notary.availability as string[] | null) ?? []
@@ -100,6 +116,33 @@ export default async function NotaryDetailPage({ params }: { params: Promise<{ i
             <span className="text-xs text-gray-400">Application notes: </span>{notary.notes}
           </div>
         )}
+      </div>
+
+      {/* Reliability */}
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Reliability</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 text-center">
+          <div>
+            <p className="text-2xl font-black text-gray-900">{acceptanceRate != null ? `${acceptanceRate}%` : '—'}</p>
+            <p className="text-xs text-gray-500 mt-0.5">Accept rate{offeredCount ? ` (${acceptedCount}/${offeredCount})` : ''}</p>
+          </div>
+          <div>
+            <p className="text-2xl font-black text-gray-900">{avgResponseMin != null ? `${avgResponseMin}m` : '—'}</p>
+            <p className="text-xs text-gray-500 mt-0.5">Avg response</p>
+          </div>
+          <div>
+            <p className={`text-2xl font-black ${onTimePct == null ? 'text-gray-900' : onTimePct >= 90 ? 'text-green-600' : onTimePct >= 70 ? 'text-amber-600' : 'text-red-600'}`}>{onTimePct != null ? `${onTimePct}%` : '—'}</p>
+            <p className="text-xs text-gray-500 mt-0.5">On-time</p>
+          </div>
+          <div>
+            <p className={`text-2xl font-black ${(notary.times_cancelled ?? 0) > 0 ? 'text-red-600' : 'text-gray-900'}`}>{notary.times_cancelled ?? 0}</p>
+            <p className="text-xs text-gray-500 mt-0.5">Cancellations</p>
+          </div>
+          <div>
+            <p className={`text-2xl font-black ${daysSinceActive == null ? 'text-gray-400' : daysSinceActive > 60 ? 'text-red-600' : 'text-gray-900'}`}>{lastActive ? format(new Date(lastActive), 'MMM d') : '—'}</p>
+            <p className="text-xs text-gray-500 mt-0.5">{daysSinceActive != null && daysSinceActive > 60 ? `Last active (${daysSinceActive}d!)` : 'Last active'}</p>
+          </div>
+        </div>
       </div>
 
       {/* Onboarding / credentials */}

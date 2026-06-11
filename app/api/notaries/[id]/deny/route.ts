@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { isAdminAuthed } from '@/lib/admin-auth'
+import { isAdminAuthed, adminEmail } from '@/lib/admin-auth'
 import { sendSMS } from '@/lib/sms'
 import { sendNotaryDeniedEmail } from '@/lib/email'
+import { logAudit, reqIp } from '@/lib/audit'
 
 // Deny a notary application: mark denied (retained, not deleted) + notify them
 // kindly that we're going with other applicants but keeping them on file.
@@ -20,6 +21,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     .update({ active: false, denied_at: new Date().toISOString(), denial_reason: body?.reason ?? null })
     .eq('id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  logAudit({ action: 'deny_notary', actor: adminEmail(), actorType: 'admin', entityType: 'notary', entityId: id, ip: reqIp(req), meta: { name: n.name, reason: body?.reason ?? null } })
 
   // Notify once (don't re-notify if already denied before)
   if (!n.denied_at) {

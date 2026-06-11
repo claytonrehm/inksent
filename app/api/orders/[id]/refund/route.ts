@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { isAdminAuthed } from '@/lib/admin-auth'
+import { isAdminAuthed, adminEmail } from '@/lib/admin-auth'
 import { refundOrder } from '@/lib/stripe'
 import { sendSMS } from '@/lib/sms'
+import { logAudit, reqIp } from '@/lib/audit'
 
 // Admin-only: refund a client's payment for an order (Stripe), record it, and
 // flag if the notary was already paid (you may need to recover that separately).
@@ -22,6 +23,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!result.ok) return NextResponse.json({ error: result.error }, { status: 400 })
 
   await supabase.from('orders').update({ refunded_at: new Date().toISOString() }).eq('id', id)
+
+  logAudit({ action: 'refund', actor: adminEmail(), actorType: 'admin', entityType: 'order', entityId: id, ip: reqIp(req), meta: { confirmation_number: order.confirmation_number, client_company: order.client_company, notaryAlreadyPaid: !!order.notary_paid_at } })
 
   if (process.env.ADMIN_PHONE) {
     const clawback = order.notary_paid_at ? ` ⚠️ The notary was ALREADY paid $${(order.notary_fee / 100).toFixed(0)} — recover separately.` : ''

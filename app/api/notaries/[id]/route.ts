@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { isAdminAuthed } from '@/lib/admin-auth'
+import { isAdminAuthed, adminEmail } from '@/lib/admin-auth'
 import { sendSMS } from '@/lib/sms'
 import { sendNotaryApprovedEmail } from '@/lib/email'
+import { logAudit, reqIp } from '@/lib/audit'
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!(await isAdminAuthed())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -14,9 +15,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { data: before } = await supabase.from('notaries').select('active, name, phone, email').eq('id', id).single()
 
   const isNewlyApproved = body.active === true && before && !before.active
+  const isDeactivation = body.active === false && before && before.active
 
   const { error } = await supabase.from('notaries').update(body).eq('id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Audit: classify what this admin edit did.
+  const action = isNewlyApproved ? 'approve_notary' : isDeactivation ? 'deactivate_notary' : 'edit_notary'
+  logAudit({ action, actor: adminEmail(), actorType: 'admin', entityType: 'notary', entityId: id, ip: reqIp(req), meta: { name: before?.name, fields: Object.keys(body) } })
 
   // On newly approved: send welcome SMS + approval email, both with the onboarding link
   if (isNewlyApproved) {

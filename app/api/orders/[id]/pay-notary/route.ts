@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { isAdminAuthed } from '@/lib/admin-auth'
+import { isAdminAuthed, adminEmail } from '@/lib/admin-auth'
 import { payoutNotary } from '@/lib/stripe'
 import { sendSMS } from '@/lib/sms'
+import { logAudit, reqIp } from '@/lib/audit'
 
 // Admin "Pay Notary" — actually moves the money via Stripe, and ONLY marks the
 // order paid + texts the notary if the transfer truly succeeds. Never tells a
@@ -40,6 +41,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   }
 
   await supabase.from('orders').update({ notary_paid_at: new Date().toISOString() }).eq('id', id)
+
+  logAudit({ action: 'pay_notary', actor: adminEmail(), actorType: 'admin', entityType: 'order', entityId: id, ip: reqIp(req), meta: { confirmation_number: order.confirmation_number, amount_cents: order.notary_fee, notary: n.name } })
 
   if (n.phone) {
     const firstName = n.name.split(' ')[0]

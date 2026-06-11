@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient, hasServiceRole } from '@/lib/supabase/admin'
 import { format } from 'date-fns'
 import InksentLogo from '@/components/InksentLogo'
+import { logAudit } from '@/lib/audit'
+import { headers } from 'next/headers'
 import { FileText, Download, ShieldCheck, AlertTriangle } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
@@ -25,6 +27,19 @@ export default async function DocsPage({
 
   // Access control: only the currently-assigned notary can see the docs
   const authorized = order && notaryId && order.notary_id === notaryId
+
+  // PII access trail (GLBA): record every view of a signing-doc package, authorized or not.
+  const ip = (await headers()).get('x-forwarded-for')?.split(',')[0]?.trim() ?? null
+  logAudit({
+    action: 'document_access',
+    actor: notaryId ?? 'anonymous',
+    actorType: 'notary',
+    entityType: 'order',
+    entityId: orderId,
+    ip,
+    success: !!authorized,
+    meta: { authorized: !!authorized, doc_count: Array.isArray(order?.documents) ? order!.documents.length : 0 },
+  })
 
   return (
     <main className="min-h-screen bg-gray-50">

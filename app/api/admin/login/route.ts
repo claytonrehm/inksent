@@ -4,12 +4,15 @@ import {
   checkAdminPassword, adminCookieName, adminTokenValue,
   twoFactorEnabled, adminEmail, generateCode, pendingCookieName, makePendingToken,
 } from '@/lib/admin-auth'
+import { logAudit, reqIp } from '@/lib/audit'
 
 export async function POST(req: Request) {
   const form = await req.formData().catch(() => null)
   const password = (form?.get('password') as string) || ''
+  const ip = reqIp(req)
 
   if (!checkAdminPassword(password)) {
+    logAudit({ action: 'admin_login_failed', actorType: 'admin', entityType: 'auth', ip, success: false, meta: { reason: 'bad_password' } })
     return NextResponse.redirect(new URL('/admin-login?error=1', req.url), { status: 303 })
   }
 
@@ -35,6 +38,7 @@ export async function POST(req: Request) {
     res.cookies.set(pendingCookieName(), makePendingToken(code), {
       httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 600,
     })
+    logAudit({ action: 'admin_login_password_ok', actor: adminEmail(), actorType: 'admin', entityType: 'auth', ip, meta: { step: '2fa_code_sent' } })
     return res
   }
 
@@ -43,5 +47,6 @@ export async function POST(req: Request) {
   res.cookies.set(adminCookieName(), adminTokenValue(), {
     httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 60 * 60 * 12,
   })
+  logAudit({ action: 'admin_login_success', actor: adminEmail(), actorType: 'admin', entityType: 'auth', ip, meta: { twofa: false } })
   return res
 }

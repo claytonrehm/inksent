@@ -16,6 +16,7 @@ export default function robots(): MetadataRoute.Robots {
         '/notaries',
         '/coverage',
         '/reports',
+        '/activity',
         '/setup',
         '/portal',
         '/login',

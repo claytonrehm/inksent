@@ -70,6 +70,14 @@ A running record of what the platform does and what was added. Use this for your
 - **All-orders CSV** with every field an accountant or a dispute would need.
 - Every state change is timestamped (created, dispatched, accepted, en-route, arrived, completed, paid, refunded) — a full audit trail per order.
 
+## Security & audit trail
+- **Append-only audit log** (`audit_log`) recording who-did-what: admin **login successes + failures** (with IP), refunds, notary payouts, approvals, denials, deactivations, credential edits, and **document access** (every view of a signing-doc package, authorized or not — a GLBA/PII trail). Best-effort so it never blocks an action.
+- **Admin "Activity" page** — a searchable security/action log view (most recent 300 events), color-coded, kept out of search.
+- Admin login attempts (good + bad password, bad 2FA code) are now logged → brute-force visibility you didn't have before.
+
+## Team quality / reliability
+- **Reliability block** on each notary's detail page: acceptance rate (accepted ÷ offered), average response time to offers, on-time %, cancellations, and **last-active date** (flags notaries idle >60 days in red) — all computed from existing dispatch/order data.
+
 ## Security
 - Admin login + emailed 2FA; all admin pages + APIs gated.
 - Row-level security on the database; server uses service-role, public uses locked anon.
