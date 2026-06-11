@@ -18,7 +18,7 @@ export default async function PortalPage() {
   const supabase = await createClient()
   const { data: orders } = await supabase
     .from('orders')
-    .select('id, confirmation_number, status, signing_date, signing_time, signing_type, signer_name, property_city, property_state, client_fee, invoice_id, created_at, completed_at, dispatched_at, accepted_at, client_satisfaction')
+    .select('id, confirmation_number, client_reference, status, signing_date, signing_time, signing_type, signer_name, property_city, property_state, client_fee, invoice_id, created_at, completed_at, dispatched_at, accepted_at, client_satisfaction')
     .eq('client_email', user.email)
     .order('created_at', { ascending: false })
 
@@ -82,7 +82,7 @@ export default async function PortalPage() {
           <table className="w-full text-sm min-w-[680px]">
             <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
               <tr>
-                <th className="px-5 py-3 text-left">Confirmation</th>
+                <th className="px-5 py-3 text-left">Your Ref / Conf #</th>
                 <th className="px-5 py-3 text-left">Signing</th>
                 <th className="px-5 py-3 text-left">Signer</th>
                 <th className="px-5 py-3 text-left">Location</th>
@@ -102,7 +102,10 @@ export default async function PortalPage() {
                 </tr>
               ) : orders.map((order) => (
                 <tr key={order.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-5 py-3 font-mono text-xs text-gray-500">{order.confirmation_number}</td>
+                  <td className="px-5 py-3">
+                    {order.client_reference && <div className="text-xs font-semibold text-gray-800">{order.client_reference}</div>}
+                    <div className="font-mono text-xs text-gray-400">{order.confirmation_number}</div>
+                  </td>
                   <td className="px-5 py-3 whitespace-nowrap">
                     <div className="font-medium text-gray-900">{format(new Date(order.signing_date), 'MMM d, yyyy')}</div>
                     <div className="text-xs text-gray-400">{formatTime(order.signing_time)}</div>

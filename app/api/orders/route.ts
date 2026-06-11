@@ -40,11 +40,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
     }
 
+    // Keep client_reference out of the main insert so order placement never fails
+    // if the migration hasn't been applied yet; save it best-effort below.
+    const { client_reference, ...orderData } = parsed.data
+
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('orders')
       .insert({
-        ...parsed.data,
+        ...orderData,
         status: 'pending',
         client_fee: 18500,  // $185.00
         notary_fee: 9000,   // $90.00
@@ -55,6 +59,11 @@ export async function POST(req: NextRequest) {
     if (error) {
       console.error('Supabase error:', error)
       return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
+    }
+
+    if (client_reference) {
+      await supabase.from('orders').update({ client_reference }).eq('id', data.id)
+        .then(({ error }) => { if (error) console.warn('client_reference save skipped:', error.message) })
     }
 
     const h = parseInt(data.signing_time.split(':')[0])

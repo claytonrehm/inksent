@@ -148,6 +148,14 @@ export default function OrderForm({ prefill }: { prefill?: OrderPrefill }) {
         <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">
           Signing Details
         </h2>
+        <div className="mb-4">
+          <Input
+            id="client_reference"
+            label="Your file / order # (optional)"
+            placeholder="e.g. ESC-24-1087 — appears in your portal so you can cross-reference"
+            {...register('client_reference')}
+          />
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Select
             id="signing_type"

@@ -24,14 +24,14 @@ const STATS = [
   { label: 'Est. staff hours saved', value: '31 hrs', icon: <TrendingUp size={15} /> },
 ]
 
-type Row = { conf: string; date: string; signer: string; loc: string; agent: string; fee: string; status: string; color: string }
+type Row = { ref: string; conf: string; date: string; signer: string; loc: string; agent: string; fee: string; status: string; color: string }
 const ORDERS: Row[] = [
-  { conf: 'ND-260610-A1B2C3', date: 'Today · 4:00 PM', signer: 'Maria & Luis Reyes', loc: 'Chula Vista, CA', agent: 'En route — Rosaura O.', fee: '$185', status: 'En Route', color: 'bg-blue-100 text-blue-800' },
-  { conf: 'ND-260610-D4E5F6', date: 'Today · 1:30 PM', signer: 'James Whitfield', loc: 'Carlsbad, CA', agent: 'Confirmed — Mikhail S.', fee: '$185', status: 'Agent Confirmed', color: 'bg-violet-100 text-violet-800' },
-  { conf: 'ND-260610-G7H8I9', date: 'Today · 5:30 PM', signer: 'Priya Nair', loc: 'Irvine, CA', agent: 'Finding agent…', fee: '$185', status: 'Finding Agent', color: 'bg-amber-100 text-amber-800' },
-  { conf: 'ND-260609-J1K2L3', date: 'Yesterday', signer: 'Robert Chen', loc: 'San Diego, CA', agent: 'Lynn Daniels', fee: '$185', status: 'Completed', color: 'bg-green-100 text-green-800' },
-  { conf: 'ND-260609-M4N5O6', date: 'Yesterday', signer: 'Tara Mitchell', loc: 'El Cajon, CA', agent: 'Marika Dalesandro', fee: '$185', status: 'Completed', color: 'bg-green-100 text-green-800' },
-  { conf: 'ND-260608-P7Q8R9', date: 'Jun 8', signer: 'David & Anne Park', loc: 'Temecula, CA', agent: 'Michael Krause', fee: '$185', status: 'Completed', color: 'bg-green-100 text-green-800' },
+  { ref: 'SUM-26-1087', conf: 'ND-260610-A1B2C3', date: 'Today · 4:00 PM', signer: 'Maria & Luis Reyes', loc: 'Chula Vista, CA', agent: 'En route — Rosaura O.', fee: '$185', status: 'En Route', color: 'bg-blue-100 text-blue-800' },
+  { ref: 'SUM-26-1085', conf: 'ND-260610-D4E5F6', date: 'Today · 1:30 PM', signer: 'James Whitfield', loc: 'Carlsbad, CA', agent: 'Confirmed — Mikhail S.', fee: '$185', status: 'Agent Confirmed', color: 'bg-violet-100 text-violet-800' },
+  { ref: 'SUM-26-1090', conf: 'ND-260610-G7H8I9', date: 'Today · 5:30 PM', signer: 'Priya Nair', loc: 'Irvine, CA', agent: 'Finding agent…', fee: '$185', status: 'Finding Agent', color: 'bg-amber-100 text-amber-800' },
+  { ref: 'SUM-26-1079', conf: 'ND-260609-J1K2L3', date: 'Yesterday', signer: 'Robert Chen', loc: 'San Diego, CA', agent: 'Lynn Daniels', fee: '$185', status: 'Completed', color: 'bg-green-100 text-green-800' },
+  { ref: 'SUM-26-1078', conf: 'ND-260609-M4N5O6', date: 'Yesterday', signer: 'Tara Mitchell', loc: 'El Cajon, CA', agent: 'Marika Dalesandro', fee: '$185', status: 'Completed', color: 'bg-green-100 text-green-800' },
+  { ref: 'SUM-26-1074', conf: 'ND-260608-P7Q8R9', date: 'Jun 8', signer: 'David & Anne Park', loc: 'Temecula, CA', agent: 'Michael Krause', fee: '$185', status: 'Completed', color: 'bg-green-100 text-green-800' },
 ]
 
 const TIMELINE = [
@@ -201,7 +201,7 @@ export default async function DemoPage({
             <table className="w-full text-sm min-w-[760px]">
               <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
                 <tr>
-                  <th className="px-5 py-3 text-left">Confirmation</th>
+                  <th className="px-5 py-3 text-left">Your Ref / Conf #</th>
                   <th className="px-5 py-3 text-left">When</th>
                   <th className="px-5 py-3 text-left">Signer</th>
                   <th className="px-5 py-3 text-left">Location</th>
@@ -213,7 +213,10 @@ export default async function DemoPage({
               <tbody className="divide-y divide-gray-50">
                 {ORDERS.map((o) => (
                   <tr key={o.conf} className="hover:bg-gray-50">
-                    <td className="px-5 py-3 font-mono text-xs text-gray-500">{o.conf}</td>
+                    <td className="px-5 py-3">
+                      <div className="text-xs font-semibold text-gray-800">{o.ref}</div>
+                      <div className="font-mono text-xs text-gray-400">{o.conf}</div>
+                    </td>
                     <td className="px-5 py-3 whitespace-nowrap text-gray-700">{o.date}</td>
                     <td className="px-5 py-3 text-gray-900 font-medium whitespace-nowrap">{o.signer}</td>
                     <td className="px-5 py-3 text-gray-500 whitespace-nowrap">{o.loc}</td>
