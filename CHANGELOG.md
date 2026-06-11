@@ -33,6 +33,12 @@ A running record of what the platform does and what was added. Use this for your
 - **Airtight replacement.** When a lender sends an updated package, "Replace package" deletes the old files and re-sends the new set flagged **⚠️ Updated — discard the previous version**, so no one ever signs a stale package.
 - **Compliance retention.** Loan packages auto-purge **14 days** after completion (GLBA/CCPA data-minimization + signing-industry practice), leaving the order record as the audit trail.
 
+## Credential lifecycle (auto-monitored)
+- **At-a-glance bench status.** Every notary on the active bench (and their detail page) shows color-coded NNA / Background-check / E&O / Commission badges — valid (green) / expiring ≤30d (amber) / expired (red) / not-on-file (gray). Hover for the exact status.
+- **All four credentials tracked**, not just E&O + commission. Background-check expiry is derived from the completion date + 12 months (NNA annual standard); NNA certification renewal is tracked from an optional date (the NNA has no public verification API, so we monitor the recorded renewal date and confirm via the NNA directory at approval — not a live lookup).
+- **Automated renewal requests.** A scheduled job finds any active notary with an expiring/expired credential and sends one friendly combined SMS + email ("quick refresh to keep your signings coming") with a one-tap update link — throttled to ~every 14 days. Expired credentials also alert the admin.
+- **Self-service credential update.** The renewal link opens the onboarding form pre-filled in edit mode (`/onboard/[id]?update=1`) so a notary can refresh a date in ~2 minutes without redoing their profile. Dispatch already auto-excludes lapsed E&O/commission.
+
 ## Vetting & quality
 - **Real-estate transaction vetting.** Applicants declare purchase/refi experience + signing types; scored and filterable so you never approve someone who can't handle a closing.
 - **Automated applicant scoring** with pros/cons (experience, volume, NNA, background check).

@@ -48,6 +48,38 @@ export async function sendNotaryApprovedEmail(data: { name: string; email: strin
   })
 }
 
+// ─── Credential Renewal Request (notary) ──────────────────────────────────────
+
+export async function sendCredentialRenewalEmail(data: {
+  name: string
+  email: string
+  items: { label: string; message: string }[]
+  updateUrl: string
+}) {
+  const firstName = data.name.split(' ')[0]
+  const rows = data.items.map((i) => `<tr><td style="padding:10px 14px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:13px;color:#9a3412;line-height:1.5;"><strong style="color:#7c2d12;">${i.label}</strong> — ${i.message}</td></tr><tr><td style="height:8px;"></td></tr>`).join('')
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/>${META}</head>
+  <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111111;margin:0;padding:0;background:#f4f4f5;">
+  <div style="max-width:560px;margin:32px auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+    ${HEADER}
+    <div style="padding:32px;">
+      <p style="font-size:16px;font-weight:700;color:#111111;margin:0 0 8px;">Quick refresh to keep your signings coming, ${firstName}</p>
+      <p style="font-size:14px;color:#555555;line-height:1.6;margin:0 0 20px;">To stay eligible for jobs, a couple of your credentials are due for an update. Takes about 2 minutes — no need to re-do your whole profile.</p>
+      <table width="100%" cellpadding="0" cellspacing="0" role="presentation">${rows}</table>
+      <a href="${data.updateUrl}" style="display:block;text-align:center;background:#7c3aed;color:#ffffff;text-decoration:none;font-weight:700;padding:14px;border-radius:10px;font-size:15px;margin-top:12px;">Update My Info →</a>
+      <p style="font-size:13px;color:#888888;line-height:1.6;margin:20px 0 0;">Already renewed? Just send us the new dates and we&rsquo;ll update it for you. Questions? (619) 949-3361.</p>
+      <p style="font-size:13px;color:#888888;margin:12px 0 0;">— Clayton, Inksent</p>
+    </div>
+    ${FOOTER}
+  </div></body></html>`
+  return getResend().emails.send({
+    from: 'Clayton at Inksent <orders@inksent.co>',
+    to: data.email,
+    subject: 'Quick update to keep your signings coming',
+    html,
+  })
+}
+
 // ─── Documents Ready for Notary ───────────────────────────────────────────────
 
 export async function sendNotaryDocsEmail(data: { notaryName: string; notaryEmail: string; signerName: string; docsUrl: string; updated?: boolean }) {

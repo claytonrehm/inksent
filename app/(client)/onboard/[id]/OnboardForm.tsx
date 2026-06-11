@@ -27,16 +27,23 @@ type FormData = z.infer<typeof schema>
 
 const LANGUAGES = ['Spanish', 'Mandarin', 'Vietnamese', 'Tagalog', 'Korean', 'Other']
 
-export default function OnboardForm({ notaryId, notaryName, hasPhoto }: { notaryId: string; notaryName: string; hasPhoto: boolean }) {
+export default function OnboardForm({ notaryId, notaryName, hasPhoto, isUpdate = false, defaults }: {
+  notaryId: string
+  notaryName: string
+  hasPhoto: boolean
+  isUpdate?: boolean
+  defaults?: Record<string, unknown>
+}) {
   const [done, setDone] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [languages, setLanguages] = useState<string[]>([])
+  const [languages, setLanguages] = useState<string[]>(Array.isArray(defaults?.languages) ? (defaults!.languages as string[]) : [])
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [photoError, setPhotoError] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
+    defaultValues: (defaults ?? {}) as unknown as Partial<FormData>,
   })
 
   function toggleLang(l: string) {
@@ -81,6 +88,19 @@ export default function OnboardForm({ notaryId, notaryName, hasPhoto }: { notary
     })
     if (!res.ok) { setError('Something went wrong. Please try again or email support@inksent.co.'); return }
     setDone(true)
+  }
+
+  if (done && isUpdate) {
+    return (
+      <div className="flex flex-col items-center justify-center py-10 text-center gap-4">
+        <div className="bg-green-50 rounded-full p-5"><CheckCircle className="text-green-500 w-12 h-12" /></div>
+        <h2 className="text-2xl font-bold text-gray-900">Updated — thank you!</h2>
+        <p className="text-gray-500 max-w-sm">
+          Thanks, {notaryName.split(' ')[0]}. Your info is refreshed and you&apos;re all set to keep receiving signings. No further action needed.
+        </p>
+        <a href={`/agent/${notaryId}`} className="text-sm text-violet-600 font-semibold hover:underline">View your dashboard →</a>
+      </div>
+    )
   }
 
   if (done) {

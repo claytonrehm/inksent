@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendSMS } from '@/lib/sms'
 import { sendPaymentReminderEmail } from '@/lib/invoice'
-import { sendNotaryApprovedEmail } from '@/lib/email'
+import { sendNotaryApprovedEmail, sendCredentialRenewalEmail } from '@/lib/email'
+import { actionableCredentials } from '@/lib/credentials'
 import { orderWasPaid, payoutNotary, hasStripe } from '@/lib/stripe'
 import { createAdminClient, hasServiceRole } from '@/lib/supabase/admin'
 import { format } from 'date-fns'
@@ -125,6 +126,45 @@ export async function GET(req: NextRequest) {
     nudged++
   }
 
+  // 2b-3. CREDENTIAL RENEWALS — keep the bench compliant automatically. For every
+  //   active notary, find credentials that are expiring (≤30d) or expired (NNA cert,
+  //   background check, E&O, commission) and send ONE friendly combined renewal
+  //   request (SMS + email) with a link to update — throttled to ~every 14 days via
+  //   cred_reminder_at. Already-expired creds also ping the admin. Degrades to a
+  //   no-op until the credential-lifecycle migration is applied.
+  const credReminderCutoff = new Date(now - 14 * 86_400_000).toISOString()
+  const { data: benchCreds } = await supabase
+    .from('notaries')
+    .select('id, name, phone, email, nna_certified, nna_cert_expiry, background_checked, bgc_date, eo_carrier, eo_expiry, commission_expiry, cred_reminder_at')
+    .eq('active', true)
+  let credRemind = 0
+  for (const n of benchCreds ?? []) {
+    const items = actionableCredentials(n)
+    if (items.length === 0) continue
+    if (n.cred_reminder_at && n.cred_reminder_at >= credReminderCutoff) continue
+
+    const updateUrl = `${baseUrl}/onboard/${n.id}?update=1`
+    const firstName = (n.name ?? '').split(' ')[0]
+    const labels = items.map((i) => i.label).join(' & ')
+    if (n.phone) {
+      await sendSMS(
+        n.phone,
+        `Hi ${firstName}, quick heads-up from Inksent — your ${labels} ${items.length > 1 ? 'need' : 'needs'} a refresh to keep you eligible for signings. Takes ~2 min: ${updateUrl} — Clayton`
+      ).catch(() => {})
+    }
+    if (n.email) {
+      await sendCredentialRenewalEmail({ name: n.name, email: n.email, items: items.map((i) => ({ label: i.label, message: i.message })), updateUrl }).catch(() => {})
+    }
+    // Already-expired credentials are urgent — flag the admin too.
+    const expired = items.filter((i) => i.status === 'expired')
+    if (expired.length && process.env.ADMIN_PHONE) {
+      await sendSMS(process.env.ADMIN_PHONE, `⚠️ ${n.name} has EXPIRED ${expired.map((i) => i.short).join(', ')} — renewal requested. Not dispatch-eligible until renewed (E&O/commission auto-excluded).`).catch(() => {})
+    }
+    await supabase.from('notaries').update({ cred_reminder_at: new Date().toISOString() }).eq('id', n.id)
+      .then(({ error }) => { if (error) console.warn('cred_reminder_at stamp skipped:', error.message) })
+    credRemind++
+  }
+
   // 2c. MONEY SAFETY NET — runs BEFORE dunning so we never chase a paid client.
   //   (i)  Recover a payment whose webhook was missed (reconcile from Stripe).
   //   (ii) Retry a payout that failed earlier (e.g. card funds hadn't settled yet).
@@ -230,5 +270,5 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ ok: true, alerted: toAlert.length, nudged, reminded, purged })
+  return NextResponse.json({ ok: true, alerted: toAlert.length, nudged, credRemind, reminded, purged })
 }
