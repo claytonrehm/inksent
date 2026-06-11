@@ -5,6 +5,7 @@ import ApplicantsBoard, { type Applicant } from './ApplicantsBoard'
 import CredentialBadges from '@/components/CredentialBadges'
 import RequestCredentialsButton from './RequestCredentialsButton'
 import { computePriority } from '@/lib/priority'
+import { fullyCredentialed } from '@/lib/credentials'
 import { formatCurrency } from '@/lib/utils'
 import { lookupZip } from '@/lib/coverage'
 import { AlertCircle, Star, Users, ClipboardList } from 'lucide-react'
@@ -65,9 +66,14 @@ export default async function NotariesPage() {
       timesCancelled: n.times_cancelled,
     })
   }
-  const activeRanked = [...active].sort((a, b) =>
-    (priorityOf[b.id].score - priorityOf[a.id].score) || a.name.localeCompare(b.name)
-  )
+  // Fully-credentialed agents (all four green = dispatchable) always sort to the
+  // top, then by priority score within each group.
+  const activeRanked = [...active].sort((a, b) => {
+    const af = fullyCredentialed(a) ? 1 : 0
+    const bf = fullyCredentialed(b) ? 1 : 0
+    if (af !== bf) return bf - af
+    return (priorityOf[b.id].score - priorityOf[a.id].score) || a.name.localeCompare(b.name)
+  })
 
   // Map notary rows → Applicant shape for the board
   const toApplicant = (n: (typeof pending)[number]): Applicant => {
