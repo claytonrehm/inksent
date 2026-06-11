@@ -31,7 +31,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: 'This signing can’t be rescheduled.' }, { status: 400 })
   }
 
-  await supabase.from('orders').update({ signing_date, signing_time, rescheduled_at: new Date().toISOString() }).eq('id', id)
+  // Core update first; stamp rescheduled_at best-effort (pre-migration safe).
+  const { error: rescheduleErr } = await supabase.from('orders').update({ signing_date, signing_time }).eq('id', id)
+  if (rescheduleErr) return NextResponse.json({ error: 'Could not reschedule — please try again.' }, { status: 500 })
+  await supabase.from('orders').update({ rescheduled_at: new Date().toISOString() }).eq('id', id)
+    .then(({ error }) => { if (error) console.warn('rescheduled_at stamp skipped:', error.message) })
 
   const [h, m] = signing_time.split(':').map(Number)
   const timeStr = `${h % 12 || 12}:${m.toString().padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`

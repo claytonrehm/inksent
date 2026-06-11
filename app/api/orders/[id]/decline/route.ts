@@ -36,14 +36,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       // A real cancellation — log it with timing, bump the cancel counter
       const { data: n } = await supabase.from('notaries').select('times_cancelled').eq('id', notary_id).single()
       await supabase.from('notaries').update({ times_cancelled: (n?.times_cancelled ?? 0) + 1 }).eq('id', notary_id)
-      await supabase.from('notary_cancellations').insert({
+      // Insert the base row (always works), then stamp the reason best-effort so a
+      // pre-migration DB without the `reason` column still records the cancellation.
+      const { data: cancRow } = await supabase.from('notary_cancellations').insert({
         notary_id,
         order_id: id,
         hours_before_signing: hoursBefore,
         signer_name: order.signer_name,
         confirmation_number: order.confirmation_number,
-        reason: declineReason,
-      })
+      }).select('id').single()
+      if (declineReason && cancRow?.id) {
+        await supabase.from('notary_cancellations').update({ reason: declineReason }).eq('id', cancRow.id)
+          .then(({ error }) => { if (error) console.warn('decline reason skipped:', error.message) })
+      }
     } else {
       // Just declined an offer (never committed) — minor signal
       const { data: n } = await supabase.from('notaries').select('times_declined').eq('id', notary_id).single()

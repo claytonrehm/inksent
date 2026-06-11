@@ -28,7 +28,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ ok: true, already: true })
   }
 
-  await supabase.from('orders').update({ status: 'cancelled', cancelled_at: new Date().toISOString() }).eq('id', id)
+  // Core state change first (always works); stamp cancelled_at best-effort so this
+  // can't fail if the site-features migration hasn't been applied yet.
+  const { error: cancelErr } = await supabase.from('orders').update({ status: 'cancelled' }).eq('id', id)
+  if (cancelErr) return NextResponse.json({ error: 'Could not cancel — please try again.' }, { status: 500 })
+  await supabase.from('orders').update({ cancelled_at: new Date().toISOString() }).eq('id', id)
+    .then(({ error }) => { if (error) console.warn('cancelled_at stamp skipped:', error.message) })
 
   // Refund if the client already paid.
   let refunded = false
