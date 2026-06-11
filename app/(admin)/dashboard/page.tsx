@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { fullyCredentialed } from '@/lib/credentials'
 import { formatCurrency, STATUS_COLORS, STATUS_LABELS } from '@/lib/utils'
 import { format, startOfWeek, startOfMonth } from 'date-fns'
 import Link from 'next/link'
@@ -20,7 +21,7 @@ async function getData() {
       .eq('signing_date', today)
       .order('signing_time'),
     supabase.from('notaries').select('id', { count: 'exact', head: true }).eq('active', false),
-    supabase.from('notaries').select('id, name, onboarded_at, payouts_enabled, created_at').eq('active', true).order('created_at', { ascending: false }),
+    supabase.from('notaries').select('id, name, onboarded_at, payouts_enabled, created_at, nna_certified, nna_cert_expiry, background_checked, bgc_date, eo_carrier, eo_expiry, commission_expiry').eq('active', true).order('created_at', { ascending: false }),
   ])
 
   const orders = allOrders.data ?? []
@@ -47,11 +48,15 @@ async function getData() {
 
   const active = orders.filter(o => ['pending', 'dispatching', 'assigned', 'confirmed'].includes(o.status)).length
 
-  // Notary bench onboarding status: Approved → Profile (onboarded_at) → Bank (payouts_enabled)
+  // Notary bench status: Approved → Profile (onboarded) → Creds (all 4 valid) → Bank.
+  // "Fully active" requires ALL of them — a notary missing/expired on any credential
+  // is NOT dispatchable, so it must never read as fully active.
   const bench = (activeNotaries.data ?? []).map(n => {
     const profile = !!n.onboarded_at
     const bank = !!n.payouts_enabled
-    return { id: n.id, name: n.name, profile, bank, stage: profile && bank ? 'active' : profile ? 'bank' : 'profile' }
+    const creds = fullyCredentialed(n)
+    const stage = !profile ? 'profile' : !creds ? 'creds' : !bank ? 'bank' : 'active'
+    return { id: n.id, name: n.name, profile, bank, creds, stage }
   })
   const fullyActive = bench.filter(b => b.stage === 'active').length
 
@@ -176,10 +181,11 @@ export default async function DashboardPage() {
                 <div className="hidden sm:flex items-center gap-3 text-xs">
                   <Step on label="Approved" />
                   <Step on={b.profile} label="Profile" />
+                  <Step on={b.creds} label="Creds" />
                   <Step on={b.bank} label="Bank" />
                 </div>
-                <span className={`shrink-0 inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${b.stage === 'active' ? 'bg-green-100 text-green-700' : b.stage === 'bank' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}`}>
-                  {b.stage === 'active' ? '✓ Fully active' : b.stage === 'bank' ? 'Can work · bank pending' : 'Needs profile'}
+                <span className={`shrink-0 inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${b.stage === 'active' ? 'bg-green-100 text-green-700' : b.stage === 'bank' ? 'bg-blue-100 text-blue-700' : b.stage === 'creds' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
+                  {b.stage === 'active' ? '✓ Fully active' : b.stage === 'bank' ? 'Can work · bank pending' : b.stage === 'creds' ? '⚠ Credentials needed' : 'Needs profile'}
                 </span>
                 <Link href={`/notaries/${b.id}`} className="text-xs text-violet-600 hover:underline shrink-0">View</Link>
               </div>

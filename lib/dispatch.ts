@@ -1,7 +1,7 @@
 import { sendSMS, buildDispatchMessage } from '@/lib/sms'
 import { sendNotaryJobOfferEmail } from '@/lib/email'
 import { notaryCoversZip } from '@/lib/coverage'
-import { credentialItems } from '@/lib/credentials'
+import { fullyCredentialed } from '@/lib/credentials'
 import { format } from 'date-fns'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
@@ -36,12 +36,11 @@ export async function blastOrderToCoveringNotaries(
 
   const exclude = new Set(opts.exclude ?? [])
   const active = notaries ?? []
-  // Never dispatch to an agent with ANY EXPIRED credential (NNA cert, background
-  // check, E&O, or commission) — this is what makes the "expired = auto-removed
-  // from dispatch" promise to title companies true. Missing-but-not-expired data
-  // does not block (we chase it separately), so the bench isn't starved.
-  const credsValid = (n: Parameters<typeof credentialItems>[0]) =>
-    !credentialItems(n).some((c) => c.status === 'expired')
+  // Only dispatch to FULLY-credentialed agents — all four (NNA cert, background
+  // check, E&O, commission) must be on file AND valid. A missing OR expired
+  // credential takes them out of dispatch (we chase them to provide/renew it).
+  // This is what makes the "every agent vetted & insured" promise true.
+  const credsValid = (n: Parameters<typeof fullyCredentialed>[0]) => fullyCredentialed(n)
 
   // Dispatch to agents who finished their profile + have valid credentials.
   // Bank connection is NOT required to receive jobs — we use "just-in-time"
