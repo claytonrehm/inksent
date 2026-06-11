@@ -57,6 +57,16 @@ A running record of what the platform does and what was added. Use this for your
 - Row-level security on the database; server uses service-role, public uses locked anon.
 - Stripe + Twilio webhooks signature-verified; cron endpoints secret-gated.
 - CAPTCHA + honeypot + first-order hold on public forms. Clickwrap Terms + IC agreement.
+- **Fail-closed webhooks/cron.** Stripe webhook now rejects any request without a configured secret + valid signature (no unsigned-JSON fallback — a forged "paid" event can't trigger a payout). Escalate cron rejects if `CRON_SECRET` is unset instead of running open.
+- **Invoice XSS hardened.** All client-supplied order fields (names, company, address) are HTML-escaped before the invoice is rendered via `dangerouslySetInnerHTML` in the admin/client views.
+- **Less PII echoed.** Dispatch API no longer returns the notary's phone number in its response.
+
+## Site polish & hygiene
+- **Reliable job accept.** The notary accept screen now reads the API response: a "just missed it" state if another agent grabbed it first (409), a retry-able error state otherwise — it can no longer say "confirmed" when the accept actually failed.
+- **Homepage shows the price** ("$185 / signing") instead of a vague "Flat Rate," matching the partners page and the "no surprises" promise.
+- **Branded 404 + error pages** (`not-found.tsx`, `error.tsx`) with home + call-us actions, replacing the default Next.js screens.
+- **`robots.ts` + `sitemap.ts`.** Public marketing/legal pages are indexed; every admin, account, and capability-link route (track/upload/onboard/accept/complete/docs, portal, dashboard) is kept out of search.
+- Removed empty dead route directories (`(notary)/jobs`, `api/invoices`, `(client)/orders`).
 
 ## Site / UX
 - Two-sided animated "How It Works" (title vs notary) with a smooth, continuous journey.

@@ -13,8 +13,11 @@ import { format } from 'date-fns'
 // Alerts the admin ONCE per order (escalated_at), so you can step in instead of
 // finding out from an angry client.
 export async function GET(req: NextRequest) {
+  // Fail CLOSED: if the secret is unset we reject rather than run unauthenticated.
+  // This endpoint sends SMS, moves money (payout retries), and purges documents —
+  // it must never be publicly triggerable.
   const secret = process.env.CRON_SECRET
-  if (secret && req.headers.get('authorization') !== `Bearer ${secret}`) {
+  if (!secret || req.headers.get('authorization') !== `Bearer ${secret}`) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   }
 

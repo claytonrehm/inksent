@@ -12,12 +12,17 @@ export async function POST(req: NextRequest) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET
   const body = await req.text()
 
+  // Fail CLOSED: never trust an unsigned body. Without a configured secret + a
+  // valid signature we reject — otherwise anyone could POST a forged
+  // "checkout.session.completed" and mark orders paid / trigger real payouts.
+  if (!secret || !sig) {
+    console.error('Stripe webhook rejected: missing signature or STRIPE_WEBHOOK_SECRET')
+    return NextResponse.json({ error: 'webhook signature required' }, { status: 400 })
+  }
+
   let event
   try {
-    const stripe = getStripe()
-    event = secret && sig
-      ? stripe.webhooks.constructEvent(body, sig, secret)
-      : JSON.parse(body)
+    event = getStripe().webhooks.constructEvent(body, sig, secret)
   } catch (err) {
     console.error('Stripe webhook signature failed:', err)
     return NextResponse.json({ error: 'invalid signature' }, { status: 400 })

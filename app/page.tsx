@@ -259,8 +259,9 @@ export default function Home() {
           <ScrollReveal>
             <div className="gradient-border max-w-sm mx-auto rounded-3xl p-8 text-center bg-gradient-to-b from-violet-600/15 to-white/[0.02] shadow-[0_0_70px_-15px_rgba(168,85,247,0.55)] backdrop-blur-sm">
               <p className="text-violet-300 font-semibold text-sm uppercase tracking-widest mb-4">Per Signing</p>
-              <div className="mb-2">
-                <span className="text-5xl sm:text-6xl font-black text-white leading-none">Flat Rate</span>
+              <div className="mb-2 flex items-baseline justify-center gap-1">
+                <span className="text-5xl sm:text-6xl font-black text-white leading-none">$185</span>
+                <span className="text-slate-400 text-lg font-semibold">/ signing</span>
               </div>
               <p className="text-slate-400 text-sm mb-8">one transparent fee, any signing type</p>
               <div className="space-y-3 text-left mb-8">

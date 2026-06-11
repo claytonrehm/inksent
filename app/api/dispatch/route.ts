@@ -61,5 +61,5 @@ export async function POST(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  return NextResponse.json({ ok: true, sms_sent_to: notary.phone })
+  return NextResponse.json({ ok: true })
 }

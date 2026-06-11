@@ -9,6 +9,19 @@ export function generateInvoiceNumber(orderId: string) {
   return `INV-${Date.now().toString(36).toUpperCase()}`
 }
 
+// Escape any value that came from user input (order fields are client-supplied via
+// the order form) before interpolating into invoice HTML. The invoice is rendered
+// with dangerouslySetInnerHTML in the admin + client views, so an unescaped
+// signer_name like `<img src=x onerror=...>` would be stored XSS.
+function esc(v: unknown): string {
+  return String(v ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 export function buildInvoiceHTML(order: {
   confirmation_number: string
   invoice_number: string
@@ -69,7 +82,7 @@ export function buildInvoiceHTML(order: {
       <div class="invoice-meta">
         <div>
           <div class="label">Invoice</div>
-          <div class="value">${order.invoice_number}</div>
+          <div class="value">${esc(order.invoice_number)}</div>
         </div>
         <div style="text-align:right">
           <div class="label">Date</div>
@@ -80,16 +93,16 @@ export function buildInvoiceHTML(order: {
 
       <div class="section-title">Billed To</div>
       <div style="margin-bottom:24px; font-size:14px; line-height:1.6">
-        <strong>${order.client_company}</strong><br/>
-        ${order.client_name}<br/>
-        ${order.client_email}
+        <strong>${esc(order.client_company)}</strong><br/>
+        ${esc(order.client_name)}<br/>
+        ${esc(order.client_email)}
       </div>
 
       <div class="section-title">Signing Details</div>
-      <div class="row"><span style="color:#555">Confirmation #</span><span>${order.confirmation_number}</span></div>
-      <div class="row"><span style="color:#555">Service</span><span>${signingTypeLabel} Signing</span></div>
-      <div class="row"><span style="color:#555">Signer</span><span>${order.signer_name}</span></div>
-      <div class="row"><span style="color:#555">Property</span><span>${order.property_address}, ${order.property_city}, ${order.property_state} ${order.property_zip}</span></div>
+      <div class="row"><span style="color:#555">Confirmation #</span><span>${esc(order.confirmation_number)}</span></div>
+      <div class="row"><span style="color:#555">Service</span><span>${esc(signingTypeLabel)} Signing</span></div>
+      <div class="row"><span style="color:#555">Signer</span><span>${esc(order.signer_name)}</span></div>
+      <div class="row"><span style="color:#555">Property</span><span>${esc(order.property_address)}, ${esc(order.property_city)}, ${esc(order.property_state)} ${esc(order.property_zip)}</span></div>
       <div class="row"><span style="color:#555">Signing Date</span><span>${format(new Date(order.signing_date), 'MMMM d, yyyy')} at ${timeStr}</span></div>
 
       <hr class="divider" />
