@@ -48,7 +48,7 @@ export default function Image() {
           <span style={{ color: 'white' }}>Signing Agents,&nbsp;</span>
           <span style={{ color: '#a78bfa' }}>On Demand</span>
         </div>
-        <div style={{ display: 'flex', fontSize: 32, color: '#94a3b8', marginTop: 28, maxWidth: 920 }}>
+        <div style={{ fontSize: 32, color: '#94a3b8', marginTop: 28, maxWidth: 880, lineHeight: 1.4, letterSpacing: '-0.4px' }}>
           Vetted, NNA-certified notary signing agents — confirmed in ~30 minutes, with automatic backup if anyone cancels.
         </div>
       </div>
