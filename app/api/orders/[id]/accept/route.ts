@@ -116,6 +116,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       confirmationNumber: order.confirmation_number,
       fee: order.notary_fee,
       completeUrl: `${process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'}/complete/${id}?notary=${notary_id}`,
+      dashboardUrl: `${process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'}/agent/${notary_id}`,
     }).catch(console.error)
 
     sendSMS(

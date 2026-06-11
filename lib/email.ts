@@ -151,6 +151,7 @@ export async function sendNotaryAssignmentEmail(data: {
   confirmationNumber: string
   fee: number
   completeUrl?: string
+  dashboardUrl?: string
 }) {
   const firstName = data.notaryName.split(' ')[0]
   const typeLabel = data.signingType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
@@ -193,6 +194,7 @@ export async function sendNotaryAssignmentEmail(data: {
       <p style="font-size:13px;color:#555555;margin-top:20px;line-height:1.6;">
         Please arrive a few minutes early and bring all required supplies.
       </p>
+      ${data.dashboardUrl ? `<p style="font-size:13px;color:#777777;margin:16px 0 0">See all your signings &amp; earnings on your <a href="${data.dashboardUrl}" style="color:#7c3aed;text-decoration:none;font-weight:600;">dashboard</a>.</p>` : ''}
       <p style="font-size:13px;color:#777777;margin:12px 0 0">
         Questions? Call or text <a href="tel:+16199493361" style="color:#7c3aed;text-decoration:none;">(619) 949-3361</a> — Clayton, Inksent
       </p>

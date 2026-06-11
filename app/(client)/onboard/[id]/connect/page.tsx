@@ -58,7 +58,10 @@ export default async function ConnectPage({
           <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-8 text-center">
             <CheckCircle className="text-green-500 w-12 h-12 mx-auto mb-3" />
             <h1 className="text-xl font-bold text-gray-900 mb-1">Payouts are set up!</h1>
-            <p className="text-gray-500 text-sm">You&apos;re fully ready. When you complete a signing, your $90 lands in your bank automatically — no invoicing, no waiting on us.</p>
+            <p className="text-gray-500 text-sm mb-5">You&apos;re fully ready. When you complete a signing, your $90 lands in your bank automatically — no invoicing, no waiting on us.</p>
+            <a href={`/agent/${id}`} className="inline-block bg-violet-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-violet-700 transition-colors">
+              View Your Dashboard →
+            </a>
           </div>
         ) : (!hasStripe() || setupPending) ? (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-8 text-center">
