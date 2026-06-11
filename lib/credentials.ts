@@ -110,3 +110,29 @@ export function credentialItems(n: NotaryCreds): CredItem[] {
 export function actionableCredentials(n: NotaryCreds): CredItem[] {
   return credentialItems(n).filter((c) => c.status === 'expiring' || c.status === 'expired')
 }
+
+export interface CredAction extends CredItem { need: 'renew' | 'provide' }
+
+// What to ASK the notary for. NNA cert + background check are required, so we chase
+// both renewals AND missing dates on those (this is how the existing bench gets
+// asked to supply dates we don't have). E&O + commission are only chased when an
+// actual expiry is approaching/passed — we don't nag about ones never on file.
+export function credentialActionItems(n: NotaryCreds): CredAction[] {
+  const out: CredAction[] = []
+  for (const c of credentialItems(n)) {
+    const expiringOrExpired = c.status === 'expiring' || c.status === 'expired'
+    const missingDate = c.status === 'missing' || c.status === 'untracked'
+    if (c.key === 'nna' || c.key === 'bgc') {
+      if (expiringOrExpired) out.push({ ...c, need: 'renew' })
+      else if (missingDate) out.push({
+        ...c, need: 'provide',
+        message: c.key === 'nna'
+          ? 'We need your NNA certification renewal date on file'
+          : 'We need your background-check completion date on file',
+      })
+    } else if (expiringOrExpired) {
+      out.push({ ...c, need: 'renew' })
+    }
+  }
+  return out
+}

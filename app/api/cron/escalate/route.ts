@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { sendSMS } from '@/lib/sms'
 import { sendPaymentReminderEmail } from '@/lib/invoice'
 import { sendNotaryApprovedEmail, sendCredentialRenewalEmail } from '@/lib/email'
-import { actionableCredentials } from '@/lib/credentials'
+import { credentialActionItems } from '@/lib/credentials'
 import { orderWasPaid, payoutNotary, hasStripe } from '@/lib/stripe'
 import { createAdminClient, hasServiceRole } from '@/lib/supabase/admin'
 import { format } from 'date-fns'
@@ -139,7 +139,7 @@ export async function GET(req: NextRequest) {
     .eq('active', true)
   let credRemind = 0
   for (const n of benchCreds ?? []) {
-    const items = actionableCredentials(n)
+    const items = credentialActionItems(n)
     if (items.length === 0) continue
     if (n.cred_reminder_at && n.cred_reminder_at >= credReminderCutoff) continue
 
@@ -149,7 +149,7 @@ export async function GET(req: NextRequest) {
     if (n.phone) {
       await sendSMS(
         n.phone,
-        `Hi ${firstName}, quick heads-up from Inksent — your ${labels} ${items.length > 1 ? 'need' : 'needs'} a refresh to keep you eligible for signings. Takes ~2 min: ${updateUrl} — Clayton`
+        `Hi ${firstName}, quick note from Inksent — we need your current ${labels} on file to keep you eligible for signings. Takes ~2 min: ${updateUrl} — Clayton`
       ).catch(() => {})
     }
     if (n.email) {
