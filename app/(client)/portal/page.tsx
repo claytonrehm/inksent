@@ -5,6 +5,7 @@ import { STATUS_COLORS, STATUS_LABELS, formatCurrency } from '@/lib/utils'
 import Link from 'next/link'
 import InksentLogo from '@/components/InksentLogo'
 import { FileText, Plus } from 'lucide-react'
+import OrderActions from './OrderActions'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,7 +18,7 @@ export default async function PortalPage() {
   const supabase = await createClient()
   const { data: orders } = await supabase
     .from('orders')
-    .select('id, confirmation_number, status, signing_date, signing_time, signing_type, signer_name, property_city, property_state, client_fee, invoice_id, created_at')
+    .select('id, confirmation_number, status, signing_date, signing_time, signing_type, signer_name, property_city, property_state, client_fee, invoice_id, created_at, completed_at')
     .eq('client_email', user.email)
     .order('created_at', { ascending: false })
 
@@ -84,12 +85,13 @@ export default async function PortalPage() {
                 <th className="px-5 py-3 text-left">Fee</th>
                 <th className="px-5 py-3 text-left">Status</th>
                 <th className="px-5 py-3 text-left">Invoice</th>
+                <th className="px-5 py-3 text-left">Manage</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
               {!orders || orders.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-16 text-center">
+                  <td colSpan={8} className="px-5 py-16 text-center">
                     <p className="text-gray-400 mb-3">No orders yet</p>
                     <Link href="/order" className="text-violet-600 font-semibold hover:underline text-sm">Place your first order →</Link>
                   </td>
@@ -108,6 +110,9 @@ export default async function PortalPage() {
                     <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[order.status]}`}>
                       {STATUS_LABELS[order.status]}
                     </span>
+                    {order.status === 'completed' && order.completed_at && (
+                      <div className="text-[11px] text-gray-400 mt-1">{format(new Date(order.completed_at), 'MMM d, yyyy')}</div>
+                    )}
                   </td>
                   <td className="px-5 py-3">
                     {order.invoice_id ? (
@@ -117,6 +122,9 @@ export default async function PortalPage() {
                     ) : (
                       <span className="text-gray-300 text-xs">—</span>
                     )}
+                  </td>
+                  <td className="px-5 py-3">
+                    <OrderActions orderId={order.id} status={order.status} signingDate={order.signing_date} signingTime={order.signing_time} />
                   </td>
                 </tr>
               ))}
