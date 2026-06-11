@@ -47,7 +47,7 @@ A running record of what the platform does and what was added. Use this for your
 
 ## Notary dashboard & self-service
 - **Agent dashboard** at `/agent/[id]` (unguessable-link, no login): upcoming signings, completed history, and earnings (total / paid out / pending), with a connect-your-bank nudge if payouts aren't on. Linked from payout setup + the assignment email.
-- **Decline reasons.** When a notary passes on an offer they pick a reason (already booked / too far / timing / pay / other) — surfaced in the admin alert and stored for matching insight.
+- **One-tap decline (no friction).** Passing on a job is a single tap — no "why?" prompt, no judgment, no roadblock. Keeping the notary side resistance-free is the priority over collecting decline analytics. (The API still accepts an optional reason for any future passive, frictionless capture.)
 
 ## Notary recruiting funnel (conversion)
 - **Photo moved out of the way up front.** Headshot is now *optional* on the application (it was a hard wall at the top of the form, killing applicants on mobile) and *required at onboarding* instead — once they're approved and invested. Carried forward automatically if they did upload at apply.

@@ -13,11 +13,9 @@ export default function AcceptButton({
   notaryId: string
   notaryName: string
 }) {
-  const [state, setState] = useState<'idle' | 'choosing_reason' | 'accepted' | 'declined' | 'taken' | 'error'>('idle')
+  const [state, setState] = useState<'idle' | 'accepted' | 'declined' | 'taken' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState<string>('')
   const [loading, setLoading] = useState<'accept' | 'decline' | null>(null)
-
-  const DECLINE_REASONS = ['Already booked', 'Too far', 'Time doesn’t work', 'Pay too low', 'Other']
 
   async function accept() {
     setLoading('accept')
@@ -42,13 +40,13 @@ export default function AcceptButton({
     }
   }
 
-  async function decline(reason?: string) {
+  async function decline() {
     setLoading('decline')
     try {
       const res = await fetch(`/api/orders/${orderId}/decline`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ notary_id: notaryId, reason }),
+        body: JSON.stringify({ notary_id: notaryId }),
       })
       setLoading(null)
       // Decline is best-effort from the notary's view — even if it errors, treat
@@ -102,35 +100,17 @@ export default function AcceptButton({
     )
   }
 
-  if (state === 'choosing_reason') {
-    return (
-      <div className="space-y-2">
-        <p className="text-sm text-gray-600 text-center mb-1">No problem — quick note, why are you passing?</p>
-        {DECLINE_REASONS.map((r) => (
-          <button key={r} type="button" onClick={() => decline(r)} disabled={loading !== null}
-            className="w-full text-sm font-medium text-gray-700 border border-gray-200 rounded-lg py-2.5 hover:border-violet-300 hover:bg-violet-50 transition-colors disabled:opacity-50">
-            {r}
-          </button>
-        ))}
-        <button type="button" onClick={() => setState('idle')} disabled={loading !== null}
-          className="w-full text-xs text-gray-400 hover:text-gray-600 py-1">
-          ← Back
-        </button>
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-3">
       <Button onClick={accept} loading={loading === 'accept'} disabled={loading !== null} size="lg" className="w-full">
         Accept This Signing
       </Button>
       <button
-        onClick={() => setState('choosing_reason')}
+        onClick={decline}
         disabled={loading !== null}
         className="w-full text-sm text-gray-400 hover:text-gray-600 py-2 transition-colors disabled:opacity-50"
       >
-        Can&apos;t make it
+        {loading === 'decline' ? 'Declining...' : "Can't make it"}
       </button>
     </div>
   )
