@@ -12,11 +12,11 @@ import { compressImage } from '@/lib/compress-image'
 
 const schema = z.object({
   nna_number: z.string().optional(),
-  nna_cert_expiry: z.string().optional(),
+  nna_cert_expiry: z.string().min(1, 'Required — your NNA certification renewal date'),
   commission_state_code: z.string().min(2, 'Required'),
   commission_expiry: z.string().min(1, 'Required'),
   bgc_provider: z.string().optional(),
-  bgc_date: z.string().optional(),
+  bgc_date: z.string().min(1, 'Required — when your background check was completed'),
   eo_carrier: z.string().optional(),
   eo_policy: z.string().optional(),
   eo_expiry: z.string().optional(),
@@ -154,7 +154,7 @@ export default function OnboardForm({ notaryId, notaryName, hasPhoto, isUpdate =
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input id="nna_number" label="NNA Member Number" placeholder="If you have one (optional)"
             error={errors.nna_number?.message} {...register('nna_number')} />
-          <Input id="nna_cert_expiry" label="NNA Cert Renews" type="date"
+          <Input id="nna_cert_expiry" label="NNA Cert Renewal Date *" type="date"
             error={errors.nna_cert_expiry?.message} {...register('nna_cert_expiry')} />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -170,7 +170,8 @@ export default function OnboardForm({ notaryId, notaryName, hasPhoto, isUpdate =
         <p className="text-sm font-semibold text-gray-700">Background Check</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input id="bgc_provider" label="Provider" placeholder="NNA, Sterling, etc." {...register('bgc_provider')} />
-          <Input id="bgc_date" label="Date Completed" type="date" {...register('bgc_date')} />
+          <Input id="bgc_date" label="Date Completed *" type="date"
+            error={errors.bgc_date?.message} {...register('bgc_date')} />
         </div>
       </section>
 

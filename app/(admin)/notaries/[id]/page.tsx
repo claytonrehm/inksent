@@ -7,6 +7,7 @@ import { SIGNINGS_LABEL } from '@/lib/notary'
 import NotaryDetailActions from './NotaryDetailActions'
 import CoverageMap from '@/components/CoverageMap'
 import CredentialBadges from '@/components/CredentialBadges'
+import EditCredentials from './EditCredentials'
 import BackLink from '@/components/BackLink'
 import { Star, MapPin, Phone, Mail, CheckCircle, XCircle } from 'lucide-react'
 
@@ -132,6 +133,7 @@ export default async function NotaryDetailPage({ params }: { params: Promise<{ i
             <span className="font-mono text-violet-600 text-xs">inksent.co/onboard/{notary.id}</span>
           </p>
         )}
+        <EditCredentials notaryId={notary.id} current={notary} />
       </div>
 
       {/* Coverage map */}
