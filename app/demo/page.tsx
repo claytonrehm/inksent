@@ -6,6 +6,7 @@ import BrandHeader from './BrandHeader'
 import DemoSectionNav from '@/components/DemoSectionNav'
 import DemoOrders, { type DemoOrder } from './DemoOrders'
 import DemoInvoices, { type DemoInvoice } from './DemoInvoices'
+import DemoOrderButton from './DemoOrderButton'
 import { createClient } from '@/lib/supabase/server'
 import { lookupZip } from '@/lib/coverage'
 import { credentialsEligible } from '@/lib/credentials'
@@ -120,9 +121,7 @@ export default async function DemoPage({
             <h1 className="text-2xl font-black text-gray-900">Welcome back, {firstName}</h1>
             <p className="text-gray-500 text-sm mt-1">Your signings at a glance</p>
           </div>
-          <Link href="/order" className="inline-flex items-center gap-2 bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-violet-700">
-            + New Signing Order
-          </Link>
+          <DemoOrderButton />
         </div>
 
         {/* Scorecard */}
