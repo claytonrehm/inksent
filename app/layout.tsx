@@ -24,6 +24,7 @@ export const metadata: Metadata = {
 }
 
 import SmoothScroll from '@/components/SmoothScroll'
+import Script from 'next/script'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -31,6 +32,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-full flex flex-col">
         <SmoothScroll />
         {children}
+        {/* Google Analytics 4 */}
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-E3B2DB6CBE" strategy="afterInteractive" />
+        <Script id="ga4" strategy="afterInteractive">{`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-E3B2DB6CBE');
+        `}</Script>
       </body>
     </html>
   )

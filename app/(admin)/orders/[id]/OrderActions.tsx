@@ -318,7 +318,7 @@ export default function OrderActions({ order, notaries }: { order: Order; notari
           ) : order.client_paid_at ? (
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-2.5">
-                <CheckCircle size={14} /> Client paid ${order.client_fee ? (order.client_fee / 100).toFixed(0) : '185'} on {new Date(order.client_paid_at).toLocaleDateString()}
+                <CheckCircle size={14} /> Client paid ${order.client_fee ? (order.client_fee / 100).toFixed(0) : '200'} on {new Date(order.client_paid_at).toLocaleDateString()}
               </div>
               <button onClick={refundClient} disabled={loading === 'refund'} className="text-xs text-gray-400 hover:text-red-600 underline disabled:opacity-50">
                 {loading === 'refund' ? 'Refunding…' : 'Refund this payment'}
@@ -333,7 +333,7 @@ export default function OrderActions({ order, notaries }: { order: Order; notari
               className="w-full bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
             >
               <DollarSign size={14} className="mr-1.5" />
-              Mark Client Paid (${order.client_fee ? (order.client_fee / 100).toFixed(0) : '185'})
+              Mark Client Paid (${order.client_fee ? (order.client_fee / 100).toFixed(0) : '200'})
             </Button>
           )}
         </div>

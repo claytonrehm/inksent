@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { clientFeeForType, dollars } from '@/lib/pricing'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CheckCircle } from 'lucide-react'
 import { orderSchema, type OrderSchema } from '@/lib/validations'
@@ -82,6 +83,7 @@ export default function OrderForm({ prefill }: { prefill?: OrderPrefill }) {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<OrderSchema>({
     resolver: zodResolver(orderSchema),
@@ -347,13 +349,13 @@ export default function OrderForm({ prefill }: { prefill?: OrderPrefill }) {
         </span>
       </label>
 
-      {/* Pricing summary — no surprises at submit time */}
+      {/* Pricing summary — updates with the signing type, no surprises at submit time */}
       <div className="flex items-center justify-between bg-violet-50 border border-violet-100 rounded-xl px-5 py-4">
         <div>
-          <p className="font-semibold text-gray-900 text-sm">Flat rate — $185 per signing</p>
-          <p className="text-xs text-gray-500 mt-0.5">NNA-certified agent, background-checked, automatic backup. Invoiced after the signing is completed.</p>
+          <p className="font-semibold text-gray-900 text-sm">{dollars(clientFeeForType(watch('signing_type')))} per signing</p>
+          <p className="text-xs text-gray-500 mt-0.5">Refinance $200 · Purchase $250. NNA-certified agent, background-checked, automatic backup. Invoiced after the signing is completed.</p>
         </div>
-        <span className="text-2xl font-black text-violet-700 shrink-0 ml-4">$185</span>
+        <span className="text-2xl font-black text-violet-700 shrink-0 ml-4">{dollars(clientFeeForType(watch('signing_type')))}</span>
       </div>
 
       {submitError && (

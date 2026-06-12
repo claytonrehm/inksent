@@ -4,7 +4,7 @@ import { faqSchema } from '@/lib/seo'
 export const metadata = {
   title: 'Notary Signing FAQ — Signing Agents & Title Companies | Inksent',
   description:
-    'Answers for notary signing agents (how jobs work, $90/signing pay) and title companies (30-minute confirmation, flat $185, live tracking, automatic backup).',
+    'Answers for notary signing agents (how jobs work, $90/signing pay) and title companies (30-minute confirmation, from $200 per signing, live tracking, automatic backup).',
   alternates: { canonical: '/faq' },
 }
 
@@ -22,7 +22,7 @@ const CLIENT_FAQ = [
   ['How do I send the signing documents?', 'Your confirmation email has an "Upload Documents" link. Upload the package anytime it\'s ready — your assigned agent gets it automatically, even if coverage changes.'],
   ['What if the assigned notary cancels?', 'We automatically re-offer the job to other covering agents and re-route your documents to whoever takes it — you never have to re-send anything or scramble for a replacement.'],
   ['Can I track the status?', 'Yes — your confirmation email includes a live tracking link showing real-time status and your assigned agent.'],
-  ['How much does it cost?', '$185 flat per signing. No contracts, no minimums, no surprise fees. Pay securely online by card or ACH via Stripe (other methods available for established partners), due within 30 days of completion.'],
+  ['How much does it cost?', '$200 per signing for refinances and $250 for purchases — no contracts, no minimums, no surprise fees. Volume rates available for established partners. Pay securely online by card or ACH via Stripe, due within 30 days of completion.'],
   ['Do you cover my area?', 'We dispatch nationwide. Coverage depends on agent availability in a given ZIP — submit an order and we\'ll confirm fast.'],
 ]
 

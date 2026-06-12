@@ -29,18 +29,18 @@ const STATS = [
 ]
 
 const ORDERS: DemoOrder[] = [
-  { ref: 'SUM-26-1087', conf: 'ND-260610-A1B2C3', date: 'Today · 4:00 PM', signer: 'Maria & Luis Reyes', loc: 'Chula Vista, CA', agent: 'En route — Rosaura O.', fee: '$185', status: 'En Route', color: 'bg-blue-100 text-blue-800', type: 'Purchase' },
-  { ref: 'SUM-26-1085', conf: 'ND-260610-D4E5F6', date: 'Today · 1:30 PM', signer: 'James Whitfield', loc: 'Carlsbad, CA', agent: 'Confirmed — Mikhail S.', fee: '$185', status: 'Agent Confirmed', color: 'bg-violet-100 text-violet-800', type: 'Refinance' },
-  { ref: 'SUM-26-1090', conf: 'ND-260610-G7H8I9', date: 'Today · 5:30 PM', signer: 'Priya Nair', loc: 'Irvine, CA', agent: 'Finding agent…', fee: '$185', status: 'Finding Agent', color: 'bg-amber-100 text-amber-800', type: 'HELOC' },
-  { ref: 'SUM-26-1079', conf: 'ND-260609-J1K2L3', date: 'Yesterday', signer: 'Robert Chen', loc: 'San Diego, CA', agent: 'Lynn Daniels', fee: '$185', status: 'Completed', color: 'bg-green-100 text-green-800', type: 'Refinance' },
-  { ref: 'SUM-26-1078', conf: 'ND-260609-M4N5O6', date: 'Yesterday', signer: 'Tara Mitchell', loc: 'El Cajon, CA', agent: 'Marika Dalesandro', fee: '$185', status: 'Completed', color: 'bg-green-100 text-green-800', type: 'Purchase' },
-  { ref: 'SUM-26-1074', conf: 'ND-260608-P7Q8R9', date: 'Jun 8', signer: 'David & Anne Park', loc: 'Temecula, CA', agent: 'Michael Krause', fee: '$185', status: 'Completed', color: 'bg-green-100 text-green-800', type: 'Seller Package' },
+  { ref: 'SUM-26-1087', conf: 'ND-260610-A1B2C3', date: 'Today · 4:00 PM', signer: 'Maria & Luis Reyes', loc: 'Chula Vista, CA', agent: 'En route — Rosaura O.', fee: '$250', status: 'En Route', color: 'bg-blue-100 text-blue-800', type: 'Purchase' },
+  { ref: 'SUM-26-1085', conf: 'ND-260610-D4E5F6', date: 'Today · 1:30 PM', signer: 'James Whitfield', loc: 'Carlsbad, CA', agent: 'Confirmed — Mikhail S.', fee: '$200', status: 'Agent Confirmed', color: 'bg-violet-100 text-violet-800', type: 'Refinance' },
+  { ref: 'SUM-26-1090', conf: 'ND-260610-G7H8I9', date: 'Today · 5:30 PM', signer: 'Priya Nair', loc: 'Irvine, CA', agent: 'Finding agent…', fee: '$200', status: 'Finding Agent', color: 'bg-amber-100 text-amber-800', type: 'HELOC' },
+  { ref: 'SUM-26-1079', conf: 'ND-260609-J1K2L3', date: 'Yesterday', signer: 'Robert Chen', loc: 'San Diego, CA', agent: 'Lynn Daniels', fee: '$200', status: 'Completed', color: 'bg-green-100 text-green-800', type: 'Refinance' },
+  { ref: 'SUM-26-1078', conf: 'ND-260609-M4N5O6', date: 'Yesterday', signer: 'Tara Mitchell', loc: 'El Cajon, CA', agent: 'Marika Dalesandro', fee: '$250', status: 'Completed', color: 'bg-green-100 text-green-800', type: 'Purchase' },
+  { ref: 'SUM-26-1074', conf: 'ND-260608-P7Q8R9', date: 'Jun 8', signer: 'David & Anne Park', loc: 'Temecula, CA', agent: 'Michael Krause', fee: '$200', status: 'Completed', color: 'bg-green-100 text-green-800', type: 'Seller Package' },
 ]
 
 const INVOICES: DemoInvoice[] = [
-  { inv: 'INV-9F2K', signer: 'Robert Chen', type: 'Refinance', date: 'Jun 9', loc: 'San Diego, CA', amount: '$185', status: 'Paid' },
-  { inv: 'INV-9F1A', signer: 'Tara Mitchell', type: 'Purchase', date: 'Jun 9', loc: 'El Cajon, CA', amount: '$185', status: 'Due' },
-  { inv: 'INV-8E7C', signer: 'David & Anne Park', type: 'Seller Package', date: 'Jun 8', loc: 'Temecula, CA', amount: '$185', status: 'Paid' },
+  { inv: 'INV-9F2K', signer: 'Robert Chen', type: 'Refinance', date: 'Jun 9', loc: 'San Diego, CA', amount: '$200', status: 'Paid' },
+  { inv: 'INV-9F1A', signer: 'Tara Mitchell', type: 'Purchase', date: 'Jun 9', loc: 'El Cajon, CA', amount: '$250', status: 'Due' },
+  { inv: 'INV-8E7C', signer: 'David & Anne Park', type: 'Seller Package', date: 'Jun 8', loc: 'Temecula, CA', amount: '$200', status: 'Paid' },
 ]
 
 const TIMELINE = [

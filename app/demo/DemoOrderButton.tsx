@@ -19,7 +19,9 @@ function tomorrow() {
 
 export default function DemoOrderButton() {
   const [open, setOpen] = useState(false)
+  const [type, setType] = useState('Refinance')
   const [result, setResult] = useState<{ conf: string; signer: string; city: string } | null>(null)
+  const fee = type === 'Purchase' ? '$250' : '$200'
 
   function close() {
     setOpen(false)
@@ -76,7 +78,7 @@ export default function DemoOrderButton() {
                   <p className="text-sm text-gray-500">Pre-filled with sample data — just hit <strong className="text-gray-700">Place Order</strong> to see what happens next.</p>
                   <div className="grid grid-cols-2 gap-3">
                     <div><label className={label}>Your file / order #</label><input name="ref" defaultValue="SUM-26-1092" className={input} /></div>
-                    <div><label className={label}>Signing type</label><select name="type" defaultValue="Refinance" className={input}>{TYPES.map((t) => <option key={t}>{t}</option>)}</select></div>
+                    <div><label className={label}>Signing type</label><select name="type" value={type} onChange={(e) => setType(e.target.value)} className={input}>{TYPES.map((t) => <option key={t}>{t}</option>)}</select></div>
                   </div>
                   <div><label className={label}>Signer name(s)</label><input name="signer" defaultValue="Daniel & Erin Foster" className={input} /></div>
                   <div><label className={label}>Property address</label><input name="address" defaultValue="1420 Seacoast Dr" className={input} /></div>
@@ -93,7 +95,7 @@ export default function DemoOrderButton() {
 
                 {/* Footer (fixed, always visible) */}
                 <div className="flex items-center justify-between gap-3 p-4 border-t border-gray-100 shrink-0">
-                  <span className="text-sm text-gray-500">Flat <strong className="text-gray-900">$185</strong> · ~30-min confirmation</span>
+                  <span className="text-sm text-gray-500"><strong className="text-gray-900">{fee}</strong> ({type === 'Purchase' ? 'purchase' : 'refi'}) · ~30-min confirmation</span>
                   <button type="submit" form="demoOrderForm" className="bg-violet-600 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-violet-700 shrink-0">Place Order</button>
                 </div>
               </>

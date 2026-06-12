@@ -5,7 +5,7 @@ import { createClient, createAuthClient } from '@/lib/supabase/server'
 
 export const metadata = {
   title: 'Order a Notary Signing Agent — Inksent',
-  description: 'Place a notary signing order in two minutes. Vetted, NNA-certified signing agents confirmed in ~30 minutes, flat $185, with automatic backup if anyone cancels.',
+  description: 'Place a notary signing order in two minutes. Vetted, NNA-certified signing agents confirmed in ~30 minutes, from $200 per signing, with automatic backup if anyone cancels.',
   alternates: { canonical: '/order' },
 }
 

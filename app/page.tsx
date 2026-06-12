@@ -29,7 +29,7 @@ const FEATURES = [
   { icon: <Eye size={22} />, title: 'You Know Who Shows Up', desc: 'NNA-certified, background-checked, E&O-insured, and vetted for real purchase & refi experience. Lapsed credentials are auto-blocked from your closing.' },
   { icon: <Clock size={22} />, title: '30-Minute Confirmation', desc: 'We alert every qualified agent at once; first to accept wins. No phone tag, no waiting hours.' },
   { icon: <MapPin size={22} />, title: 'Live Tracking', desc: 'Watch real-time status from a link — confirmed with agent photo, on the way, arrived, complete.' },
-  { icon: <DollarSign size={22} />, title: 'Flat-Rate, No Games', desc: 'No contracts, no minimums, no surprise fees. Pay online in one click or by check.' },
+  { icon: <DollarSign size={22} />, title: 'Transparent Pricing', desc: 'Set per-signing price, no contracts, no minimums, no surprise fees. Pay online in one click or by check.' },
 ]
 
 // Cohesive accent spectrum (indigo → violet → fuchsia → sky → pink) so the
@@ -134,7 +134,7 @@ export default function Home() {
       {/* Trust bar */}
       <div className="border-y border-white/10 bg-white/[0.02] py-4 px-6">
         <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-6 sm:gap-12 text-slate-400 text-sm font-medium">
-          {['NNA Certified Network', 'Background Checked', 'Flat-Rate Pricing', 'All 50 States'].map((item) => (
+          {['NNA Certified Network', 'Background Checked', 'Transparent Pricing', 'All 50 States'].map((item) => (
             <span key={item} className="flex items-center gap-2">
               <CheckCircle size={14} className="text-violet-400" /> {item}
             </span>
@@ -349,17 +349,17 @@ export default function Home() {
         <div className="max-w-4xl mx-auto">
           <ScrollReveal className="text-center mb-12">
             <p className="text-violet-400 font-semibold text-sm uppercase tracking-widest mb-3">Simple Pricing</p>
-            <h2 className="text-4xl font-black text-white">One flat rate. No surprises.</h2>
+            <h2 className="text-4xl font-black text-white">Straightforward pricing. No surprises.</h2>
             <p className="text-slate-400 mt-3 text-lg">No contracts, no minimums, no hidden fees.</p>
           </ScrollReveal>
           <ScrollReveal>
             <div className="gradient-border max-w-sm mx-auto rounded-3xl p-8 text-center bg-gradient-to-b from-violet-600/15 to-white/[0.02] shadow-[0_0_70px_-15px_rgba(168,85,247,0.55)] backdrop-blur-sm">
               <p className="text-violet-300 font-semibold text-sm uppercase tracking-widest mb-4">Per Signing</p>
               <div className="mb-2 flex items-baseline justify-center gap-1">
-                <span className="text-5xl sm:text-6xl font-black text-white leading-none">$185</span>
+                <span className="text-5xl sm:text-6xl font-black text-white leading-none">$200</span>
                 <span className="text-slate-400 text-lg font-semibold">/ signing</span>
               </div>
-              <p className="text-slate-400 text-sm mb-8">one transparent fee, any signing type</p>
+              <p className="text-slate-400 text-sm mb-8">$200 refinance · $250 purchase — no hidden fees</p>
               <div className="space-y-3 text-left mb-8">
                 {[
                   'All signing types — purchase, refi, HELOC, and more',

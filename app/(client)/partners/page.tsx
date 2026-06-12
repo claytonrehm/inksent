@@ -4,7 +4,7 @@ import PrintButton from './PrintButton'
 
 export const metadata = {
   title: 'Notary Signing Service for Title & Escrow Companies | Inksent',
-  description: 'A faster, more reliable notary signing service for title and escrow: vetted NNA-certified agents, 30-minute confirmation, automatic backup on cancel, live tracking, flat $185.',
+  description: 'A faster, more reliable notary signing service for title and escrow: vetted NNA-certified agents, 30-minute confirmation, automatic backup on cancel, live tracking, from $200 per signing.',
   alternates: { canonical: '/partners' },
   keywords: ['notary signing service', 'title company notary', 'escrow signing service', 'loan signing service', 'signing agent dispatch'],
 }
@@ -42,8 +42,8 @@ const EDGES = [
   },
   {
     icon: <DollarSign size={20} />,
-    title: 'Flat $185. No games.',
-    body: 'No contracts, no minimums, no surprise fees. Pay securely online by card or bank transfer (ACH) via Stripe, net-30 — established partners can arrange other methods. Bilingual agents matched on request.',
+    title: '$200 refi · $250 purchase. No games.',
+    body: 'No contracts, no minimums, no surprise fees. Pay securely online by card or bank transfer (ACH) via Stripe, net-30 — established partners can arrange volume rates and other methods. Bilingual agents matched on request.',
   },
 ]
 
@@ -116,10 +116,10 @@ export default function PartnersPage() {
             </ol>
           </div>
           <div className="bg-gradient-to-br from-violet-600 to-violet-800 rounded-xl p-6 text-white text-center flex flex-col justify-center">
-            <p className="text-violet-200 text-xs font-semibold uppercase tracking-widest mb-1">Flat Rate</p>
-            <div className="text-5xl font-black">$185</div>
-            <p className="text-violet-200 text-sm mt-1">per signing</p>
-            <p className="text-violet-100 text-xs mt-3 border-t border-white/20 pt-3">No contracts · No minimums · All signing types</p>
+            <p className="text-violet-200 text-xs font-semibold uppercase tracking-widest mb-1">Per Signing</p>
+            <div className="text-5xl font-black">$200</div>
+            <p className="text-violet-200 text-sm mt-1">refi · $250 purchase</p>
+            <p className="text-violet-100 text-xs mt-3 border-t border-white/20 pt-3">No contracts · No minimums · Volume rates available</p>
           </div>
         </div>
 

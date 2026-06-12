@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic'
 export const metadata = {
   title: 'Notary Signing Service in San Diego — Loan Signing Agents | Inksent',
   description:
-    'On-demand notary signing agents for title and escrow companies in San Diego County. NNA-certified, background-checked, E&O-insured agents confirmed in ~30 minutes, flat $185, with automatic backup if anyone cancels.',
+    'On-demand notary signing agents for title and escrow companies in San Diego County. NNA-certified, background-checked, E&O-insured agents confirmed in ~30 minutes, from $200 per signing, with automatic backup if anyone cancels.',
   alternates: { canonical: '/notary-signing-service-san-diego' },
   keywords: [
     'notary signing service San Diego', 'mobile notary San Diego', 'loan signing agent San Diego',
@@ -23,7 +23,7 @@ export const metadata = {
 
 const FAQ: [string, string][] = [
   ['How fast can you get a notary signing agent in San Diego?', 'Most signings are confirmed in about 30 minutes. We alert every qualified agent covering the area at once, and the first to accept is assigned — no phone tag or waiting for callbacks.'],
-  ['What does a notary signing typically cost?', 'A flat $185 per signing — no contracts, no minimums, and no surprise trip fees. Pay by card or ACH, with net-30 available for established title and escrow partners.'],
+  ['What does a notary signing typically cost?', '$200 per signing for refinances and $250 for purchases — no contracts, no minimums, and no surprise trip fees. Volume rates available for established title and escrow partners. Pay by card or ACH, net-30 available.'],
   ['Are your signing agents vetted and insured?', 'Yes. Every agent is NNA-certified, background-checked, and E&O-insured, and we re-verify credentials before every job. An agent with a lapsed credential is automatically blocked from being assigned.'],
   ['What happens if the assigned agent cancels?', 'The job instantly re-offers to every other covering agent until one accepts, and your document package re-routes to whoever takes it — so you never have to scramble or re-send anything.'],
   ['What types of signings do you handle?', 'Purchase, refinance, HELOC, reverse mortgage, loan modification, seller packages, loan applications, and single-document notarizations. Agents are equipped with dual-tray printers for legal + letter packages.'],
@@ -36,7 +36,7 @@ const POINTS = [
   { icon: <ShieldCheck size={20} />, title: 'Every agent vetted & insured', body: 'NNA-certified, background-checked, and E&O-insured — verified before every job. A lapsed credential auto-blocks the agent from your closing.' },
   { icon: <FileCheck2 size={20} />, title: 'Documents follow the job', body: 'Upload the package once; whoever ends up at the table gets it — even a backup. A lender re-send replaces the old set so no one signs stale docs.' },
   { icon: <MapPin size={20} />, title: 'Live tracking', body: 'Watch real-time status from a link — confirmed with agent photo, on the way, arrived, complete. Keep escrow and borrowers informed.' },
-  { icon: <CheckCircle2 size={20} />, title: 'Flat $185, no games', body: 'No contracts, no minimums, no surprise trip fees. Pay by card or ACH, net 30 for established partners.' },
+  { icon: <CheckCircle2 size={20} />, title: 'Transparent pricing, no games', body: '$200 per refinance, $250 per purchase — no contracts, no minimums, no surprise trip fees. Volume rates for established partners.' },
 ]
 
 export default async function Page() {
@@ -88,7 +88,7 @@ export default async function Page() {
               <Phone size={17} /> (619) 949-3361
             </a>
           </div>
-          <p className="text-sm text-gray-400 mt-3">No contracts · No minimums · Flat $185 per signing</p>
+          <p className="text-sm text-gray-400 mt-3">No contracts · No minimums · From $200 per signing</p>
         </section>
 
         {/* Why */}

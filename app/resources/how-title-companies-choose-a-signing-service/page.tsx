@@ -47,7 +47,7 @@ export default function Page() {
         <div className="mt-10 border border-violet-100 bg-violet-50 rounded-2xl p-6">
           <h2 className="text-xl font-black text-gray-900 mb-2">How Inksent measures up</h2>
           <p className="text-gray-700 leading-relaxed">
-            Inksent dispatches only vetted, NNA-certified, background-checked, E&amp;O-insured agents — re-verified before every job — confirms most signings in about 30 minutes, automatically re-offers a cancelled job to other covering agents, re-routes documents so no one signs a stale package, and gives you live tracking. Flat $185 per signing, no contracts or minimums. See it in action or place an order below.
+            Inksent dispatches only vetted, NNA-certified, background-checked, E&amp;O-insured agents — re-verified before every job — confirms most signings in about 30 minutes, automatically re-offers a cancelled job to other covering agents, re-routes documents so no one signs a stale package, and gives you live tracking. From $200 per signing ($250 for purchases), no contracts or minimums. See it in action or place an order below.
           </p>
         </div>
 

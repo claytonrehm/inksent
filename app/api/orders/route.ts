@@ -6,6 +6,7 @@ import { orderSchema } from '@/lib/validations'
 import { sendSMS } from '@/lib/sms'
 import { sendOrderConfirmationEmail, sendAdminOrderAlert } from '@/lib/email'
 import { blastOrderToCoveringNotaries } from '@/lib/dispatch'
+import { clientFeeForType } from '@/lib/pricing'
 import { checkRateLimit, clientIp } from '@/lib/rate-limit'
 import { format } from 'date-fns'
 
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
       .insert({
         ...orderData,
         status: 'pending',
-        client_fee: 18500,  // $185.00
+        client_fee: clientFeeForType(orderData.signing_type),  // $200 refi / $250 purchase
         notary_fee: 9000,   // $90.00
       })
       .select('id, confirmation_number, signing_date, signing_time, signing_type, signer_name, property_city, property_zip, property_address, client_name, client_email, client_company, notary_fee, language_needed')

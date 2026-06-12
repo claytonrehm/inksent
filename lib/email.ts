@@ -1,5 +1,6 @@
 import { Resend } from 'resend'
 import { format } from 'date-fns'
+import { clientFeeForType, dollars } from '@/lib/pricing'
 
 function getResend() {
   return new Resend(process.env.RESEND_API_KEY ?? 're_placeholder')
@@ -556,6 +557,7 @@ export async function sendOrderConfirmationEmail(order: {
   const timeStr = `${h % 12 || 12}:${m.toString().padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`
   const dateStr = format(new Date(order.signing_date), 'EEEE, MMMM d, yyyy')
   const typeLabel = order.signing_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  const feeStr = dollars(clientFeeForType(order.signing_type))
   const firstName = order.client_name.split(' ')[0]
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'
   const uploadUrl = order.id ? `${baseUrl}/upload/${order.id}` : null
@@ -589,7 +591,7 @@ export async function sendOrderConfirmationEmail(order: {
         ${detailRow('Date', dateStr)}
         ${detailRow('Time', timeStr)}
         ${detailRow('Location', order.property_city)}
-        ${detailRow('Fee', '<span style="font-weight:700;color:#5b21b6;">$185.00</span>', { last: true })}
+        ${detailRow('Fee', `<span style="font-weight:700;color:#5b21b6;">${feeStr}.00</span>`, { last: true })}
       </table>
 
       ${uploadUrl ? `<div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:18px 20px;margin:24px 0;">
@@ -604,7 +606,7 @@ export async function sendOrderConfirmationEmail(order: {
           ${nextItem('<strong>Now:</strong> we&rsquo;re contacting available signing agents in the area')}
           ${nextItem('<strong>Within ~30 min:</strong> you&rsquo;ll get an email with your assigned agent&rsquo;s name (we&rsquo;ll call you if coverage is tight)')}
           ${nextItem('<strong>Before the signing:</strong> upload your documents anytime — we route them to the agent automatically')}
-          ${nextItem('<strong>After completion:</strong> your $185 invoice is emailed the same day (pay by card, check, or ACH)')}
+          ${nextItem(`<strong>After completion:</strong> your ${feeStr} invoice is emailed the same day (pay by card, check, or ACH)`)}
         </table>
       </div>
 

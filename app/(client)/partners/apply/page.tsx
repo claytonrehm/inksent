@@ -6,13 +6,13 @@ import { CheckCircle } from 'lucide-react'
 
 export const metadata = {
   title: 'Become a Title Partner — Inksent',
-  description: 'Set up your title or escrow company with Inksent: vetted, insured notary signing agents, 30-minute confirmation, live tracking, flat $185, and white-glove service.',
+  description: 'Set up your title or escrow company with Inksent: vetted, insured notary signing agents, 30-minute confirmation, live tracking, from $200 per signing, and white-glove service.',
   alternates: { canonical: '/partners/apply' },
 }
 
 const PERKS = [
   'Vetted, NNA-certified, E&O-insured agents — credentials monitored automatically',
-  'Flat $185 per signing — no surprises',
+  'From $200 per signing ($250 purchases) — no surprises',
   'Confirmed within ~30 minutes, automatic backup if an agent cancels',
   'Live tracking + proactive status updates, so you never have to chase',
   'Per-signing or monthly net-30 billing — your call',
