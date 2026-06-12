@@ -7,6 +7,7 @@ import { sendSMS } from '@/lib/sms'
 import { sendOrderConfirmationEmail, sendAdminOrderAlert } from '@/lib/email'
 import { blastOrderToCoveringNotaries } from '@/lib/dispatch'
 import { clientFeeForType } from '@/lib/pricing'
+import { alertOwner } from '@/lib/alert'
 import { checkRateLimit, clientIp } from '@/lib/rate-limit'
 import { format } from 'date-fns'
 
@@ -59,6 +60,7 @@ export async function POST(req: NextRequest) {
 
     if (error) {
       console.error('Supabase error:', error)
+      alertOwner(`An order from ${body?.client_company || 'a client'} FAILED to save — a paying customer may have been lost. Check immediately.`).catch(() => {})
       return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
     }
 
@@ -123,6 +125,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ id: data.id, confirmation_number: data.confirmation_number })
   } catch (err) {
     console.error('Order creation error:', err)
+    alertOwner('An order submission CRASHED before saving — a paying customer may have been lost. Check the order form.').catch(() => {})
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

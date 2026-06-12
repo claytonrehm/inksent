@@ -8,6 +8,7 @@ import { lookupZip } from '@/lib/coverage'
 import { SIGNINGS_LABEL } from '@/lib/notary'
 import { verifyTurnstile } from '@/lib/turnstile'
 import { checkRateLimit, clientIp } from '@/lib/rate-limit'
+import { alertOwner } from '@/lib/alert'
 
 const schema = z.object({
   name: z.string().min(2),
@@ -86,6 +87,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'An application with this email already exists. We already have you on file!' }, { status: 409 })
     }
     console.error('Notary insert failed:', insertError)
+    alertOwner(`A notary application from ${d.name} FAILED to save — a potential agent was lost. Check the apply form.`).catch(() => {})
     return NextResponse.json({ error: 'Could not save application' }, { status: 500 })
   }
   const notaryId = inserted?.id as string

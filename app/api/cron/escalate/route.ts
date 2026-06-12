@@ -4,7 +4,7 @@ import { sendSMS } from '@/lib/sms'
 import { sendPaymentReminderEmail } from '@/lib/invoice'
 import { sendNotaryApprovedEmail } from '@/lib/email'
 import { chaseCredentials } from '@/lib/credential-chase'
-import { orderWasPaid, payoutNotary, hasStripe } from '@/lib/stripe'
+import { orderWasPaid, payoutNotary, hasStripe, accountPayoutsEnabled } from '@/lib/stripe'
 import { createAdminClient, hasServiceRole } from '@/lib/supabase/admin'
 import { format } from 'date-fns'
 
@@ -152,6 +152,21 @@ export async function GET(req: NextRequest) {
         if (process.env.ADMIN_PHONE) {
           await sendSMS(process.env.ADMIN_PHONE, `✅ Recovered a missed payment: ${o.confirmation_number} (${o.client_company}) is actually PAID. Reconciled — paying the notary now.`).catch(() => {})
         }
+      }
+    }
+
+    // (i-b) Un-strand notaries: a missed account.updated webhook can leave a notary
+    //   with a connected account but payouts_enabled=false forever, blocking their
+    //   pay. Re-check Stripe and flip them so the payout retry below can pay them.
+    const { data: pendingBank } = await supabase
+      .from('notaries')
+      .select('id, name, stripe_account_id')
+      .not('stripe_account_id', 'is', null)
+      .eq('payouts_enabled', false)
+    for (const n of pendingBank ?? []) {
+      if (await accountPayoutsEnabled(n.stripe_account_id as string)) {
+        await supabase.from('notaries').update({ payouts_enabled: true }).eq('id', n.id)
+        if (process.env.ADMIN_PHONE) await sendSMS(process.env.ADMIN_PHONE, `🏦 ${n.name} is now bank-connected (recovered a missed Stripe update) — releasing any pending pay.`).catch(() => {})
       }
     }
 

@@ -22,5 +22,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     sendSMS(process.env.ADMIN_PHONE, `⚠️ ${order.client_company} left a 👎 on ${order.confirmation_number}. Reach out to make it right.`).catch(() => {})
   }
 
+  // A thumbs-UP is the perfect moment to ask for a Google review (free local-SEO
+  // gold). Send the happy client straight to the review page if it's configured.
+  // Set GOOGLE_REVIEW_URL once your Business Profile is verified (its "write a
+  // review" short link); until then they just see the thank-you page.
+  if (r === 'up' && process.env.GOOGLE_REVIEW_URL) {
+    return NextResponse.redirect(process.env.GOOGLE_REVIEW_URL)
+  }
+
   return NextResponse.redirect(`${baseUrl}/feedback-thanks?r=${r}`)
 }

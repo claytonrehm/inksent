@@ -8,6 +8,18 @@ export function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!)
 }
 
+// True once a connected account can actually receive payouts. Used by the cron to
+// catch notaries whose `account.updated` webhook was missed (so they don't stay
+// stranded "bank pending" forever, blocking their just-in-time payout).
+export async function accountPayoutsEnabled(accountId: string): Promise<boolean> {
+  try {
+    const acct = await getStripe().accounts.retrieve(accountId)
+    return !!acct.payouts_enabled
+  } catch {
+    return false
+  }
+}
+
 // ─── Connect (notary payouts) ─────────────────────────────────────────────────
 
 // Create (or reuse) a Stripe Express account for a notary and return an
