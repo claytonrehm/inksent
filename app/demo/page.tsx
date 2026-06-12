@@ -3,6 +3,7 @@ import InksentLogo from '@/components/InksentLogo'
 import CoverageCheck from '@/components/CoverageCheck'
 import ClientCoverageMap, { type CoverageArea } from '@/components/ClientCoverageMap'
 import BrandHeader from './BrandHeader'
+import DemoSectionNav from '@/components/DemoSectionNav'
 import { createClient } from '@/lib/supabase/server'
 import { lookupZip } from '@/lib/coverage'
 import { credentialsEligible } from '@/lib/credentials'
@@ -104,8 +105,10 @@ export default async function DemoPage({
         </div>
       </div>
 
+      <DemoSectionNav />
+
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
-        <div className="flex items-end justify-between flex-wrap gap-3">
+        <div id="overview" className="scroll-mt-20 flex items-end justify-between flex-wrap gap-3">
           <div>
             <h1 className="text-2xl font-black text-gray-900">Welcome back, {firstName}</h1>
             <p className="text-gray-500 text-sm mt-1">Your signings at a glance</p>
@@ -127,7 +130,7 @@ export default async function DemoPage({
         </div>
 
         {/* Trust / compliance — the title company's #1 concern */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-6">
+        <div id="compliance" className="scroll-mt-20 bg-white rounded-2xl border border-gray-100 shadow-md p-6">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4 flex items-center gap-2"><ShieldCheck size={15} className="text-violet-600" /> Every agent, every time</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
@@ -149,7 +152,7 @@ export default async function DemoPage({
         </div>
 
         {/* Coverage — honest footprint + real-time check */}
-        <div>
+        <div id="coverage" className="scroll-mt-20">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-2"><MapPin size={14} className="text-violet-600" /> Where we cover for you</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-3">
@@ -175,7 +178,7 @@ export default async function DemoPage({
         </div>
 
         {/* Live tracking sample */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-6">
+        <div id="tracking" className="scroll-mt-20 bg-white rounded-2xl border border-gray-100 shadow-md p-6">
           <div className="flex items-center gap-2 mb-1">
             <MapPin size={16} className="text-violet-600" />
             <h2 className="font-bold text-gray-900">Live — Maria &amp; Luis Reyes signing</h2>
@@ -195,7 +198,7 @@ export default async function DemoPage({
         </div>
 
         {/* Orders table */}
-        <div>
+        <div id="orders" className="scroll-mt-20">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Recent Orders</h2>
           <div className="bg-white rounded-2xl border border-gray-100 shadow-md overflow-x-auto">
             <table className="w-full text-sm min-w-[760px]">
@@ -231,7 +234,7 @@ export default async function DemoPage({
         </div>
 
         {/* Invoice + closeout sample */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div id="invoices" className="scroll-mt-20 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-6">
             <div className="flex items-center gap-2 mb-2"><FileText size={16} className="text-violet-600" /><h3 className="font-bold text-gray-900">Invoices</h3></div>
             <div className="space-y-2 text-sm">
