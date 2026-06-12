@@ -13,7 +13,7 @@
  *   - app/api/coverage/route.ts              (active + onboarded + fullyCredentialed)
  *   - lib/dispatch.ts                        (dispatch eligibility filter)
  */
-import { credentialItems, fullyCredentialed } from '../lib/credentials'
+import { credentialItems, fullyCredentialed, credentialsEligible } from '../lib/credentials'
 import { notaryCoversZip } from '../lib/coverage'
 
 // ── tiny test harness ──────────────────────────────────────────────────────
@@ -68,13 +68,13 @@ function onboardSubmit(n: N, d: { nna_cert_expiry?: string; commission_expiry?: 
 function coveredForZip(bench: N[], zip: string): N[] {
   return bench
     .filter((n) => n.active === true && n.onboarded_at != null)
-    .filter((n) => fullyCredentialed(n))
+    .filter((n) => credentialsEligible(n))
     .filter((n) => notaryCoversZip(n.base_zip as string, n.coverage_radius as number, zip))
 }
 
 // lib/dispatch.ts — who an order actually blasts to.
 function dispatchEligible(bench: N[], zip: string): N[] {
-  return bench.filter((n) => n.active === true && n.onboarded_at && fullyCredentialed(n) && notaryCoversZip(n.base_zip as string, n.coverage_radius as number, zip))
+  return bench.filter((n) => n.active === true && n.onboarded_at && credentialsEligible(n) && notaryCoversZip(n.base_zip as string, n.coverage_radius as number, zip))
 }
 
 const SD = '92101'   // San Diego — agent base
@@ -135,13 +135,16 @@ check('expired E&O → dropped from coverage', coveredForZip([expiredEO], SD).le
 const notOnboarded = { ...agent, onboarded_at: null }
 check('active + fully-green but not onboarded → not advertised', coveredForZip([notOnboarded], SD).length === 0)
 
-// ── FINDING: expiring-but-still-valid behavior ──────────────────────────────
-section('7. Finding — credential inside the 30-day window (still legally valid)')
+// ── Expiring-window policy: keep working until actual expiry ─────────────────
+section('7. Expiring window — still valid until the date → keeps working, only drops at expiry')
 const expiringNNA = { ...agent, nna_cert_expiry: EXPIRING_SOON }
-const expStatus = credentialItems(expiringNNA).find((c) => c.key === 'nna')!.status
-console.log(`  → NNA expiring in 15 days reads as: '${expStatus}'`)
-console.log(`  → coverage/dispatch eligible? ${coveredForZip([expiringNNA], SD).length === 1 ? 'YES' : 'NO — dropped 30 days before actual expiry'}`)
-console.log('  \x1b[33m(behavioral note, not a failure — see summary)\x1b[0m')
+check('NNA expiring in 15 days reads as "expiring" (yellow badge)', credentialItems(expiringNNA).find((c) => c.key === 'nna')!.status === 'expiring')
+check('expiring agent STAYS coverage-eligible (no early drop)', coveredForZip([expiringNNA], SD).length === 1)
+check('expiring agent STAYS dispatch-eligible', dispatchEligible([expiringNNA], SD).length === 1)
+check('but strict fullyCredentialed (all-green admin view) = false', fullyCredentialed(expiringNNA) === false)
+const lapsedNNA = { ...agent, nna_cert_expiry: EXPIRED }
+check('once ACTUALLY expired → drops from coverage', coveredForZip([lapsedNNA], SD).length === 0)
+check('once ACTUALLY expired → drops from dispatch', dispatchEligible([lapsedNNA], SD).length === 0)
 
 // ── summary ─────────────────────────────────────────────────────────────────
 console.log(`\n\x1b[1mRESULT:\x1b[0m \x1b[32m${passed} passed\x1b[0m, ${failed > 0 ? `\x1b[31m${failed} failed\x1b[0m` : '0 failed'}`)

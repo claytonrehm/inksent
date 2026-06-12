@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { fullyCredentialed } from '@/lib/credentials'
+import { credentialsEligible } from '@/lib/credentials'
 import { formatCurrency, STATUS_COLORS, STATUS_LABELS } from '@/lib/utils'
 import { format, startOfWeek, startOfMonth } from 'date-fns'
 import Link from 'next/link'
@@ -48,13 +48,15 @@ async function getData() {
 
   const active = orders.filter(o => ['pending', 'dispatching', 'assigned', 'confirmed'].includes(o.status)).length
 
-  // Notary bench status: Approved → Profile (onboarded) → Creds (all 4 valid) → Bank.
-  // "Fully active" requires ALL of them — a notary missing/expired on any credential
-  // is NOT dispatchable, so it must never read as fully active.
+  // Notary bench status: Approved → Profile (onboarded) → Creds (all 4 on file & not
+  // lapsed) → Bank. "Fully active" requires ALL of them — a notary missing/expired on
+  // any credential is NOT dispatchable, so it must never read as fully active. An agent
+  // inside the 30-day renewal window is still valid (and still dispatched), so it counts
+  // as past the creds gate — the yellow "expiring" badge flags the renewal separately.
   const bench = (activeNotaries.data ?? []).map(n => {
     const profile = !!n.onboarded_at
     const bank = !!n.payouts_enabled
-    const creds = fullyCredentialed(n)
+    const creds = credentialsEligible(n)
     const stage = !profile ? 'profile' : !creds ? 'creds' : !bank ? 'bank' : 'active'
     return { id: n.id, name: n.name, profile, bank, creds, stage }
   })

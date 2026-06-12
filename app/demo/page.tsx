@@ -5,7 +5,7 @@ import ClientCoverageMap, { type CoverageArea } from '@/components/ClientCoverag
 import BrandHeader from './BrandHeader'
 import { createClient } from '@/lib/supabase/server'
 import { lookupZip } from '@/lib/coverage'
-import { fullyCredentialed } from '@/lib/credentials'
+import { credentialsEligible } from '@/lib/credentials'
 import { CheckCircle2, Clock, MapPin, Truck, FileText, Star, TrendingUp, ArrowRight, ShieldCheck } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
@@ -74,7 +74,7 @@ export default async function DemoPage({
   const areas: CoverageArea[] = []
   const cities = new Set<string>()
   for (const n of bench ?? []) {
-    if (!fullyCredentialed(n)) continue // only vetted & verified agents count as coverage
+    if (!credentialsEligible(n)) continue // vetted & verified, not lapsed (expiring still counts)
     const info = n.base_zip ? lookupZip(n.base_zip) : null
     if (!info) continue
     areas.push({ lat: info.latitude, lng: info.longitude, radiusMiles: n.coverage_radius ?? 25 })

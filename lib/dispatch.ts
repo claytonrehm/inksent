@@ -1,7 +1,7 @@
 import { sendSMS, buildDispatchMessage } from '@/lib/sms'
 import { sendNotaryJobOfferEmail } from '@/lib/email'
 import { notaryCoversZip } from '@/lib/coverage'
-import { fullyCredentialed } from '@/lib/credentials'
+import { credentialsEligible } from '@/lib/credentials'
 import { format } from 'date-fns'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
@@ -36,11 +36,13 @@ export async function blastOrderToCoveringNotaries(
 
   const exclude = new Set(opts.exclude ?? [])
   const active = notaries ?? []
-  // Only dispatch to FULLY-credentialed agents — all four (NNA cert, background
-  // check, E&O, commission) must be on file AND valid. A missing OR expired
-  // credential takes them out of dispatch (we chase them to provide/renew it).
-  // This is what makes the "every agent vetted & insured" promise true.
-  const credsValid = (n: Parameters<typeof fullyCredentialed>[0]) => fullyCredentialed(n)
+  // Only dispatch to credential-eligible agents — all four (NNA cert, background
+  // check, E&O, commission) must be on file and not lapsed. A missing OR expired
+  // credential takes them out of dispatch (we chase them to provide/renew it). An
+  // agent inside the 30-day renewal window is still valid until the date, so they
+  // keep receiving jobs while we chase the renewal. This keeps the "every agent
+  // vetted & insured" promise true without shrinking the bench a month early.
+  const credsValid = (n: Parameters<typeof credentialsEligible>[0]) => credentialsEligible(n)
 
   // Dispatch to agents who finished their profile + have valid credentials.
   // Bank connection is NOT required to receive jobs — we use "just-in-time"

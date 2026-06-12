@@ -118,6 +118,15 @@ export function fullyCredentialed(n: NotaryCreds): boolean {
   return credentialItems(n).every((c) => c.status === 'valid')
 }
 
+// Eligible to be DISPATCHED and advertised as coverage. Every credential must be on
+// file and not lapsed — but a credential inside the 30-day "expiring" window is STILL
+// valid until its date, so the agent keeps working (and we chase the renewal) rather
+// than dropping off the bench a month early. They only fall out at actual expiry.
+// (Stricter `fullyCredentialed` = all-green is used for the admin "fully vetted" view.)
+export function credentialsEligible(n: NotaryCreds): boolean {
+  return credentialItems(n).every((c) => c.status === 'valid' || c.status === 'expiring')
+}
+
 export interface CredAction extends CredItem { need: 'renew' | 'provide' }
 
 // What to ASK the notary for. NNA cert + background check are required, so we chase
