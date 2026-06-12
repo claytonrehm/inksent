@@ -11,6 +11,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/resources',
     '/resources/how-to-become-a-notary-signing-agent-in-california',
     '/resources/how-title-companies-choose-a-signing-service',
+    '/resources/how-much-do-notary-signing-agents-make',
+    '/resources/notary-signing-agent-vs-mobile-notary',
+    '/resources/reduce-signing-kickbacks-title-companies',
     '/faq', '/support', '/privacy', '/terms', '/notary-agreement',
   ]
   const high = new Set(['/order', '/apply', '/join', '/partners', '/notary-signing-service-san-diego', '/notary-signing-agent-jobs-san-diego'])

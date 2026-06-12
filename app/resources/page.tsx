@@ -22,6 +22,24 @@ export const ARTICLES = [
     blurb: 'What escrow and title teams should look for: vetting, turnaround time, backup-on-cancel, tracking, and transparent pricing.',
     audience: 'For title & escrow',
   },
+  {
+    slug: 'how-much-do-notary-signing-agents-make',
+    title: 'How Much Do Notary Signing Agents Make?',
+    blurb: 'A realistic look at per-signing fees, monthly earnings, the costs to factor in, and how to earn more.',
+    audience: 'For notaries',
+  },
+  {
+    slug: 'notary-signing-agent-vs-mobile-notary',
+    title: 'Notary Signing Agent vs. Mobile Notary: What’s the Difference?',
+    blurb: 'What each does, the training and pay differences, and which path earns more in real estate.',
+    audience: 'For notaries',
+  },
+  {
+    slug: 'reduce-signing-kickbacks-title-companies',
+    title: 'How Title Companies Can Reduce Signing Kickbacks',
+    blurb: 'The common causes of kickbacks — and how title teams cut them so loans fund faster.',
+    audience: 'For title & escrow',
+  },
 ] as const
 
 export default function ResourcesPage() {
