@@ -29,7 +29,45 @@ export async function POST(req: NextRequest) {
   }
 
   if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as { metadata?: { order_id?: string } }
+    const session = event.data.object as {
+      metadata?: { order_id?: string; kind?: string; hub_user_id?: string; plan?: string }
+      customer?: string | { id: string } | null
+      subscription?: string | { id: string } | null
+    }
+
+    // Notary Hub subscription (separate product from signing orders).
+    if (session.metadata?.kind === 'hub_subscription') {
+      const supabase = await createClient()
+      const hubUserId = session.metadata.hub_user_id
+      const customerId = typeof session.customer === 'string' ? session.customer : session.customer?.id ?? null
+      const subId = typeof session.subscription === 'string' ? session.subscription : session.subscription?.id ?? null
+      let status = 'active'
+      let periodEnd: string | null = null
+      if (subId) {
+        try {
+          const sub = await getStripe().subscriptions.retrieve(subId)
+          status = sub.status
+          periodEnd = sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null
+        } catch {}
+      }
+      if (hubUserId) {
+        await supabase
+          .from('hub_users')
+          .update({
+            stripe_customer_id: customerId,
+            stripe_subscription_id: subId,
+            subscription_status: status,
+            plan: session.metadata.plan ?? null,
+            current_period_end: periodEnd,
+          })
+          .eq('id', hubUserId)
+      }
+      if (process.env.ADMIN_PHONE) {
+        sendSMS(process.env.ADMIN_PHONE, `🎉 New Notary Hub subscriber (${session.metadata.plan ?? 'plan'}).`).catch(() => {})
+      }
+      return NextResponse.json({ received: true })
+    }
+
     const orderId = session.metadata?.order_id
     if (orderId) {
       const supabase = await createClient()
@@ -87,6 +125,29 @@ export async function POST(req: NextRequest) {
     // Notify ONCE, on the transition to payout-ready = fully onboarded & dispatchable
     if (n && nowEnabled && !n.payouts_enabled && process.env.ADMIN_PHONE) {
       sendSMS(process.env.ADMIN_PHONE, `✅ ${n.name} connected their bank — fully onboarded and ready for jobs!`).catch(() => {})
+    }
+  }
+
+  // Keep Hub subscription status in sync (renewals, cancellations, trial→active,
+  // payment failures). Matches the hub_user via the subscription metadata.
+  if (event.type === 'customer.subscription.updated' || event.type === 'customer.subscription.deleted') {
+    const sub = event.data.object as {
+      id: string
+      status: string
+      current_period_end: number | null
+      customer: string | { id: string }
+      metadata?: { hub_user_id?: string }
+    }
+    const supabase = await createClient()
+    const status = event.type === 'customer.subscription.deleted' ? 'canceled' : sub.status
+    const update = {
+      subscription_status: status,
+      current_period_end: sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null,
+    }
+    if (sub.metadata?.hub_user_id) {
+      await supabase.from('hub_users').update(update).eq('id', sub.metadata.hub_user_id)
+    } else {
+      await supabase.from('hub_users').update(update).eq('stripe_subscription_id', sub.id)
     }
   }
 

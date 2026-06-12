@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { format, parseISO } from 'date-fns'
 import {
   LayoutDashboard,
@@ -14,6 +15,9 @@ import {
   TrendingUp,
   CheckCircle2,
   Clock,
+  Plus,
+  Trash2,
+  X,
 } from 'lucide-react'
 import { formatCurrency, STATUS_LABELS, STATUS_COLORS, cn } from '@/lib/utils'
 import type { HubMetrics, EnrichedOrder } from '@/lib/notary-metrics'
@@ -83,12 +87,18 @@ export default function NotaryHub({
   baseZip,
   mileageRate,
   metrics,
+  editable = false,
+  showPayoutConnect = false,
 }: {
   notaryId: string
   payoutsEnabled: boolean
   baseZip: string | null
   mileageRate: number
   metrics: HubMetrics
+  /** Subscriber mode — can add/delete their own manually-entered jobs. */
+  editable?: boolean
+  /** Show the Inksent "connect your bank" payout CTA (roster agents only). */
+  showPayoutConnect?: boolean
 }) {
   const [tab, setTab] = useState<Tab>('overview')
 
@@ -115,9 +125,9 @@ export default function NotaryHub({
         </div>
       </div>
 
-      {tab === 'overview' && <Overview metrics={metrics} notaryId={notaryId} />}
-      {tab === 'jobs' && <Jobs metrics={metrics} />}
-      {tab === 'paid' && <GetPaid metrics={metrics} payoutsEnabled={payoutsEnabled} notaryId={notaryId} />}
+      {tab === 'overview' && <Overview metrics={metrics} notaryId={notaryId} editable={editable} onAddJob={() => setTab('jobs')} />}
+      {tab === 'jobs' && <Jobs metrics={metrics} editable={editable} />}
+      {tab === 'paid' && <GetPaid metrics={metrics} showPayoutConnect={showPayoutConnect} notaryId={notaryId} />}
       {tab === 'mileage' && <Mileage metrics={metrics} baseZip={baseZip} mileageRate={mileageRate} />}
     </>
   )
@@ -125,9 +135,30 @@ export default function NotaryHub({
 
 /* ----------------------------- Overview ----------------------------- */
 
-function Overview({ metrics, notaryId }: { metrics: HubMetrics; notaryId: string }) {
+function Overview({
+  metrics,
+  notaryId,
+  editable,
+  onAddJob,
+}: {
+  metrics: HubMetrics
+  notaryId: string
+  editable: boolean
+  onAddJob: () => void
+}) {
   return (
     <div className="space-y-6">
+      {editable && metrics.jobs.length === 0 && (
+        <div className="bg-violet-50 border border-violet-200 rounded-2xl px-5 py-4 flex items-center justify-between gap-4">
+          <div>
+            <p className="font-semibold text-gray-900 text-sm">Add your first signing</p>
+            <p className="text-xs text-gray-500">Log your jobs and we&apos;ll build your earnings, payment, and mileage reports automatically.</p>
+          </div>
+          <button onClick={onAddJob} className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg bg-violet-600 text-white hover:bg-violet-700 transition-colors">
+            <Plus size={15} /> Add job
+          </button>
+        </div>
+      )}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="This month" value={formatCurrency(metrics.mtdEarningsCents)} sub={`${metrics.jobsThisMonth} signings`} accent="violet" icon={<TrendingUp size={16} />} />
         <StatCard label="Year to date" value={formatCurrency(metrics.ytdEarningsCents)} sub="Gross earnings" accent="sky" icon={<Wallet size={16} />} />
