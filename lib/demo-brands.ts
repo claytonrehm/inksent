@@ -1,0 +1,28 @@
+// Auto-generated short demo slugs → branding. Edit via /tmp/slugs.mjs or by hand.
+export type DemoBrand = { co: string; contact?: string; email?: string; domain?: string; logo?: string }
+export const DEMO_BRANDS: Record<string, DemoBrand> = {
+  'pickford': { co: 'Pickford Escrow', contact: 'Karyn', email: 'KDillon@pickfordescrow.com', domain: 'pickfordescrow.com', logo: 'https://pickfordescrow.com/wp-content/uploads/2021/12/Pickford-Escrow_2020-Logo_Black-CMYK-300x51.png' },
+  'allison-mccloskey': { co: 'Allison-McCloskey Escrow Company', contact: 'Alicia', email: 'alicia@amecsd.com', domain: 'amecsd.com' },
+  'alliance': { co: 'Alliance Escrow Inc', contact: 'Josh', email: 'josh@allianceescrowinc.com', domain: 'allianceescrowinc.com', logo: 'https://www.allianceescrowinc.com/wp-content/themes/alliance/img/logo.png' },
+  'oakwood': { co: 'Oakwood Escrow', contact: 'Pam', email: 'PamR@Oakwoodescrow.com', domain: 'oakwoodescrow.com', logo: 'https://www.oakwoodescrow.com/wp-content/uploads/2019/07/OakwoodLogo19-300x194.png' },
+  'heritage': { co: 'The Heritage Escrow Company', contact: 'Lory', email: 'llomeli@pangogroup.com', domain: 'pangogroup.com', logo: 'https://pangogroup.com/wp-content/uploads/2019/06/PangoLogo.png' },
+  'glen-oaks': { co: 'Glen Oaks Escrow', contact: 'Lisa', email: 'teamlisa@glenoaksescrow.com', domain: 'glenoaksescrow.com', logo: 'https://glenoaksescrow.com/wp-content/uploads/GOE-LOGO-copy-1.png' },
+  'elite-san': { co: 'Elite Escrow Services of San Diego', contact: 'Genia', email: 'Genia@EliteEscrowServices.com', domain: 'eliteescrowservices.com' },
+  'generations': { co: 'Generations Escrow', contact: 'Jesse', email: 'jwarner@genescrow.com', domain: 'genescrow.com' },
+  'grossmont': { co: 'Grossmont Escrow Co.', contact: 'Caren', email: 'careng@grossmontescrow.com', domain: 'grossmontescrow.com' },
+  'options': { co: 'Escrow Options Group', contact: 'Brittney', email: 'Carlsbad@EscrowOptions.com', domain: 'escrowoptions.com', logo: 'https://escrowoptions.com/wp-content/uploads/2020/03/logo_black.png' },
+  'coast-cities': { co: 'Coast Cities Escrow', contact: 'Tina', email: 'tpatterson@coastcitiesescrow.com', domain: 'coastcitiesescrow.com', logo: 'https://coastcitiesescrow.com/wp-content/uploads/2020/04/coast-cities-escrow-logo.svg' },
+  'case': { co: 'Case Escrow Inc', contact: 'Catherine', email: 'catherine@caseescrow.com', domain: 'caseescrow.com', logo: 'https://8j9.7cf.myftpupload.com/wp-content/uploads/2018/06/case-butterfly.png' },
+  'affinity': { co: 'Affinity Escrow Services', contact: 'Jamie', email: 'jamie@affinityescrowservices.com', domain: 'affinityescrowservices.com', logo: 'https://www.affinityescrowservices.com/wp-content/themes/affinity/images/logo.png' },
+  'san-dieguito': { co: 'San Dieguito Escrow Inc', contact: 'Donia', email: 'donia@sandieguitoescrow.com', domain: 'sandieguitoescrow.com' },
+  'oak-tree': { co: 'Oak Tree Escrows', contact: 'Bobbi', email: 'Bobbi@OakTreeEscrow.com', domain: 'oaktreeescrow.com' },
+  'la-mesa': { co: 'La Mesa Fund Control & Escrow', contact: 'Valerie', email: 'valerie@lmfce.com', domain: 'lmfce.com', logo: 'https://www.lamesafundcontrol.com/wp-content/uploads/2023/10/Picture1.png' },
+  'fidelity': { co: 'Fidelity National Title', contact: 'Jasmine', email: 'Jasmine.Corado@fnf.com', domain: 'fnf.com' },
+  'stewart': { co: 'Stewart Title', contact: 'Marissa', email: 'mojeda@stewart.com', domain: 'stewart.com', logo: 'https://www.stewart.com/-/media/images/stewartdotcom/headerlogo.png' },
+  'ticor': { co: 'Ticor Title', contact: 'Carrie', email: 'cdhaynes@ticortitle.com', domain: 'ticortitle.com', logo: 'https://ticortitle.com/images/FNFlogo.png' },
+  'lawyers': { co: 'Lawyers Title', contact: 'Stacie', email: 'Stacie.Ryales@ltic.com', domain: 'ltic.com' },
+  'wfg': { co: 'WFG National Title', contact: 'Nancy', email: 'teamluna@wfgtitleco.com', domain: 'wfgtitleco.com' },
+  'socal': { co: 'SoCal Title Company', contact: 'Rodney', email: 'rodneylobato@sctitle.com', domain: 'sctitle.com', logo: 'https://cdn.prod.website-files.com/6893c8ea676275c2fb541df2/6893cfe1c64990ad25cb0c91_So-Cal-Title-Final-Logo-1-980x356.png' },
+  'open': { co: 'Open Escrow', contact: 'Nicole', email: 'TeamRestine@OpenEscrowNow.com', domain: 'openescrownow.com', logo: 'https://openescrownow.com/wp-content/uploads/2016/11/Open-Escrow-Logo-Horizontal-cropped.png' },
+  'lennar': { co: 'Lennar Title', contact: 'Sherri', email: 'Sherri.Vesneski@lennartitle.com', domain: 'lennartitle.com', logo: 'https://lennartitle.com/Portals/0/Images/lennar-title.png?ver=Jx1ERBD6p7uzktxTFtMVAA%3d%3d' },
+}

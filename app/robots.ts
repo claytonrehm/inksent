@@ -25,6 +25,7 @@ export default function robots(): MetadataRoute.Robots {
         '/hub',
         '/login',
         '/demo',
+        '/d/',
         '/feedback-thanks',
         '/track/',
         '/upload/',
