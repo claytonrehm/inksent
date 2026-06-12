@@ -277,13 +277,11 @@ export default function Home() {
               <p className="text-slate-400 text-lg leading-relaxed mb-8">
                 Every Inksent agent gets the Notary Hub free — a private portal that tracks your earnings, shows exactly
                 what you&apos;re owed, and turns your signings into tax-ready reports. No spreadsheets, no data entry.
-                Not one of our agents? Subscribe and track every signing you do, anywhere.
+                Not yet an Inksent agent? Apply to join — the Hub comes free with the network.
               </p>
 
               <div className="flex flex-wrap items-center gap-2 mb-8">
-                <span className="text-xs font-semibold text-emerald-300 bg-emerald-500/15 border border-emerald-500/20 rounded-full px-3 py-1.5">Free for Inksent agents</span>
-                <span className="text-xs font-semibold text-slate-200 bg-white/5 border border-white/10 rounded-full px-3 py-1.5">$12/mo · $99/yr for everyone else</span>
-                <span className="text-xs font-medium text-slate-400">14-day free trial</span>
+                <span className="text-xs font-semibold text-emerald-300 bg-emerald-500/15 border border-emerald-500/20 rounded-full px-3 py-1.5">100% free for approved Inksent agents</span>
               </div>
 
               <div className="space-y-4 mb-9">
@@ -444,6 +442,8 @@ export default function Home() {
               <Link href="/partners" className="hover:text-slate-300 transition-colors">For Title Companies</Link>
               <span className="hidden sm:block">·</span>
               <Link href="/order" className="hover:text-slate-300 transition-colors">Place an Order</Link>
+              <span className="hidden sm:block">·</span>
+              <Link href="/tools/signing-check" className="hover:text-slate-300 transition-colors">Free Doc Check</Link>
             </div>
           </div>
           {/* Service-area links — internal links help these pages rank locally */}
