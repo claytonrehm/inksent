@@ -1,4 +1,8 @@
-export const metadata = { title: 'Privacy Policy — Inksent' }
+export const metadata = {
+  title: 'Privacy Policy — Inksent',
+  description: 'How Inksent collects, uses, and protects the information of title companies, signing agents, and signers who use our notary signing service.',
+  alternates: { canonical: '/privacy' },
+}
 
 export default function PrivacyPage() {
   return (

@@ -1,4 +1,8 @@
-export const metadata = { title: 'Independent Contractor Agreement — Inksent' }
+export const metadata = {
+  title: 'Independent Contractor Agreement — Inksent',
+  description: 'The independent-contractor terms for notary signing agents in the Inksent network — payment, responsibilities, and conduct.',
+  alternates: { canonical: '/notary-agreement' },
+}
 
 export default function NotaryAgreementPage() {
   return (

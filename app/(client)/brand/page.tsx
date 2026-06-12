@@ -1,5 +1,5 @@
 /* Logo concept comparison — visit /brand to pick an icon. Internal use. */
-export const metadata = { title: 'Brand Concepts — Inksent' }
+export const metadata = { title: 'Brand Concepts — Inksent', robots: { index: false, follow: false } }
 
 type IconProps = { size?: number }
 

@@ -436,6 +436,8 @@ export default function Home() {
               <Link href="/hub/login" className="hover:text-slate-300 transition-colors">Notary Login</Link>
               <span className="hidden sm:block">·</span>
               <Link href="/partners" className="hover:text-slate-300 transition-colors">For Title Companies</Link>
+              <span className="hidden sm:block">·</span>
+              <Link href="/order" className="hover:text-slate-300 transition-colors">Place an Order</Link>
             </div>
           </div>
           {/* Service-area links — internal links help these pages rank locally */}
@@ -453,7 +455,7 @@ export default function Home() {
               <Link href="/faq" className="hover:text-slate-400 transition-colors">FAQ</Link>
               <Link href="/privacy" className="hover:text-slate-400 transition-colors">Privacy</Link>
               <Link href="/terms" className="hover:text-slate-400 transition-colors">Terms</Link>
-              <a href="mailto:support@inksent.co" className="hover:text-slate-400 transition-colors">Support</a>
+              <Link href="/support" className="hover:text-slate-400 transition-colors">Support</Link>
             </div>
           </div>
         </div>

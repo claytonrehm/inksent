@@ -96,19 +96,23 @@ export default function OrderForm({ prefill }: { prefill?: OrderPrefill }) {
       setSubmitError('Please accept the Terms of Service and Privacy Policy to place your order.')
       return
     }
-    const res = await fetch('/api/orders', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...data, turnstileToken: captchaToken, terms_accepted: agreed }),
-    })
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...data, turnstileToken: captchaToken, terms_accepted: agreed }),
+      })
 
-    if (!res.ok) {
-      setSubmitError('Something went wrong. Please try again or call us.')
-      return
+      if (!res.ok) {
+        setSubmitError('Something went wrong. Please try again or call us at (619) 949-3361.')
+        return
+      }
+
+      const result = await res.json()
+      setConfirmation(result)
+    } catch {
+      setSubmitError('We couldn\'t reach our servers. Please check your connection and try again, or call (619) 949-3361.')
     }
-
-    const result = await res.json()
-    setConfirmation(result)
   }
 
   if (confirmation) {

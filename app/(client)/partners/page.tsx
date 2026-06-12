@@ -1,6 +1,8 @@
 import { ShieldCheck, FileCheck2, MapPin, Clock, Eye, DollarSign, Phone, Mail, ArrowRight, Lock } from 'lucide-react'
 import Link from 'next/link'
 import PrintButton from './PrintButton'
+import JsonLd from '@/components/JsonLd'
+import { organizationSchema } from '@/lib/seo'
 
 export const metadata = {
   title: 'Notary Signing Service for Title & Escrow Companies | Inksent',
@@ -52,13 +54,14 @@ export default function PartnersPage() {
     <main className="bg-white text-gray-900">
       <PrintButton />
 
+      <JsonLd data={organizationSchema} />
       <div className="max-w-3xl mx-auto px-8 py-12 print:py-6">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 pb-6 mb-8">
-          <div className="text-2xl font-black tracking-tight">
+          <Link href="/" className="text-2xl font-black tracking-tight">
             <span className="text-gray-900">ink</span><span className="text-violet-600">sent</span>
             <span className="block text-[10px] font-semibold tracking-[0.25em] text-gray-400 uppercase mt-0.5">Signing Services</span>
-          </div>
+          </Link>
           <div className="text-right text-sm text-gray-500">
             <a href="tel:+16199493361" className="flex items-center justify-end gap-1.5 font-semibold text-gray-700"><Phone size={13} /> (619) 949-3361</a>
             <a href="mailto:support@inksent.co" className="flex items-center justify-end gap-1.5"><Mail size={12} /> support@inksent.co</a>

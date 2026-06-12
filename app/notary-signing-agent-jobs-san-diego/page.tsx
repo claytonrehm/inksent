@@ -138,6 +138,7 @@ export default function Page() {
           <div className="flex gap-5">
             <Link href="/join" className="hover:text-gray-800">Notary Network</Link>
             <Link href="/partners" className="hover:text-gray-800">For Title Companies</Link>
+            <Link href="/resources" className="hover:text-gray-800">Resources</Link>
             <Link href="/faq" className="hover:text-gray-800">FAQ</Link>
             <a href="mailto:support@inksent.co" className="hover:text-gray-800 flex items-center gap-1"><Mail size={12} /> Contact</a>
           </div>

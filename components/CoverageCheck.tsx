@@ -27,7 +27,7 @@ export default function CoverageCheck() {
       <p className="font-bold text-gray-900 text-sm mb-1 flex items-center gap-1.5"><MapPin size={15} className="text-violet-600" /> Check coverage for a closing</p>
       <p className="text-xs text-gray-500 mb-3">Enter a property ZIP to see who we can staff there right now.</p>
       <div className="flex gap-2">
-        <input value={zip} maxLength={5} inputMode="numeric" placeholder="92101"
+        <input value={zip} maxLength={5} inputMode="numeric" placeholder="92101" aria-label="Property ZIP code"
           onChange={(e) => { setZip(e.target.value.replace(/\D/g, '')); setRes(null) }}
           onKeyDown={(e) => e.key === 'Enter' && check()}
           className="w-32 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500" />

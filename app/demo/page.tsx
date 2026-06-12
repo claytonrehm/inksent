@@ -17,6 +17,7 @@ export const dynamic = 'force-dynamic'
 export const metadata = {
   title: 'Live Demo — Inksent Title Partner Portal',
   description: 'See exactly what your title company portal looks like with Inksent — orders, live tracking, invoices, and metrics.',
+  robots: { index: false, follow: false },
 }
 
 const STATS = [

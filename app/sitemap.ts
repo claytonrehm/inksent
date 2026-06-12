@@ -11,7 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/resources',
     '/resources/how-to-become-a-notary-signing-agent-in-california',
     '/resources/how-title-companies-choose-a-signing-service',
-    '/faq', '/privacy', '/terms', '/notary-agreement',
+    '/faq', '/support', '/privacy', '/terms', '/notary-agreement',
   ]
   const high = new Set(['/order', '/apply', '/join', '/partners', '/notary-signing-service-san-diego', '/notary-signing-agent-jobs-san-diego'])
   return routes.map((path) => ({

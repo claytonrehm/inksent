@@ -1,4 +1,8 @@
-export const metadata = { title: 'Terms of Service — Inksent' }
+export const metadata = {
+  title: 'Terms of Service — Inksent',
+  description: 'The terms governing use of Inksent\'s notary signing dispatch service by title companies, escrow officers, and signing agents.',
+  alternates: { canonical: '/terms' },
+}
 
 export default function TermsPage() {
   return (
