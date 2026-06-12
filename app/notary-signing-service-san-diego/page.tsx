@@ -98,7 +98,7 @@ export default async function Page() {
 
         {/* Coverage */}
         <section>
-          <h2 className="text-2xl font-black mb-3">Where we cover in San Diego County</h2>
+          <h2 className="text-2xl font-black mb-3">Where we cover — San Diego County &amp; surrounding areas</h2>
           {coveredCities.length > 0 ? (
             <>
               <p className="text-gray-600 mb-4">Active signing agents currently serving:</p>
