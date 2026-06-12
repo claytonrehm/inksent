@@ -4,10 +4,12 @@ import CoverageCheck from '@/components/CoverageCheck'
 import ClientCoverageMap, { type CoverageArea } from '@/components/ClientCoverageMap'
 import BrandHeader from './BrandHeader'
 import DemoSectionNav from '@/components/DemoSectionNav'
+import DemoOrders, { type DemoOrder } from './DemoOrders'
+import DemoInvoices, { type DemoInvoice } from './DemoInvoices'
 import { createClient } from '@/lib/supabase/server'
 import { lookupZip } from '@/lib/coverage'
 import { credentialsEligible } from '@/lib/credentials'
-import { CheckCircle2, Clock, MapPin, Truck, FileText, Star, TrendingUp, ArrowRight, ShieldCheck } from 'lucide-react'
+import { CheckCircle2, Clock, MapPin, Truck, Star, TrendingUp, ArrowRight, ShieldCheck } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,14 +27,19 @@ const STATS = [
   { label: 'Est. staff hours saved', value: '31 hrs', icon: <TrendingUp size={15} /> },
 ]
 
-type Row = { ref: string; conf: string; date: string; signer: string; loc: string; agent: string; fee: string; status: string; color: string }
-const ORDERS: Row[] = [
-  { ref: 'SUM-26-1087', conf: 'ND-260610-A1B2C3', date: 'Today · 4:00 PM', signer: 'Maria & Luis Reyes', loc: 'Chula Vista, CA', agent: 'En route — Rosaura O.', fee: '$185', status: 'En Route', color: 'bg-blue-100 text-blue-800' },
-  { ref: 'SUM-26-1085', conf: 'ND-260610-D4E5F6', date: 'Today · 1:30 PM', signer: 'James Whitfield', loc: 'Carlsbad, CA', agent: 'Confirmed — Mikhail S.', fee: '$185', status: 'Agent Confirmed', color: 'bg-violet-100 text-violet-800' },
-  { ref: 'SUM-26-1090', conf: 'ND-260610-G7H8I9', date: 'Today · 5:30 PM', signer: 'Priya Nair', loc: 'Irvine, CA', agent: 'Finding agent…', fee: '$185', status: 'Finding Agent', color: 'bg-amber-100 text-amber-800' },
-  { ref: 'SUM-26-1079', conf: 'ND-260609-J1K2L3', date: 'Yesterday', signer: 'Robert Chen', loc: 'San Diego, CA', agent: 'Lynn Daniels', fee: '$185', status: 'Completed', color: 'bg-green-100 text-green-800' },
-  { ref: 'SUM-26-1078', conf: 'ND-260609-M4N5O6', date: 'Yesterday', signer: 'Tara Mitchell', loc: 'El Cajon, CA', agent: 'Marika Dalesandro', fee: '$185', status: 'Completed', color: 'bg-green-100 text-green-800' },
-  { ref: 'SUM-26-1074', conf: 'ND-260608-P7Q8R9', date: 'Jun 8', signer: 'David & Anne Park', loc: 'Temecula, CA', agent: 'Michael Krause', fee: '$185', status: 'Completed', color: 'bg-green-100 text-green-800' },
+const ORDERS: DemoOrder[] = [
+  { ref: 'SUM-26-1087', conf: 'ND-260610-A1B2C3', date: 'Today · 4:00 PM', signer: 'Maria & Luis Reyes', loc: 'Chula Vista, CA', agent: 'En route — Rosaura O.', fee: '$185', status: 'En Route', color: 'bg-blue-100 text-blue-800', type: 'Purchase' },
+  { ref: 'SUM-26-1085', conf: 'ND-260610-D4E5F6', date: 'Today · 1:30 PM', signer: 'James Whitfield', loc: 'Carlsbad, CA', agent: 'Confirmed — Mikhail S.', fee: '$185', status: 'Agent Confirmed', color: 'bg-violet-100 text-violet-800', type: 'Refinance' },
+  { ref: 'SUM-26-1090', conf: 'ND-260610-G7H8I9', date: 'Today · 5:30 PM', signer: 'Priya Nair', loc: 'Irvine, CA', agent: 'Finding agent…', fee: '$185', status: 'Finding Agent', color: 'bg-amber-100 text-amber-800', type: 'HELOC' },
+  { ref: 'SUM-26-1079', conf: 'ND-260609-J1K2L3', date: 'Yesterday', signer: 'Robert Chen', loc: 'San Diego, CA', agent: 'Lynn Daniels', fee: '$185', status: 'Completed', color: 'bg-green-100 text-green-800', type: 'Refinance' },
+  { ref: 'SUM-26-1078', conf: 'ND-260609-M4N5O6', date: 'Yesterday', signer: 'Tara Mitchell', loc: 'El Cajon, CA', agent: 'Marika Dalesandro', fee: '$185', status: 'Completed', color: 'bg-green-100 text-green-800', type: 'Purchase' },
+  { ref: 'SUM-26-1074', conf: 'ND-260608-P7Q8R9', date: 'Jun 8', signer: 'David & Anne Park', loc: 'Temecula, CA', agent: 'Michael Krause', fee: '$185', status: 'Completed', color: 'bg-green-100 text-green-800', type: 'Seller Package' },
+]
+
+const INVOICES: DemoInvoice[] = [
+  { inv: 'INV-9F2K', signer: 'Robert Chen', type: 'Refinance', date: 'Jun 9', loc: 'San Diego, CA', amount: '$185', status: 'Paid' },
+  { inv: 'INV-9F1A', signer: 'Tara Mitchell', type: 'Purchase', date: 'Jun 9', loc: 'El Cajon, CA', amount: '$185', status: 'Due' },
+  { inv: 'INV-8E7C', signer: 'David & Anne Park', type: 'Seller Package', date: 'Jun 8', loc: 'Temecula, CA', amount: '$185', status: 'Paid' },
 ]
 
 const TIMELINE = [
@@ -200,50 +207,12 @@ export default async function DemoPage({
         {/* Orders table */}
         <div id="orders" className="scroll-mt-20">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Recent Orders</h2>
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-md overflow-x-auto">
-            <table className="w-full text-sm min-w-[760px]">
-              <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
-                <tr>
-                  <th className="px-5 py-3 text-left">Your Ref / Conf #</th>
-                  <th className="px-5 py-3 text-left">When</th>
-                  <th className="px-5 py-3 text-left">Signer</th>
-                  <th className="px-5 py-3 text-left">Location</th>
-                  <th className="px-5 py-3 text-left">Agent</th>
-                  <th className="px-5 py-3 text-left">Fee</th>
-                  <th className="px-5 py-3 text-left">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {ORDERS.map((o) => (
-                  <tr key={o.conf} className="hover:bg-gray-50">
-                    <td className="px-5 py-3">
-                      <div className="text-xs font-semibold text-gray-800">{o.ref}</div>
-                      <div className="font-mono text-xs text-gray-400">{o.conf}</div>
-                    </td>
-                    <td className="px-5 py-3 whitespace-nowrap text-gray-700">{o.date}</td>
-                    <td className="px-5 py-3 text-gray-900 font-medium whitespace-nowrap">{o.signer}</td>
-                    <td className="px-5 py-3 text-gray-500 whitespace-nowrap">{o.loc}</td>
-                    <td className="px-5 py-3 text-gray-600 whitespace-nowrap">{o.agent}</td>
-                    <td className="px-5 py-3 text-gray-900">{o.fee}</td>
-                    <td className="px-5 py-3"><span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${o.color}`}>{o.status}</span></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DemoOrders orders={ORDERS} />
         </div>
 
         {/* Invoice + closeout sample */}
         <div id="invoices" className="scroll-mt-20 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-md p-6">
-            <div className="flex items-center gap-2 mb-2"><FileText size={16} className="text-violet-600" /><h3 className="font-bold text-gray-900">Invoices</h3></div>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-gray-600">INV-9F2K · Robert Chen</span><span className="text-green-600 font-medium">Paid</span></div>
-              <div className="flex justify-between"><span className="text-gray-600">INV-9F1A · Tara Mitchell</span><span className="text-amber-600 font-medium">Pay now →</span></div>
-              <div className="flex justify-between"><span className="text-gray-600">INV-8E7C · David &amp; Anne Park</span><span className="text-green-600 font-medium">Paid</span></div>
-            </div>
-            <p className="text-xs text-gray-400 mt-3">Pay by card, check, or ACH — net 30 available.</p>
-          </div>
+          <DemoInvoices invoices={INVOICES} company={company} />
           <div className="bg-gradient-to-br from-violet-600 to-fuchsia-600 rounded-2xl shadow-md p-6 text-white flex flex-col justify-center">
             <p className="text-violet-100 text-sm font-semibold">This month with Inksent</p>
             <p className="text-3xl font-black mt-1">47 signings · 98% on-time</p>
