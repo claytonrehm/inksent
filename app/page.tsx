@@ -27,7 +27,7 @@ const FEATURES = [
   { icon: <ShieldCheck size={22} />, title: 'Never Left Scrambling', desc: 'If your notary cancels, the job instantly re-offers to every other covering agent — automatically — until one sticks.' },
   { icon: <FileCheck2 size={22} />, title: 'Documents Follow the Job', desc: 'Upload once; whoever ends up at the table gets it — even a backup. Lender sends an update? The old package is deleted, so no one signs a stale set.' },
   { icon: <Eye size={22} />, title: 'You Know Who Shows Up', desc: 'NNA-certified, background-checked, E&O-insured, and vetted for real purchase & refi experience. Lapsed credentials are auto-blocked from your closing.' },
-  { icon: <Clock size={22} />, title: '30-Minute Confirmation', desc: 'We alert every qualified agent at once; first to accept wins. No phone tag, no waiting hours.' },
+  { icon: <Clock size={22} />, title: '~30-Minute Confirmation', desc: 'We alert every qualified agent at once; first to accept wins. Typically confirmed in about half an hour — no phone tag, no waiting hours.' },
   { icon: <MapPin size={22} />, title: 'Live Tracking', desc: 'Watch real-time status from a link — confirmed with agent photo, on the way, arrived, complete.' },
   { icon: <DollarSign size={22} />, title: 'Transparent Pricing', desc: 'Set per-signing price, no contracts, no minimums, no surprise fees. Pay online in one click or by check.' },
 ]
@@ -85,7 +85,7 @@ export default function Home() {
 
               <ScrollReveal delay={200}>
                 <p className="text-lg text-slate-400 max-w-xl mx-auto lg:mx-0 mb-9 leading-relaxed">
-                  Inksent connects title companies, escrow officers, and lenders with vetted NNA-certified signing agents — confirmed in 30 minutes, with an automatic backup if anyone cancels.
+                  Inksent connects title companies, escrow officers, and lenders with vetted NNA-certified signing agents — typically confirmed in about 30 minutes, with an automatic backup if anyone cancels.
                 </p>
               </ScrollReveal>
 
@@ -370,7 +370,7 @@ export default function Home() {
                 {[
                   'All signing types — purchase, refi, HELOC, and more',
                   'NNA-certified, background-checked agent',
-                  'Confirmed within 30 minutes',
+                  'Typically confirmed within ~30 minutes',
                   'Automatic backup if a notary cancels',
                   'Documents routed to your agent automatically',
                 ].map((item) => (
@@ -413,7 +413,7 @@ export default function Home() {
               Ready to close{' '}
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-fuchsia-400">faster?</span>
             </h2>
-            <p className="text-slate-400 text-lg mb-10">No contracts. No minimums. Reliable signings, confirmed in 30 minutes.</p>
+            <p className="text-slate-400 text-lg mb-10">No contracts. No minimums. Reliable signings, typically confirmed in ~30 minutes.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/order" className="group inline-flex items-center justify-center gap-2 bg-violet-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-violet-500 transition-all shadow-[0_0_40px_-8px_rgba(139,92,246,0.8)] hover:-translate-y-0.5">
                 Place an Order Now

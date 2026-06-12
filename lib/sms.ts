@@ -55,5 +55,5 @@ Your pay: $${(fee / 100).toFixed(0)}
 
 Reply YES to accept or tap: ${acceptUrl}
 
-This offer expires in 30 min.`
+First to accept wins — please reply fast. Title companies count on us confirming within ~30 min, so a quick yes keeps us reliable. Expires in 30 min.`
 }
