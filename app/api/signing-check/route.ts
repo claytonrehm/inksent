@@ -1,21 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Resend } from 'resend'
+import { createClient, createAuthClient } from '@/lib/supabase/server'
 import { sendSMS } from '@/lib/sms'
-import { checkRateLimit, clientIp } from '@/lib/rate-limit'
+import { checkRateLimit } from '@/lib/rate-limit'
 import { analyzeSigningPackage, hasSigningCheck } from '@/lib/signing-check'
 
 export const maxDuration = 120 // AI analysis of a full package can take ~30–60s
 
 const MAX_BYTES = 4.5 * 1024 * 1024
 
+// SignCheck is gated, not public: FREE for approved Inksent agents, and available
+// to title partners by arrangement (paid). Not open to anonymous use — protects AI
+// cost and matches the product model.
 export async function POST(req: NextRequest) {
   if (!hasSigningCheck()) {
     return NextResponse.json({ error: 'The signing checker is being set up — please check back shortly or email support@inksent.co.' }, { status: 503 })
   }
 
-  // Lead-gen + abuse guard: a few free checks per IP per day.
-  if (!(await checkRateLimit(`signcheck:${clientIp(req)}`, 4, 86_400))) {
-    return NextResponse.json({ error: 'You\'ve hit today\'s free-check limit. Email support@inksent.co to keep going.' }, { status: 429 })
+  // Must be signed in
+  const auth = await createAuthClient()
+  const { data: { user } } = await auth.auth.getUser()
+  const email = user?.email
+  if (!email) return NextResponse.json({ error: 'Please sign in to use SignCheck.' }, { status: 401 })
+
+  // Authorize: approved Inksent agents (free). Title-company paid access is granted
+  // per-partner (no public/self-serve tier yet).
+  const supabase = await createClient()
+  const { data: notary } = await supabase.from('notaries').select('id, active').ilike('email', email).maybeSingle()
+  // Title partners are granted access via a simple allow-list table (created when a
+  // partner signs up). If the table doesn't exist yet, this is just null → no access.
+  const { data: partner } = await supabase.from('signcheck_partners').select('email').ilike('email', email).maybeSingle()
+  const authorized = !!notary?.active || !!partner
+  if (!authorized) {
+    return NextResponse.json({ error: 'SignCheck is free for approved Inksent agents. Title companies — email support@inksent.co to get your team set up.' }, { status: 403 })
+  }
+
+  // Per-user daily cap (cost guard)
+  if (!(await checkRateLimit(`signcheck:${email}`, 30, 86_400))) {
+    return NextResponse.json({ error: 'You\'ve hit today\'s check limit. Email support@inksent.co to raise it.' }, { status: 429 })
   }
 
   let form: FormData
@@ -25,15 +46,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Could not read the upload. Please try again.' }, { status: 400 })
   }
 
-  if (form.get('company_website')) return NextResponse.json({ ok: true }) // honeypot
-
-  const name = String(form.get('name') ?? '').trim()
-  const email = String(form.get('email') ?? '').trim()
   const file = form.get('file')
-
-  if (!name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-    return NextResponse.json({ error: 'Please add your name and a valid email.' }, { status: 400 })
-  }
   if (!(file instanceof File)) {
     return NextResponse.json({ error: 'Please attach the signing package as a PDF.' }, { status: 400 })
   }
@@ -54,22 +67,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'We couldn\'t analyze that package. It may be scanned/image-only or too large. Try a text-based PDF.' }, { status: 502 })
   }
 
-  // Capture the lead (notary/title prospect) — do not store the document.
-  const adminEmail = process.env.ADMIN_EMAIL || 'clayton.rehm@gmail.com'
-  if (process.env.RESEND_API_KEY) {
-    const resend = new Resend(process.env.RESEND_API_KEY)
-    resend.emails.send({
-      from: 'Inksent SignCheck <orders@inksent.co>',
-      to: adminEmail,
-      replyTo: email,
-      subject: `🔎 SignCheck used: ${name} (${report.riskLevel} risk)`,
-      html: `<p><strong>${name}</strong> · <a href="mailto:${email}">${email}</a> ran a signing-package check.</p>
-        <p>Risk: <strong>${report.riskLevel}</strong> · ${report.totals.signatures} signatures · ${report.totals.notarizations} notarizations · ${report.issues.length} issue(s) flagged.</p>
-        <p>A warm lead — they're a notary or title company doing live signings.</p>`,
-    }).catch(console.error)
-  }
   if (process.env.ADMIN_PHONE) {
-    sendSMS(process.env.ADMIN_PHONE, `🔎 SignCheck lead: ${name} (${email}) — ${report.riskLevel} risk, ${report.issues.length} issues.`).catch(console.error)
+    sendSMS(process.env.ADMIN_PHONE, `🔎 ${email} ran SignCheck — ${report.riskLevel} risk, ${report.issues.length} issue(s).`).catch(console.error)
   }
 
   return NextResponse.json({ ok: true, report })

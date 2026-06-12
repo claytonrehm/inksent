@@ -31,7 +31,7 @@ export default function CheckForm() {
     setError('')
     if (!file) { setError('Please attach the signing package PDF.'); return }
     setBusy(true)
-    const fd = new FormData(e.currentTarget)
+    const fd = new FormData()
     fd.set('file', file)
     try {
       const res = await fetch('/api/signing-check', { method: 'POST', body: fd })
@@ -109,18 +109,6 @@ export default function CheckForm() {
 
   return (
     <form onSubmit={submit} className="space-y-4">
-      <input type="text" name="company_website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
-      <div className="grid sm:grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="sc-name" className="block text-sm font-medium text-gray-700 mb-1">Your name</label>
-          <input id="sc-name" name="name" required className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500" placeholder="Jane Smith" />
-        </div>
-        <div>
-          <label htmlFor="sc-email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-          <input id="sc-email" name="email" type="email" required className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500" placeholder="you@company.com" />
-        </div>
-      </div>
-
       <div
         onClick={() => fileRef.current?.click()}
         className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${file ? 'border-violet-300 bg-violet-50/40' : 'border-gray-300 hover:border-violet-400 bg-gray-50'}`}

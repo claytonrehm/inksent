@@ -1,8 +1,8 @@
+import Link from 'next/link'
 import { ShieldCheck, AlertTriangle, ListChecks, Stamp, Lock } from 'lucide-react'
 import MarketingShell from '@/components/MarketingShell'
 import JsonLd from '@/components/JsonLd'
 import { organizationSchema } from '@/lib/seo'
-import CheckForm from './CheckForm'
 
 export const metadata = {
   title: 'Free Signing-Package Check — Never Get Kicked Back | Inksent',
@@ -30,8 +30,15 @@ export default function SigningCheckPage() {
           Upload a loan-signing package and our AI maps <strong>every</strong> place a signer must sign, initial, date, or notarize — and flags anything that could get it rejected by the lender or title company. A missed signature means a redraw, a re-drive, and a lost fee. This catches it first.
         </p>
 
-        <div className="bg-white border border-gray-100 rounded-2xl shadow-md p-6 sm:p-8 mb-12">
-          <CheckForm />
+        <div className="bg-white border border-gray-100 rounded-2xl shadow-md p-6 sm:p-8 mb-12 text-center">
+          <span className="inline-block text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-3 py-1 mb-4">Free for Inksent agents</span>
+          <p className="text-gray-700 font-semibold mb-1">Run a check on your next package</p>
+          <p className="text-sm text-gray-500 mb-5">SignCheck is a free perk for approved Inksent signing agents. Sign in to use it — or join the network and it&apos;s yours free.</p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/hub/signing-check" className="bg-violet-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-violet-700">Sign in to run a check</Link>
+            <Link href="/apply" className="border border-gray-300 px-6 py-3 rounded-xl font-bold text-gray-800 hover:bg-gray-50">Become an agent</Link>
+          </div>
+          <p className="text-xs text-gray-400 mt-4">Title company? <a href="mailto:support@inksent.co?subject=SignCheck%20for%20our%20team" className="underline">Email us</a> to set up your team.</p>
         </div>
 
         <h2 className="text-2xl font-black mb-6">What you get</h2>
