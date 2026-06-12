@@ -49,6 +49,48 @@ export async function sendNotaryApprovedEmail(data: { name: string; email: strin
   })
 }
 
+// ─── Notary Hub Announcement (bench-wide) ─────────────────────────────────────
+
+export async function sendNotaryHubAnnouncementEmail(data: { name: string; email: string; hubUrl: string }) {
+  const firstName = (data.name || '').split(' ')[0] || 'there'
+  // Only invite a review if we have a real review link configured — never guess one.
+  const reviewUrl = process.env.GOOGLE_REVIEW_URL
+  const reviewBlock = reviewUrl
+    ? `<div style="margin-top:24px;padding-top:20px;border-top:1px solid #eee;">
+        <p style="font-size:14px;color:#555555;line-height:1.6;margin:0 0 12px;">If the Hub is useful to you, a quick Google review would mean a lot to us as a small, growing team — it&rsquo;s the single biggest way you can help. 🙏</p>
+        <a href="${reviewUrl}" style="display:inline-block;background:#ffffff;color:#7c3aed;text-decoration:none;font-weight:700;padding:10px 18px;border:1.5px solid #7c3aed;border-radius:10px;font-size:14px;">Leave a quick review →</a>
+      </div>`
+    : ''
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/>${META}</head>
+  <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111111;margin:0;padding:0;background:#f4f4f5;">
+  <div style="max-width:560px;margin:32px auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+    ${HEADER}
+    <div style="padding:32px;">
+      <div style="display:inline-block;background:#ede9fe;color:#5b21b6;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;">&#10003; New &amp; free for you</div>
+      <p style="font-size:18px;font-weight:700;color:#111111;margin:0 0 8px;">${firstName}, your Notary Hub is live 🎉</p>
+      <p style="font-size:14px;color:#555555;line-height:1.6;margin:0 0 16px;">We just rolled out the <strong>Notary Hub</strong> — a free private dashboard for every approved Inksent agent. No spreadsheets, no data entry. It tracks:</p>
+      <table cellpadding="0" cellspacing="0" style="width:100%;margin:0 0 24px;">
+        ${detailRow('💰 Live earnings', 'Month-to-date, year-to-date & per-job')}
+        ${detailRow('🧾 What you&rsquo;re owed', 'Paid vs. pending payouts at a glance')}
+        ${detailRow('🚗 Automatic mileage', 'Round-trip miles tallied at the IRS rate')}
+        ${detailRow('📤 Tax-ready exports', 'One-click income & mileage CSVs for your CPA', { last: true })}
+      </table>
+      <a href="${data.hubUrl}" style="display:block;text-align:center;background:#7c3aed;color:#ffffff;text-decoration:none;font-weight:700;padding:14px;border-radius:10px;font-size:15px;">Open My Hub →</a>
+      <p style="font-size:13px;color:#888888;line-height:1.6;margin:20px 0 0;">Sign in with this email — we&rsquo;ll send a secure one-tap link, no password to remember.</p>
+      ${reviewBlock}
+      <p style="font-size:13px;color:#888888;margin:18px 0 0;">— Clayton<br/>Inksent Signing Services</p>
+    </div>
+    ${FOOTER}
+  </div></body></html>`
+
+  return getResend().emails.send({
+    from: 'Clayton at Inksent <orders@inksent.co>',
+    to: data.email,
+    subject: `${firstName}, your free Notary Hub is live`,
+    html,
+  })
+}
+
 // ─── Credential Renewal Request (notary) ──────────────────────────────────────
 
 export async function sendCredentialRenewalEmail(data: {
