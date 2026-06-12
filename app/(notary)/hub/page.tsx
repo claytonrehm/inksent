@@ -103,7 +103,7 @@ export default async function HubPage({ searchParams }: { searchParams: Promise<
     const metrics = computeHubMetrics((orders ?? []) as NotaryOrder[], notary.base_zip, new Date())
 
     // Referral program (auto-pay bounty when a referral completes their first signing)
-    const REFERRAL_BOUNTY = parseInt(process.env.REFERRAL_BOUNTY_CENTS || '2500', 10)
+    const REFERRAL_BOUNTY = parseInt(process.env.REFERRAL_BOUNTY_CENTS || '0', 10)
     let referredCount = 0, paidCount = 0
     if (REFERRAL_BOUNTY > 0) {
       const { count: rc } = await supabase.from('notaries').select('id', { count: 'exact', head: true }).eq('referred_by', notary.id)

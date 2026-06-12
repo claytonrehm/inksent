@@ -197,7 +197,7 @@ export async function GET(req: NextRequest) {
     // (iii) REFERRAL BOUNTIES — a referred notary who has completed ≥1 signing earns
     //   their referrer a one-time bonus (default $25; set REFERRAL_BOUNTY_CENTS, 0=off).
     //   Paid to a bank-connected referrer; otherwise we nudge them to connect to claim it.
-    const REFERRAL_BOUNTY = parseInt(process.env.REFERRAL_BOUNTY_CENTS || '2500', 10)
+    const REFERRAL_BOUNTY = parseInt(process.env.REFERRAL_BOUNTY_CENTS || '0', 10)
     if (REFERRAL_BOUNTY > 0) {
       const { data: referred } = await supabase
         .from('notaries')
