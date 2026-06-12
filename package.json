@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:e2e": "npx tsx scripts/e2e-lifecycle.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",

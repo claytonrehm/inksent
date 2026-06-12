@@ -4,6 +4,11 @@ A running record of what the platform does and what was added. Use this for your
 
 ---
 
+## Recent changes (2026-06-11)
+- **Self-service credential update auto-greens badges.** When an approved agent supplies a credential date through the renewal/"missing info" link (`/onboard/[id]?update=1`), the onboard API now also sets `nna_certified`/`background_checked` true — so the status badge, coverage map, and dispatch eligibility update automatically the moment they submit (previously the date saved but the NNA icon could stay grey).
+- **End-to-end lifecycle test** (`npm run test:e2e`). Drives the real `credentials.ts`/`coverage.ts` logic + each route's field-mapping through ingest → approve → self-service creds → coverage → dispatch, with regression + honesty-guard assertions. 24/24 green. Safe to run anytime — no production writes or SMS.
+- **OG/social-share image** subtitle spacing fixed (was loose from a flex container).
+
 ## Core money loop (automated, zero-touch)
 - **Client pays → notary auto-paid.** Stripe Connect transfers the payout to the notary's bank the moment the client's payment clears. Your spread is the difference; no manual payouts.
 - **Auto-invoicing.** Completing a signing generates an invoice + emails the client a payment link automatically.
