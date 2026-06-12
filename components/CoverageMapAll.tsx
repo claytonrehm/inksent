@@ -29,17 +29,20 @@ export default function CoverageMapAll({ notaries }: { notaries: CoverageNotary[
       const circles: import('leaflet').Layer[] = []
       for (const n of notaries) {
         const isActive = n.status === 'active'
-        const stroke = isActive ? '#7c3aed' : '#94a3b8'
-        const fill = isActive ? '#a855f7' : '#94a3b8'
+        const stroke = isActive ? '#9333ea' : '#94a3b8'
+        const fill = isActive ? '#c084fc' : '#94a3b8'
         const circle = L.circle([n.lat, n.lng], {
+          // Low per-circle opacity so heavily-overlapping areas (e.g. San Diego)
+          // stay readable instead of stacking into a solid blob — you can still see
+          // the map and tell circles apart.
           radius: n.radiusMiles * 1609.34,
           color: stroke, fillColor: fill,
-          fillOpacity: isActive ? 0.25 : 0.08,
-          weight: isActive ? 3 : 1,
+          fillOpacity: isActive ? 0.1 : 0.05,
+          weight: isActive ? 2 : 1,
           dashArray: isActive ? undefined : '4',
         }).addTo(map)
         L.circleMarker([n.lat, n.lng], {
-          radius: 5, color: '#ffffff', weight: 2, fillColor: fill, fillOpacity: 1,
+          radius: 5, color: '#ffffff', weight: 2, fillColor: stroke, fillOpacity: 1,
         }).addTo(map).bindPopup(`${n.name} · ${n.radiusMiles}mi${isActive ? '' : ' (applicant)'}`)
         circles.push(circle)
       }
