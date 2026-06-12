@@ -14,6 +14,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/resources/how-much-do-notary-signing-agents-make',
     '/resources/notary-signing-agent-vs-mobile-notary',
     '/resources/reduce-signing-kickbacks-title-companies',
+    '/resources/how-to-get-more-loan-signing-jobs',
+    '/resources/loan-signing-agent-supplies-checklist',
     '/faq', '/support', '/privacy', '/terms', '/notary-agreement',
   ]
   const high = new Set(['/order', '/apply', '/join', '/partners', '/notary-signing-service-san-diego', '/notary-signing-agent-jobs-san-diego'])

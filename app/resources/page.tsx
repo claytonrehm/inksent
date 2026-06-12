@@ -40,6 +40,18 @@ export const ARTICLES = [
     blurb: 'The common causes of kickbacks — and how title teams cut them so loans fund faster.',
     audience: 'For title & escrow',
   },
+  {
+    slug: 'how-to-get-more-loan-signing-jobs',
+    title: 'How to Get More Loan Signing Jobs as a Notary',
+    blurb: 'Practical ways to get more steady signing work — rosters, fast response, reliability, and coverage.',
+    audience: 'For notaries',
+  },
+  {
+    slug: 'loan-signing-agent-supplies-checklist',
+    title: 'Loan Signing Agent Supplies: The Complete Checklist',
+    blurb: 'Everything you need to start and run loan signings — printer, scanner, stamp, insurance, and more.',
+    audience: 'For notaries',
+  },
 ] as const
 
 export default function ResourcesPage() {
