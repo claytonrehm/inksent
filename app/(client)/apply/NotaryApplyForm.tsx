@@ -133,11 +133,14 @@ export default function NotaryApplyForm() {
       }
     }
 
+    // Referral tag — who sent them (from /r/<id> → /apply?ref=<id>)
+    const ref = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('ref') : null
+
     try {
       const res = await fetch('/api/notary-apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, photo_url, signing_types: signingTypes, availability, turnstileToken: captchaToken }),
+        body: JSON.stringify({ ...data, photo_url, signing_types: signingTypes, availability, turnstileToken: captchaToken, ...(ref ? { ref } : {}) }),
       })
       if (res.status === 409) {
         const j = await res.json().catch(() => ({}))

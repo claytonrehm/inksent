@@ -2,6 +2,7 @@ import { createClient, createAuthClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import InksentLogo from '@/components/InksentLogo'
 import NotaryHub from '@/components/notary/NotaryHub'
+import ReferralCard from '@/components/notary/ReferralCard'
 import ManageBillingButton from '@/components/notary/ManageBillingButton'
 import { computeHubMetrics, IRS_MILEAGE_RATE_CENTS, type NotaryOrder } from '@/lib/notary-metrics'
 import { hubJobToOrder, isSubscribed, type HubJob, type HubUser } from '@/lib/hub'
@@ -101,10 +102,28 @@ export default async function HubPage({ searchParams }: { searchParams: Promise<
 
     const metrics = computeHubMetrics((orders ?? []) as NotaryOrder[], notary.base_zip, new Date())
 
+    // Referral program (auto-pay bounty when a referral completes their first signing)
+    const REFERRAL_BOUNTY = parseInt(process.env.REFERRAL_BOUNTY_CENTS || '2500', 10)
+    let referredCount = 0, paidCount = 0
+    if (REFERRAL_BOUNTY > 0) {
+      const { count: rc } = await supabase.from('notaries').select('id', { count: 'exact', head: true }).eq('referred_by', notary.id)
+      const { count: pc } = await supabase.from('notaries').select('id', { count: 'exact', head: true }).eq('referred_by', notary.id).not('referral_bounty_paid_at', 'is', null)
+      referredCount = rc ?? 0; paidCount = pc ?? 0
+    }
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'
+
     return (
       <Shell action={<SignOutButton />}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
           <Greeting firstName={(notary.name ?? '').split(' ')[0]} />
+          {REFERRAL_BOUNTY > 0 && (
+            <ReferralCard
+              link={`${baseUrl}/r/${notary.id}`}
+              bounty={`$${(REFERRAL_BOUNTY / 100).toFixed(0)}`}
+              referred={referredCount}
+              earned={`$${((paidCount * REFERRAL_BOUNTY) / 100).toFixed(0)}`}
+            />
+          )}
           <NotaryHub
             notaryId={notary.id}
             payoutsEnabled={!!notary.payouts_enabled}

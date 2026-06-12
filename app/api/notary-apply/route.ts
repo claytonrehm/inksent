@@ -123,6 +123,15 @@ export async function POST(req: NextRequest) {
       .then(({ error }) => { if (error) console.warn('commission save skipped:', error.message) })
   }
 
+  // Referral attribution — tag who referred them (best-effort; ignore self-refer).
+  if (body?.ref && notaryId) {
+    const { data: referrer } = await supabase.from('notaries').select('id').eq('id', body.ref).maybeSingle()
+    if (referrer && referrer.id !== notaryId) {
+      await supabase.from('notaries').update({ referred_by: referrer.id }).eq('id', notaryId)
+        .then(({ error }) => { if (error) console.warn('referred_by save skipped:', error.message) })
+    }
+  }
+
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'
   const firstName = d.name.split(' ')[0]
 

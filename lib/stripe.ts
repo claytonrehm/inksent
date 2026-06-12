@@ -66,6 +66,28 @@ export async function createConnectOnboardingLink(notary: {
   return { url: link.url, accountId }
 }
 
+// Pay a referral bounty into the referrer's connected account. Returns true on success.
+export async function payReferralBounty(params: {
+  stripeAccountId: string
+  amount: number
+  referredName: string
+}): Promise<boolean> {
+  if (!hasStripe()) return false
+  try {
+    await getStripe().transfers.create({
+      amount: params.amount,
+      currency: 'usd',
+      destination: params.stripeAccountId,
+      description: `Inksent referral bonus — referred ${params.referredName}`,
+      metadata: { type: 'referral_bounty', referred: params.referredName },
+    })
+    return true
+  } catch (e) {
+    console.error('referral bounty transfer failed:', e)
+    return false
+  }
+}
+
 // Pay a notary their fee into their connected account. Returns true on success.
 export async function payoutNotary(params: {
   stripeAccountId: string

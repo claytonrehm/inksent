@@ -4,7 +4,7 @@ import { sendSMS } from '@/lib/sms'
 import { sendPaymentReminderEmail } from '@/lib/invoice'
 import { sendNotaryApprovedEmail } from '@/lib/email'
 import { chaseCredentials } from '@/lib/credential-chase'
-import { orderWasPaid, payoutNotary, hasStripe, accountPayoutsEnabled } from '@/lib/stripe'
+import { orderWasPaid, payoutNotary, hasStripe, accountPayoutsEnabled, payReferralBounty } from '@/lib/stripe'
 import { createAdminClient, hasServiceRole } from '@/lib/supabase/admin'
 import { format } from 'date-fns'
 
@@ -191,6 +191,35 @@ export async function GET(req: NextRequest) {
         }
       } else if (process.env.ADMIN_PHONE) {
         await sendSMS(process.env.ADMIN_PHONE, `⚠️ ${n?.name ?? 'A notary'} completed ${o.confirmation_number} but isn't payout-connected — nudge them to finish Stripe so they get paid.`).catch(() => {})
+      }
+    }
+
+    // (iii) REFERRAL BOUNTIES — a referred notary who has completed ≥1 signing earns
+    //   their referrer a one-time bonus (default $25; set REFERRAL_BOUNTY_CENTS, 0=off).
+    //   Paid to a bank-connected referrer; otherwise we nudge them to connect to claim it.
+    const REFERRAL_BOUNTY = parseInt(process.env.REFERRAL_BOUNTY_CENTS || '2500', 10)
+    if (REFERRAL_BOUNTY > 0) {
+      const { data: referred } = await supabase
+        .from('notaries')
+        .select('id, name, referred_by')
+        .not('referred_by', 'is', null)
+        .is('referral_bounty_paid_at', null)
+      for (const rn of referred ?? []) {
+        const { count } = await supabase.from('orders').select('id', { count: 'exact', head: true }).eq('notary_id', rn.id).eq('status', 'completed')
+        if (!count) continue
+        const { data: ref } = await supabase.from('notaries').select('id, name, phone, stripe_account_id, payouts_enabled').eq('id', rn.referred_by).maybeSingle()
+        if (!ref) { await supabase.from('notaries').update({ referral_bounty_paid_at: new Date().toISOString() }).eq('id', rn.id); continue }
+        const bonus = `$${(REFERRAL_BOUNTY / 100).toFixed(0)}`
+        if (ref.stripe_account_id && ref.payouts_enabled) {
+          const ok = await payReferralBounty({ stripeAccountId: ref.stripe_account_id, amount: REFERRAL_BOUNTY, referredName: rn.name || 'a referral' })
+          if (ok) {
+            await supabase.from('notaries').update({ referral_bounty_paid_at: new Date().toISOString() }).eq('id', rn.id)
+            if (ref.phone) await sendSMS(ref.phone, `🎉 Referral bonus! ${bonus} is on its way to your bank — ${(rn.name || 'your referral').split(' ')[0]} completed their first Inksent signing. Thanks for growing the team! — Inksent`).catch(() => {})
+            if (process.env.ADMIN_PHONE) await sendSMS(process.env.ADMIN_PHONE, `💸 Paid ${bonus} referral bonus to ${ref.name} (referred ${rn.name}).`).catch(() => {})
+          }
+        } else if (ref.phone) {
+          await sendSMS(ref.phone, `💰 You've earned a ${bonus} referral bonus — connect your bank to claim it: ${baseUrl}/onboard/${ref.id}/connect — Inksent`).catch(() => {})
+        }
       }
     }
   }
