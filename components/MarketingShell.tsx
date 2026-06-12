@@ -32,7 +32,6 @@ export default function MarketingShell({
           <div className="flex flex-wrap justify-center gap-4">
             <Link href="/partners" className="hover:text-gray-800">For Title Companies</Link>
             <Link href="/join" className="hover:text-gray-800">For Signing Agents</Link>
-            <Link href="/tools/signing-check" className="hover:text-gray-800">Free Doc Check</Link>
             <Link href="/resources" className="hover:text-gray-800">Resources</Link>
             <Link href="/faq" className="hover:text-gray-800">FAQ</Link>
             <Link href="/support" className="hover:text-gray-800">Support</Link>

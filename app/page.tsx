@@ -442,8 +442,6 @@ export default function Home() {
               <Link href="/partners" className="hover:text-slate-300 transition-colors">For Title Companies</Link>
               <span className="hidden sm:block">·</span>
               <Link href="/order" className="hover:text-slate-300 transition-colors">Place an Order</Link>
-              <span className="hidden sm:block">·</span>
-              <Link href="/tools/signing-check" className="hover:text-slate-300 transition-colors">Free Doc Check</Link>
             </div>
           </div>
           {/* Service-area links — internal links help these pages rank locally */}

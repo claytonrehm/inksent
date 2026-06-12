@@ -11,6 +11,7 @@ export const metadata = {
     'Upload a loan-signing package and AI maps every signature, initial, date, and notarization — and flags anything that could get it kicked back. Free for notary signing agents and title companies.',
   alternates: { canonical: '/tools/signing-check' },
   keywords: ['notary signing checklist', 'loan signing document check', 'signing package review', 'notary kicked back', 'signature audit loan documents'],
+  robots: { index: false, follow: false }, // dormant until SignCheck is turned on
 }
 
 const POINTS = [

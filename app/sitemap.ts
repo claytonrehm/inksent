@@ -8,13 +8,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     '', '/order', '/apply', '/join', '/partners', '/partners/apply',
     '/notary-signing-service-san-diego', '/notary-signing-agent-jobs-san-diego',
-    '/tools/signing-check',
     '/resources',
     '/resources/how-to-become-a-notary-signing-agent-in-california',
     '/resources/how-title-companies-choose-a-signing-service',
     '/faq', '/support', '/privacy', '/terms', '/notary-agreement',
   ]
-  const high = new Set(['/order', '/apply', '/join', '/partners', '/notary-signing-service-san-diego', '/notary-signing-agent-jobs-san-diego', '/tools/signing-check'])
+  const high = new Set(['/order', '/apply', '/join', '/partners', '/notary-signing-service-san-diego', '/notary-signing-agent-jobs-san-diego'])
   return routes.map((path) => ({
     url: `${BASE}${path}`,
     changeFrequency: path === '' ? 'weekly' : 'monthly',
