@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { href: '#pricing', label: 'Pricing', external: false },
   { href: '/partners', label: 'Title Companies', external: true },
   { href: '/join', label: 'Notaries', external: true },
+  { href: '/#notary-hub', label: 'Notary Hub', external: true },
 ]
 
 export default function NavClient() {

@@ -280,6 +280,12 @@ export default function Home() {
                 Not one of our agents? Subscribe and track every signing you do, anywhere.
               </p>
 
+              <div className="flex flex-wrap items-center gap-2 mb-8">
+                <span className="text-xs font-semibold text-emerald-300 bg-emerald-500/15 border border-emerald-500/20 rounded-full px-3 py-1.5">Free for Inksent agents</span>
+                <span className="text-xs font-semibold text-slate-200 bg-white/5 border border-white/10 rounded-full px-3 py-1.5">$12/mo · $99/yr for everyone else</span>
+                <span className="text-xs font-medium text-slate-400">14-day free trial</span>
+              </div>
+
               <div className="space-y-4 mb-9">
                 {[
                   { icon: <LayoutDashboard size={18} />, title: 'Live earnings dashboard', desc: 'Month-to-date, year-to-date, and per-job earnings with charts — updated automatically.' },
