@@ -219,9 +219,12 @@ function Overview({
 
 /* ------------------------------- Jobs ------------------------------- */
 
-function Jobs({ metrics }: { metrics: HubMetrics }) {
+function Jobs({ metrics, editable }: { metrics: HubMetrics; editable: boolean }) {
+  const router = useRouter()
   const [q, setQ] = useState('')
   const [status, setStatus] = useState('all')
+  const [adding, setAdding] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase()
@@ -234,15 +237,26 @@ function Jobs({ metrics }: { metrics: HubMetrics }) {
     })
   }, [metrics.jobs, q, status])
 
+  async function remove(id: string) {
+    if (!confirm('Delete this job?')) return
+    setDeletingId(id)
+    const res = await fetch(`/api/hub/jobs/${id}`, { method: 'DELETE' })
+    setDeletingId(null)
+    if (res.ok) router.refresh()
+  }
+
+  const cols = editable ? 7 : 6
+
   return (
     <Card>
+      {adding && <AddJobModal onClose={() => setAdding(false)} onSaved={() => { setAdding(false); router.refresh() }} />}
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <div className="relative flex-1">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search signer, city, confirmation…"
+            placeholder="Search signer, city, company…"
             className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
           />
         </div>
@@ -258,6 +272,14 @@ function Jobs({ metrics }: { metrics: HubMetrics }) {
             </option>
           ))}
         </select>
+        {editable && (
+          <button
+            onClick={() => setAdding(true)}
+            className="shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg bg-violet-600 text-white hover:bg-violet-700 transition-colors"
+          >
+            <Plus size={15} /> Add job
+          </button>
+        )}
       </div>
 
       <div className="overflow-x-auto -mx-5">
@@ -265,18 +287,19 @@ function Jobs({ metrics }: { metrics: HubMetrics }) {
           <thead>
             <tr className="text-left text-[11px] uppercase tracking-wider text-gray-400 border-b border-gray-100">
               <th className="font-semibold px-5 py-2">Date</th>
-              <th className="font-semibold px-2 py-2">Signer</th>
+              <th className="font-semibold px-2 py-2">{editable ? 'Signer / Co.' : 'Signer'}</th>
               <th className="font-semibold px-2 py-2">Location</th>
               <th className="font-semibold px-2 py-2">Status</th>
               <th className="font-semibold px-2 py-2 text-right">Fee</th>
-              <th className="font-semibold px-5 py-2 text-right">Pay</th>
+              <th className="font-semibold px-2 py-2 text-right">Pay</th>
+              {editable && <th className="font-semibold px-5 py-2"></th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-5 py-8 text-center text-gray-400">
-                  No jobs match.
+                <td colSpan={cols} className="px-5 py-8 text-center text-gray-400">
+                  {editable ? 'No jobs yet — add your first signing.' : 'No jobs match.'}
                 </td>
               </tr>
             ) : (
@@ -285,7 +308,12 @@ function Jobs({ metrics }: { metrics: HubMetrics }) {
                   <td className="px-5 py-3 whitespace-nowrap text-gray-600">
                     {format(parseISO(o.signing_date), 'MMM d, yyyy')}
                   </td>
-                  <td className="px-2 py-3 font-medium text-gray-900 whitespace-nowrap">{o.signer_name}</td>
+                  <td className="px-2 py-3 font-medium text-gray-900 whitespace-nowrap">
+                    {o.signer_name}
+                    {editable && o.confirmation_number && (
+                      <span className="block text-[11px] font-normal text-gray-400">{o.confirmation_number}</span>
+                    )}
+                  </td>
                   <td className="px-2 py-3 text-gray-500 whitespace-nowrap">
                     {o.property_city}, {o.property_state}
                   </td>
@@ -295,7 +323,7 @@ function Jobs({ metrics }: { metrics: HubMetrics }) {
                   <td className="px-2 py-3 text-right font-semibold text-gray-900 tabular-nums">
                     {formatCurrency(o.notary_fee ?? 0)}
                   </td>
-                  <td className="px-5 py-3 text-right whitespace-nowrap">
+                  <td className="px-2 py-3 text-right whitespace-nowrap">
                     {o.status === 'completed' ? (
                       <span className={cn('text-[11px] font-semibold', o.notary_paid_at ? 'text-emerald-600' : 'text-amber-600')}>
                         {o.notary_paid_at ? 'Paid' : 'Pending'}
@@ -304,6 +332,18 @@ function Jobs({ metrics }: { metrics: HubMetrics }) {
                       <span className="text-[11px] text-gray-300">—</span>
                     )}
                   </td>
+                  {editable && (
+                    <td className="px-5 py-3 text-right">
+                      <button
+                        onClick={() => remove(o.id)}
+                        disabled={deletingId === o.id}
+                        className="text-gray-300 hover:text-red-500 transition-colors disabled:opacity-40"
+                        aria-label="Delete job"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))
             )}
@@ -314,20 +354,153 @@ function Jobs({ metrics }: { metrics: HubMetrics }) {
   )
 }
 
+const TYPE_OPTIONS: { value: string; label: string }[] = [
+  { value: 'refinance', label: 'Refinance' },
+  { value: 'purchase', label: 'Purchase' },
+  { value: 'heloc', label: 'HELOC' },
+  { value: 'reverse_mortgage', label: 'Reverse Mortgage' },
+  { value: 'loan_mod', label: 'Loan Modification' },
+  { value: 'other', label: 'Other' },
+]
+
+function AddJobModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
+  const today = new Date().toISOString().slice(0, 10)
+  const [form, setForm] = useState({
+    signing_date: today,
+    fee: '',
+    signing_type: 'refinance',
+    company: '',
+    signer_name: '',
+    property_city: '',
+    property_state: 'CA',
+    property_zip: '',
+    status: 'completed',
+    paid: false,
+  })
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const set = (k: string, v: string | boolean) => setForm((f) => ({ ...f, [k]: v }))
+
+  async function save() {
+    setError(null)
+    if (!/^\d{5}$/.test(form.property_zip)) return setError('Enter a 5-digit property ZIP (used for mileage).')
+    const feeNum = parseFloat(form.fee)
+    if (isNaN(feeNum) || feeNum < 0) return setError('Enter a valid fee.')
+    setSaving(true)
+    const res = await fetch('/api/hub/jobs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        signing_date: form.signing_date,
+        fee: feeNum,
+        signing_type: form.signing_type,
+        company: form.company || undefined,
+        signer_name: form.signer_name || undefined,
+        property_city: form.property_city || undefined,
+        property_state: form.property_state || undefined,
+        property_zip: form.property_zip,
+        status: form.status,
+        paid: form.paid,
+      }),
+    })
+    setSaving(false)
+    if (res.ok) return onSaved()
+    setError('Could not save — check your entries and try again.')
+  }
+
+  const field = 'w-full px-3 py-2 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500'
+  const label = 'block text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-1'
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="text-lg font-black text-gray-900">Add a signing</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-700" aria-label="Close"><X size={18} /></button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className={label}>Date</label>
+            <input type="date" value={form.signing_date} onChange={(e) => set('signing_date', e.target.value)} className={field} />
+          </div>
+          <div>
+            <label className={label}>Fee ($)</label>
+            <input type="number" inputMode="decimal" placeholder="125" value={form.fee} onChange={(e) => set('fee', e.target.value)} className={field} />
+          </div>
+          <div>
+            <label className={label}>Type</label>
+            <select value={form.signing_type} onChange={(e) => set('signing_type', e.target.value)} className={field}>
+              {TYPE_OPTIONS.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className={label}>Status</label>
+            <select value={form.status} onChange={(e) => set('status', e.target.value)} className={field}>
+              <option value="completed">Completed</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="assigned">Assigned</option>
+            </select>
+          </div>
+          <div className="col-span-2">
+            <label className={label}>Signing company / title co. (optional)</label>
+            <input value={form.company} onChange={(e) => set('company', e.target.value)} placeholder="e.g. Acme Title" className={field} />
+          </div>
+          <div className="col-span-2">
+            <label className={label}>Signer name (optional)</label>
+            <input value={form.signer_name} onChange={(e) => set('signer_name', e.target.value)} placeholder="e.g. John Borrower" className={field} />
+          </div>
+          <div>
+            <label className={label}>City</label>
+            <input value={form.property_city} onChange={(e) => set('property_city', e.target.value)} className={field} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={label}>State</label>
+              <input value={form.property_state} maxLength={2} onChange={(e) => set('property_state', e.target.value.toUpperCase())} className={field} />
+            </div>
+            <div>
+              <label className={label}>ZIP *</label>
+              <input value={form.property_zip} maxLength={5} onChange={(e) => set('property_zip', e.target.value.replace(/\D/g, ''))} placeholder="92101" className={field} />
+            </div>
+          </div>
+        </div>
+
+        <label className="flex items-center gap-2 mt-4 text-sm text-gray-700">
+          <input type="checkbox" checked={form.paid} onChange={(e) => set('paid', e.target.checked)} className="rounded border-gray-300 text-violet-600 focus:ring-violet-500" />
+          Already paid
+        </label>
+
+        {error && <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2 mt-4">{error}</p>}
+
+        <div className="flex gap-3 mt-6">
+          <button onClick={onClose} className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-lg bg-white border border-gray-300 text-gray-700 hover:bg-gray-50">
+            Cancel
+          </button>
+          <button onClick={save} disabled={saving} className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-lg bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50">
+            {saving ? 'Saving…' : 'Save job'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /* ----------------------------- Get Paid ----------------------------- */
 
 function GetPaid({
   metrics,
-  payoutsEnabled,
+  showPayoutConnect,
   notaryId,
 }: {
   metrics: HubMetrics
-  payoutsEnabled: boolean
+  showPayoutConnect: boolean
   notaryId: string
 }) {
   return (
     <div className="space-y-6">
-      {!payoutsEnabled && (
+      {showPayoutConnect && (
         <a
           href={`/onboard/${notaryId}/connect`}
           className="flex items-center gap-3 bg-violet-50 border border-violet-200 rounded-2xl px-5 py-4 hover:bg-violet-100 transition-colors"

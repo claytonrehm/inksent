@@ -3,6 +3,14 @@ import { getStripe, hasStripe, payoutNotary } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/server'
 import { sendSMS } from '@/lib/sms'
 
+// Period-end moved from the subscription root to line items in newer Stripe API
+// versions — read whichever is present. Takes `unknown` to stay type-version-safe.
+function subPeriodEnd(sub: unknown): string | null {
+  const s = sub as { current_period_end?: number; items?: { data?: { current_period_end?: number }[] } }
+  const ts = s.current_period_end ?? s.items?.data?.[0]?.current_period_end
+  return ts ? new Date(ts * 1000).toISOString() : null
+}
+
 // Stripe calls this when an invoice is paid. We mark the order client-paid
 // automatically — no manual reconciliation.
 export async function POST(req: NextRequest) {
@@ -47,7 +55,7 @@ export async function POST(req: NextRequest) {
         try {
           const sub = await getStripe().subscriptions.retrieve(subId)
           status = sub.status
-          periodEnd = sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null
+          periodEnd = subPeriodEnd(sub)
         } catch {}
       }
       if (hubUserId) {
@@ -131,18 +139,16 @@ export async function POST(req: NextRequest) {
   // Keep Hub subscription status in sync (renewals, cancellations, trial→active,
   // payment failures). Matches the hub_user via the subscription metadata.
   if (event.type === 'customer.subscription.updated' || event.type === 'customer.subscription.deleted') {
-    const sub = event.data.object as {
+    const sub = event.data.object as unknown as {
       id: string
       status: string
-      current_period_end: number | null
-      customer: string | { id: string }
       metadata?: { hub_user_id?: string }
     }
     const supabase = await createClient()
     const status = event.type === 'customer.subscription.deleted' ? 'canceled' : sub.status
     const update = {
       subscription_status: status,
-      current_period_end: sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null,
+      current_period_end: subPeriodEnd(event.data.object),
     }
     if (sub.metadata?.hub_user_id) {
       await supabase.from('hub_users').update(update).eq('id', sub.metadata.hub_user_id)

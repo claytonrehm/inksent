@@ -55,6 +55,7 @@ export default async function AgentDashboard({ params }: { params: Promise<{ id:
         <NotaryHub
           notaryId={notary.id}
           payoutsEnabled={!!notary.payouts_enabled}
+          showPayoutConnect={!notary.payouts_enabled}
           baseZip={notary.base_zip ?? null}
           mileageRate={IRS_MILEAGE_RATE_CENTS}
           metrics={metrics}

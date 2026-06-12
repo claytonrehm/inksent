@@ -275,8 +275,9 @@ export default function Home() {
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-fuchsia-400">in one dashboard.</span>
               </h2>
               <p className="text-slate-400 text-lg leading-relaxed mb-8">
-                Every Inksent agent gets the Notary Hub — a private portal that tracks your earnings, shows exactly
+                Every Inksent agent gets the Notary Hub free — a private portal that tracks your earnings, shows exactly
                 what you&apos;re owed, and turns your signings into tax-ready reports. No spreadsheets, no data entry.
+                Not one of our agents? Subscribe and track every signing you do, anywhere.
               </p>
 
               <div className="space-y-4 mb-9">
