@@ -129,7 +129,16 @@ export default function OrderForm({ prefill }: { prefill?: OrderPrefill }) {
           <p className="text-xs text-gray-400 uppercase tracking-widest mb-1">Confirmation</p>
           <p className="text-2xl font-mono font-bold text-gray-900">{confirmation.confirmation_number}</p>
         </div>
-        <Button variant="secondary" className="mt-2" onClick={() => setConfirmation(null)}>
+        <a
+          href={`/track/${confirmation.id}`}
+          className="mt-2 inline-flex items-center gap-2 bg-violet-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-violet-700 transition-colors"
+        >
+          Track your signing live →
+        </a>
+        <p className="text-xs text-gray-400 max-w-sm">
+          We&apos;ve also emailed you this confirmation and a link to upload your documents.
+        </p>
+        <Button variant="secondary" className="mt-1" onClick={() => setConfirmation(null)}>
           Place Another Order
         </Button>
       </div>

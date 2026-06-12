@@ -261,6 +261,11 @@ export default function Home() {
             </Link>
           </ScrollReveal>
         </div>
+        <ScrollReveal delay={150}>
+          <p className="text-center text-slate-400 text-sm mt-8">
+            Title company? <Link href="/demo" className="text-violet-300 font-semibold hover:text-violet-200 underline underline-offset-2">See a live demo of your portal →</Link>
+          </p>
+        </ScrollReveal>
       </section>
 
       {/* Notary Business Hub */}
@@ -456,6 +461,7 @@ export default function Home() {
           <div className="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
             <span>© {new Date().getFullYear()} Inksent Signing Services · All rights reserved</span>
             <div className="flex items-center gap-4">
+              <Link href="/about" className="hover:text-slate-400 transition-colors">About</Link>
               <Link href="/faq" className="hover:text-slate-400 transition-colors">FAQ</Link>
               <Link href="/privacy" className="hover:text-slate-400 transition-colors">Privacy</Link>
               <Link href="/terms" className="hover:text-slate-400 transition-colors">Terms</Link>

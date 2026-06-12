@@ -30,12 +30,12 @@ const STATS = [
 ]
 
 const ORDERS: DemoOrder[] = [
-  { ref: 'SUM-26-1087', conf: 'ND-260610-A1B2C3', date: 'Today · 4:00 PM', signer: 'Maria & Luis Reyes', loc: 'Chula Vista, CA', agent: 'En route — Rosaura O.', fee: '$250', status: 'En Route', color: 'bg-blue-100 text-blue-800', type: 'Purchase' },
-  { ref: 'SUM-26-1085', conf: 'ND-260610-D4E5F6', date: 'Today · 1:30 PM', signer: 'James Whitfield', loc: 'Carlsbad, CA', agent: 'Confirmed — Mikhail S.', fee: '$200', status: 'Agent Confirmed', color: 'bg-violet-100 text-violet-800', type: 'Refinance' },
-  { ref: 'SUM-26-1090', conf: 'ND-260610-G7H8I9', date: 'Today · 5:30 PM', signer: 'Priya Nair', loc: 'Irvine, CA', agent: 'Finding agent…', fee: '$200', status: 'Finding Agent', color: 'bg-amber-100 text-amber-800', type: 'HELOC' },
-  { ref: 'SUM-26-1079', conf: 'ND-260609-J1K2L3', date: 'Yesterday', signer: 'Robert Chen', loc: 'San Diego, CA', agent: 'Lynn Daniels', fee: '$200', status: 'Completed', color: 'bg-green-100 text-green-800', type: 'Refinance' },
-  { ref: 'SUM-26-1078', conf: 'ND-260609-M4N5O6', date: 'Yesterday', signer: 'Tara Mitchell', loc: 'El Cajon, CA', agent: 'Marika Dalesandro', fee: '$250', status: 'Completed', color: 'bg-green-100 text-green-800', type: 'Purchase' },
-  { ref: 'SUM-26-1074', conf: 'ND-260608-P7Q8R9', date: 'Jun 8', signer: 'David & Anne Park', loc: 'Temecula, CA', agent: 'Michael Krause', fee: '$200', status: 'Completed', color: 'bg-green-100 text-green-800', type: 'Seller Package' },
+  { ref: 'MT-26-1087', conf: 'ND-260610-A1B2C3', date: 'Today · 4:00 PM', signer: 'Maria & Luis Reyes', loc: 'Chula Vista, CA', agent: 'En route — Rosaura O.', fee: '$250', status: 'En Route', color: 'bg-blue-100 text-blue-800', type: 'Purchase' },
+  { ref: 'MT-26-1085', conf: 'ND-260610-D4E5F6', date: 'Today · 1:30 PM', signer: 'James Whitfield', loc: 'Carlsbad, CA', agent: 'Confirmed — Mikhail S.', fee: '$200', status: 'Agent Confirmed', color: 'bg-violet-100 text-violet-800', type: 'Refinance' },
+  { ref: 'MT-26-1090', conf: 'ND-260610-G7H8I9', date: 'Today · 5:30 PM', signer: 'Priya Nair', loc: 'Irvine, CA', agent: 'Finding agent…', fee: '$200', status: 'Finding Agent', color: 'bg-amber-100 text-amber-800', type: 'HELOC' },
+  { ref: 'MT-26-1079', conf: 'ND-260609-J1K2L3', date: 'Yesterday', signer: 'Robert Chen', loc: 'San Diego, CA', agent: 'Lynn Daniels', fee: '$200', status: 'Completed', color: 'bg-green-100 text-green-800', type: 'Refinance' },
+  { ref: 'MT-26-1078', conf: 'ND-260609-M4N5O6', date: 'Yesterday', signer: 'Tara Mitchell', loc: 'El Cajon, CA', agent: 'Marika Dalesandro', fee: '$250', status: 'Completed', color: 'bg-green-100 text-green-800', type: 'Purchase' },
+  { ref: 'MT-26-1074', conf: 'ND-260608-P7Q8R9', date: 'Jun 8', signer: 'David & Anne Park', loc: 'Temecula, CA', agent: 'Michael Krause', fee: '$200', status: 'Completed', color: 'bg-green-100 text-green-800', type: 'Seller Package' },
 ]
 
 const INVOICES: DemoInvoice[] = [
@@ -58,7 +58,7 @@ export default async function DemoPage({
   searchParams: Promise<{ co?: string; contact?: string; name?: string; logo?: string; email?: string; domain?: string }>
 }) {
   const sp = await searchParams
-  const company = sp.co?.trim() || 'Summit Settlement Services'
+  const company = sp.co?.trim() || 'Meridian Title & Escrow'
   const logo = sp.logo?.trim()
   // Auto-pull the company's site icon from their domain (no API key needed).
   const domain = sp.domain?.trim().replace(/^https?:\/\//, '').replace(/\/.*$/, '')

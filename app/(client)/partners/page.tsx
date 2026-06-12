@@ -134,7 +134,10 @@ export default function PartnersPage() {
             <Link href="/order" className="no-print inline-flex items-center gap-2 bg-violet-600 text-white font-bold px-7 py-3.5 rounded-xl hover:bg-violet-700 transition-colors">
               Place a Signing Order <ArrowRight size={16} />
             </Link>
-            <Link href="/partners/apply" className="no-print inline-flex items-center gap-2 border border-violet-200 text-violet-700 font-bold px-7 py-3.5 rounded-xl hover:bg-violet-50 transition-colors">
+            <Link href="/demo" className="no-print inline-flex items-center gap-2 border border-violet-200 text-violet-700 font-bold px-7 py-3.5 rounded-xl hover:bg-violet-50 transition-colors">
+              See a Live Demo
+            </Link>
+            <Link href="/partners/apply" className="no-print inline-flex items-center gap-2 border border-gray-200 text-gray-700 font-bold px-7 py-3.5 rounded-xl hover:bg-gray-50 transition-colors">
               Become a Partner
             </Link>
           </div>

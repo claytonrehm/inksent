@@ -30,6 +30,7 @@ export default function MarketingShell({
         <div className="max-w-3xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500">
           <InksentLogo size="sm" />
           <div className="flex flex-wrap justify-center gap-4">
+            <Link href="/about" className="hover:text-gray-800">About</Link>
             <Link href="/partners" className="hover:text-gray-800">For Title Companies</Link>
             <Link href="/join" className="hover:text-gray-800">For Signing Agents</Link>
             <Link href="/resources" className="hover:text-gray-800">Resources</Link>

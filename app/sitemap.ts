@@ -6,7 +6,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'
 // (and disallowed in robots.ts).
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
-    '', '/order', '/apply', '/join', '/partners', '/partners/apply',
+    '', '/about', '/order', '/apply', '/join', '/partners', '/partners/apply',
     '/notary-signing-service-san-diego', '/notary-signing-agent-jobs-san-diego',
     '/resources',
     '/resources/how-to-become-a-notary-signing-agent-in-california',
