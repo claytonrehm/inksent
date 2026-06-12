@@ -100,16 +100,16 @@ export default async function DemoPage({
       </div>
 
       {/* Branded header (co-brand with the prospect) */}
-      <div className="bg-white border-b border-gray-100 px-6 py-4 shadow-sm">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
+      <div className="bg-white border-b border-gray-100 px-4 sm:px-6 py-3 sm:py-4 shadow-sm">
+        <div className="max-w-5xl mx-auto flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <BrandHeader logo={logo} favicon={favicon} company={company} />
-            <span className="text-gray-300">·</span>
-            <span className="text-xs text-gray-400 flex items-center gap-1">powered by <InksentLogo size="sm" /></span>
+            <span className="hidden sm:inline text-gray-300">·</span>
+            <span className="hidden sm:flex text-xs text-gray-400 items-center gap-1">powered by <InksentLogo size="sm" /></span>
           </div>
-          <div className="text-right leading-tight">
-            <div className="text-sm font-semibold text-gray-800">{fullName}</div>
-            <div className="text-xs text-gray-400">{email}</div>
+          <div className="text-right leading-tight min-w-0">
+            <div className="text-sm font-semibold text-gray-800 truncate">{fullName}</div>
+            <div className="text-xs text-gray-400 truncate max-w-[150px] sm:max-w-none">{email}</div>
           </div>
         </div>
       </div>
@@ -185,11 +185,11 @@ export default async function DemoPage({
         </div>
 
         {/* Live tracking sample */}
-        <div id="tracking" className="scroll-mt-20 bg-white rounded-2xl border border-gray-100 shadow-md p-6">
-          <div className="flex items-center gap-2 mb-1">
-            <MapPin size={16} className="text-violet-600" />
+        <div id="tracking" className="scroll-mt-20 bg-white rounded-2xl border border-gray-100 shadow-md p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
+            <MapPin size={16} className="text-violet-600 shrink-0" />
             <h2 className="font-bold text-gray-900">Live — Maria &amp; Luis Reyes signing</h2>
-            <span className="ml-auto text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-medium">On the way · ETA 4:00 PM</span>
+            <span className="sm:ml-auto text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-medium whitespace-nowrap">On the way · ETA 4:00 PM</span>
           </div>
           <p className="text-sm text-gray-500 mb-5">Chula Vista, CA · Purchase · Confirmation ND-260610-A1B2C3</p>
           <div className="space-y-3">

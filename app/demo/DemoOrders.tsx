@@ -29,7 +29,28 @@ export default function DemoOrders({ orders }: { orders: DemoOrder[] }) {
   const [sel, setSel] = useState<DemoOrder | null>(null)
   return (
     <>
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-md overflow-x-auto">
+      {/* Mobile: stacked cards */}
+      <div className="sm:hidden space-y-3">
+        {orders.map((o) => (
+          <button key={o.conf} onClick={() => setSel(o)} className="w-full text-left bg-white rounded-2xl border border-gray-100 shadow-sm p-4 active:bg-violet-50/60">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <div className="font-bold text-gray-900 truncate">{o.signer}</div>
+                <div className="text-xs text-gray-400">{o.ref}</div>
+              </div>
+              <span className={`shrink-0 inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${o.color}`}>{o.status}</span>
+            </div>
+            <div className="mt-2 flex items-center justify-between text-sm">
+              <span className="text-gray-500">{o.date}</span>
+              <span className="font-semibold text-gray-900">{o.fee}</span>
+            </div>
+            <div className="mt-1 text-sm text-gray-500 truncate">{o.loc} · {o.agent}</div>
+          </button>
+        ))}
+      </div>
+
+      {/* Desktop: table */}
+      <div className="hidden sm:block bg-white rounded-2xl border border-gray-100 shadow-md overflow-x-auto">
         <table className="w-full text-sm min-w-[800px]">
           <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
             <tr>
@@ -62,7 +83,7 @@ export default function DemoOrders({ orders }: { orders: DemoOrder[] }) {
           </tbody>
         </table>
       </div>
-      <p className="text-xs text-gray-400 mt-2 px-1">Tip: click any order to see its live status, agent, and documents.</p>
+      <p className="text-xs text-gray-400 mt-2 px-1">Tip: tap any order to see its live status, agent, and documents.</p>
 
       {sel && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm" onClick={() => setSel(null)}>
