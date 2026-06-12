@@ -3,6 +3,7 @@ import { ShieldCheck, AlertTriangle, ListChecks, Stamp, Lock } from 'lucide-reac
 import MarketingShell from '@/components/MarketingShell'
 import JsonLd from '@/components/JsonLd'
 import { organizationSchema } from '@/lib/seo'
+import TitleInterestForm from './TitleInterestForm'
 
 export const metadata = {
   title: 'Free Signing-Package Check — Never Get Kicked Back | Inksent',
@@ -54,8 +55,8 @@ export default function SigningCheckPage() {
 
         <div className="bg-gradient-to-br from-violet-600 to-fuchsia-600 rounded-2xl p-7 text-white">
           <div className="flex items-center gap-2 mb-2"><ShieldCheck size={18} /><h2 className="text-xl font-black">Title companies: QC every signing automatically</h2></div>
-          <p className="text-violet-100 leading-relaxed mb-4">Run every package through SignCheck before it goes out, or have your assigned Inksent agent do it — and your closings come back clean the first time, so loans fund faster. Ask us about volume access for your team.</p>
-          <a href="mailto:support@inksent.co?subject=SignCheck%20for%20our%20team" className="inline-block bg-white text-violet-700 font-bold px-6 py-3 rounded-xl hover:bg-violet-50">Talk to us</a>
+          <p className="text-violet-100 leading-relaxed mb-5">Run every package through SignCheck before it goes out, or have your assigned Inksent agent do it — and your closings come back clean the first time, so loans fund faster. Tell us about your team and we&apos;ll get you set up.</p>
+          <TitleInterestForm />
         </div>
       </div>
     </MarketingShell>
