@@ -40,16 +40,17 @@ export async function POST(req: NextRequest) {
   }
   if (process.env.RESEND_API_KEY) {
     const resend = new Resend(process.env.RESEND_API_KEY)
+    const esc = (s: unknown) => String(s ?? '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
     resend.emails.send({
       from: 'Inksent Partners <orders@inksent.co>',
       to: process.env.ADMIN_EMAIL || 'clayton.rehm@gmail.com',
-      subject: `🏢 New title partner inquiry: ${d.company}`,
+      subject: `🏢 New title partner inquiry: ${esc(d.company)}`,
       html: `<div style="font-family:-apple-system,Segoe UI,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#111;">
         <h2 style="font-size:17px;">New partner inquiry</h2>
-        <p><strong>${d.company}</strong><br/>${d.contact_name}${d.role ? ` · ${d.role}` : ''}<br/>
-        <a href="mailto:${d.email}">${d.email}</a>${d.phone ? ` · ${d.phone}` : ''}</p>
-        <p>Volume: ${d.monthly_volume || '—'}<br/>Billing: ${d.billing_preference || '—'}</p>
-        ${d.message ? `<p style="background:#f5f3ff;border-radius:8px;padding:12px;">${d.message}</p>` : ''}
+        <p><strong>${esc(d.company)}</strong><br/>${esc(d.contact_name)}${d.role ? ` · ${esc(d.role)}` : ''}<br/>
+        <a href="mailto:${esc(d.email)}">${esc(d.email)}</a>${d.phone ? ` · ${esc(d.phone)}` : ''}</p>
+        <p>Volume: ${esc(d.monthly_volume || '—')}<br/>Billing: ${esc(d.billing_preference || '—')}</p>
+        ${d.message ? `<p style="background:#f5f3ff;border-radius:8px;padding:12px;">${esc(d.message)}</p>` : ''}
       </div>`,
     }).catch(() => {})
   }

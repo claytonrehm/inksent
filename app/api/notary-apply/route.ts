@@ -50,6 +50,12 @@ export async function POST(req: NextRequest) {
   }
 
   const d = parsed.data
+  // Only accept a photo_url that points at our own Supabase storage (the apply form
+  // uploads there) — never an arbitrary attacker URL, which would otherwise be stored
+  // and re-rendered as an <img> in the admin email + on the track/agent pages.
+  const SUPA_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  const safePhotoUrl = d.photo_url && SUPA_URL && d.photo_url.startsWith(SUPA_URL) ? d.photo_url : null
+  const esc = (s: unknown) => String(s ?? '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
   const base = lookupZip(d.base_zip)
   if (!base) {
     return NextResponse.json({ error: 'That ZIP code was not recognized. Please double-check it.' }, { status: 400 })
@@ -76,7 +82,7 @@ export async function POST(req: NextRequest) {
     signings_completed: d.signings_completed || null,
     years_experience: d.years_experience ? parseInt(d.years_experience) : null,
     notes: d.notes || null,
-    photo_url: d.photo_url || null,
+    photo_url: safePhotoUrl,
     sms_consent_at: d.sms_consent ? new Date().toISOString() : null,
     active: autoApprove,
   }).select('id').single()
@@ -176,17 +182,17 @@ export async function POST(req: NextRequest) {
         <div style="max-width:480px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
           <div style="background:#5B4FCF;padding:16px 24px;color:#fff;font-weight:700;font-size:15px;">🖊 New Notary Application</div>
           <div style="padding:24px;">
-            ${d.photo_url ? `<img src="${d.photo_url}" alt="${d.name}" style="width:96px;height:96px;border-radius:12px;object-fit:cover;border:1px solid #eee;margin-bottom:16px;" />` : ''}
+            ${safePhotoUrl ? `<img src="${esc(safePhotoUrl)}" alt="${esc(d.name)}" style="width:96px;height:96px;border-radius:12px;object-fit:cover;border:1px solid #eee;margin-bottom:16px;" />` : ''}
             <table style="width:100%;font-size:14px;border-collapse:collapse;">
-              <tr><td style="color:#888;padding:6px 0;">Name</td><td style="text-align:right;font-weight:600;">${d.name}</td></tr>
-              <tr><td style="color:#888;padding:6px 0;">Phone</td><td style="text-align:right;"><a href="tel:${d.phone}" style="color:#5B4FCF;text-decoration:none;">${d.phone}</a></td></tr>
-              <tr><td style="color:#888;padding:6px 0;">Email</td><td style="text-align:right;">${d.email}</td></tr>
-              <tr><td style="color:#888;padding:6px 0;">Experience</td><td style="text-align:right;">${d.years_experience ? `${d.years_experience} years` : 'Not given'}</td></tr>
+              <tr><td style="color:#888;padding:6px 0;">Name</td><td style="text-align:right;font-weight:600;">${esc(d.name)}</td></tr>
+              <tr><td style="color:#888;padding:6px 0;">Phone</td><td style="text-align:right;"><a href="tel:${esc(d.phone)}" style="color:#5B4FCF;text-decoration:none;">${esc(d.phone)}</a></td></tr>
+              <tr><td style="color:#888;padding:6px 0;">Email</td><td style="text-align:right;">${esc(d.email)}</td></tr>
+              <tr><td style="color:#888;padding:6px 0;">Experience</td><td style="text-align:right;">${d.years_experience ? `${esc(d.years_experience)} years` : 'Not given'}</td></tr>
               <tr><td style="color:#888;padding:6px 0;">Signings done</td><td style="text-align:right;">${SIGNINGS_LABEL[d.signings_completed ?? ''] || 'Not given'}</td></tr>
               <tr><td style="color:#888;padding:6px 0;">NNA Certified</td><td style="text-align:right;">${d.nna_certified === 'yes' ? 'Yes' : 'No'}</td></tr>
               <tr><td style="color:#888;padding:6px 0;">Background check</td><td style="text-align:right;">${d.background_checked === 'yes' ? 'Yes' : 'No'}</td></tr>
               <tr><td style="color:#888;padding:6px 0;vertical-align:top;">Coverage</td><td style="text-align:right;">${base.city}, ${base.state} ${d.base_zip}<br/>within ${radius} miles</td></tr>
-              ${d.notes ? `<tr><td style="color:#888;padding:6px 0;vertical-align:top;">Notes</td><td style="text-align:right;">${d.notes}</td></tr>` : ''}
+              ${d.notes ? `<tr><td style="color:#888;padding:6px 0;vertical-align:top;">Notes</td><td style="text-align:right;">${esc(d.notes)}</td></tr>` : ''}
             </table>
             <a href="https://inksent.co/notaries" style="display:block;text-align:center;background:#5B4FCF;color:#fff;text-decoration:none;font-weight:700;padding:12px;border-radius:8px;margin-top:20px;">Review &amp; Approve →</a>
           </div>

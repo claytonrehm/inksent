@@ -5,11 +5,18 @@ import {
   twoFactorEnabled, adminEmail, generateCode, pendingCookieName, makePendingToken,
 } from '@/lib/admin-auth'
 import { logAudit, reqIp } from '@/lib/audit'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 export async function POST(req: Request) {
   const form = await req.formData().catch(() => null)
   const password = (form?.get('password') as string) || ''
   const ip = reqIp(req)
+
+  // Throttle password attempts (brute-force guard on the admin gate).
+  if (!(await checkRateLimit(`admin-login:${ip}`, 10, 900))) {
+    logAudit({ action: 'admin_login_failed', actorType: 'admin', entityType: 'auth', ip, success: false, meta: { reason: 'rate_limited' } })
+    return NextResponse.redirect(new URL('/admin-login?error=rate', req.url), { status: 303 })
+  }
 
   if (!checkAdminPassword(password)) {
     logAudit({ action: 'admin_login_failed', actorType: 'admin', entityType: 'auth', ip, success: false, meta: { reason: 'bad_password' } })

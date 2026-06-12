@@ -10,6 +10,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!Array.isArray(documents) || documents.length === 0) {
     return NextResponse.json({ error: 'No documents' }, { status: 400 })
   }
+  // SECURITY: the order id is the capability token (the upload link is emailed to
+  // the client). Every document path MUST be scoped to THIS order's storage prefix
+  // so a caller can never poison the record — or, on replace, trigger the storage
+  // delete — against another order's loan package. Legit paths are `${id}/...`.
+  const pathsOk = documents.every((d: unknown) => {
+    const p = (d as { path?: unknown })?.path
+    return typeof p === 'string' && p.startsWith(`${id}/`) && !p.includes('..')
+  })
+  if (!pathsOk || documents.length > 50) {
+    return NextResponse.json({ error: 'Invalid documents' }, { status: 400 })
+  }
   const replace = mode === 'replace'
 
   const supabase = await createClient()
