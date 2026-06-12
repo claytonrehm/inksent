@@ -438,6 +438,15 @@ export default function Home() {
               <Link href="/partners" className="hover:text-slate-300 transition-colors">For Title Companies</Link>
             </div>
           </div>
+          {/* Service-area links — internal links help these pages rank locally */}
+          <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600">
+            <span className="text-slate-500 font-semibold">San Diego:</span>
+            <Link href="/notary-signing-service-san-diego" className="hover:text-slate-400 transition-colors">Notary Signing Service</Link>
+            <span>·</span>
+            <Link href="/notary-signing-agent-jobs-san-diego" className="hover:text-slate-400 transition-colors">Signing Agent Jobs</Link>
+            <span>·</span>
+            <Link href="/resources" className="hover:text-slate-400 transition-colors">Resources</Link>
+          </div>
           <div className="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
             <span>© {new Date().getFullYear()} Inksent Signing Services · All rights reserved</span>
             <div className="flex items-center gap-4">

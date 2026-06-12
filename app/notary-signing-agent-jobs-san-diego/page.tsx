@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Phone, Mail, Smartphone, DollarSign, Landmark, CalendarCheck, MapPin, Languages, ArrowRight, CheckCircle2 } from 'lucide-react'
 import InksentLogo from '@/components/InksentLogo'
 import JsonLd from '@/components/JsonLd'
-import { organizationSchema } from '@/lib/seo'
+import { organizationSchema, faqSchema } from '@/lib/seo'
 
 export const metadata = {
   title: 'Notary Signing Agent Jobs in San Diego — $90/Signing | Inksent',
@@ -14,6 +14,15 @@ export const metadata = {
     'notary jobs San Diego', 'signing agent work San Diego', 'NSA jobs San Diego',
   ],
 }
+
+const FAQ: [string, string][] = [
+  ['How much do notary signing agents get paid?', 'Inksent pays $90 per completed signing, sent by direct deposit after each appointment. There are no membership fees and it\'s free to join.'],
+  ['How do I get signing jobs?', 'Once you\'re approved and finish a quick profile, we text you whenever a signing opens in a ZIP code you cover. Tap to accept — first to respond gets the job.'],
+  ['Do I need to be NNA-certified?', 'NNA certification is required to take loan signings (or a willingness to obtain it), along with a current notary commission, a background check, and E&O insurance. We help you get current if you\'re close.'],
+  ['Is there a fee to join?', 'No. Joining the Inksent network is completely free — no membership or platform fees, ever. You keep $90 per signing.'],
+  ['Do I have to accept every job?', 'No. You only accept the jobs that fit your schedule and coverage area. There are no minimums, quotas, or penalties for passing on a signing.'],
+  ['What areas have signing work?', 'We\'re actively assigning signings across San Diego County and surrounding areas. You set your home ZIP and how far you\'ll drive, and we match you by real distance.'],
+]
 
 const PERKS = [
   { icon: <DollarSign size={20} />, title: '$90 per completed signing', body: 'Competitive flat pay on every signing. No membership fees — it\'s completely free to join.' },
@@ -36,7 +45,7 @@ const REQS = [
 export default function Page() {
   return (
     <main className="bg-white text-gray-900">
-      <JsonLd data={organizationSchema} />
+      <JsonLd data={[organizationSchema, faqSchema(FAQ)]} />
 
       {/* Header */}
       <header className="border-b border-gray-100">
@@ -97,6 +106,19 @@ export default function Page() {
           <div className="grid sm:grid-cols-2 gap-x-8 gap-y-2.5">
             {REQS.map((r) => (
               <div key={r} className="flex items-center gap-2 text-gray-700"><CheckCircle2 size={16} className="text-green-500 shrink-0" /><span className="text-sm">{r}</span></div>
+            ))}
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section>
+          <h2 className="text-2xl font-black mb-6">Signing agent jobs — FAQ</h2>
+          <div className="space-y-5">
+            {FAQ.map(([q, a]) => (
+              <div key={q} className="border-b border-gray-100 pb-5">
+                <h3 className="font-bold text-gray-900 mb-1.5">{q}</h3>
+                <p className="text-gray-600 leading-relaxed">{a}</p>
+              </div>
             ))}
           </div>
         </section>

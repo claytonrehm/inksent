@@ -4,7 +4,9 @@ import BackLink from '@/components/BackLink'
 import { createClient, createAuthClient } from '@/lib/supabase/server'
 
 export const metadata = {
-  title: 'Place a Signing Order — Inksent',
+  title: 'Order a Notary Signing Agent — Inksent',
+  description: 'Place a notary signing order in two minutes. Vetted, NNA-certified signing agents confirmed in ~30 minutes, flat $185, with automatic backup if anyone cancels.',
+  alternates: { canonical: '/order' },
 }
 
 export const dynamic = 'force-dynamic'

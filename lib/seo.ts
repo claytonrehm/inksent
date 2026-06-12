@@ -60,6 +60,21 @@ export function faqSchema(items: readonly (readonly [string, string])[]) {
   }
 }
 
+export function articleSchema(opts: { title: string; description: string; slug: string; datePublished: string }) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: opts.title,
+    description: opts.description,
+    datePublished: opts.datePublished,
+    dateModified: opts.datePublished,
+    author: { '@type': 'Organization', name: 'Inksent', url: BASE },
+    publisher: { '@type': 'Organization', name: 'Inksent', logo: { '@type': 'ImageObject', url: OG } },
+    mainEntityOfPage: `${BASE}/resources/${opts.slug}`,
+    image: OG,
+  }
+}
+
 // Google for Jobs listing for the signing-agent recruiting funnel. Pay is stated in
 // the description (a "$90 per signing" piece rate isn't a valid structured salary unit,
 // so we keep it accurate in prose rather than forcing a misleading HOUR/DAY value).

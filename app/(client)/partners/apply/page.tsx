@@ -5,8 +5,9 @@ import CoverageCheck from '@/components/CoverageCheck'
 import { CheckCircle } from 'lucide-react'
 
 export const metadata = {
-  title: 'Become a Partner — Inksent',
-  description: 'Set up your title company with Inksent: vetted, insured signing agents, live tracking, flat $185, and white-glove service.',
+  title: 'Become a Title Partner — Inksent',
+  description: 'Set up your title or escrow company with Inksent: vetted, insured notary signing agents, 30-minute confirmation, live tracking, flat $185, and white-glove service.',
+  alternates: { canonical: '/partners/apply' },
 }
 
 const PERKS = [

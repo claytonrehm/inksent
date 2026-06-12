@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Phone, Mail, ShieldCheck, Clock, MapPin, RefreshCw, FileCheck2, CheckCircle2, ArrowRight } from 'lucide-react'
 import InksentLogo from '@/components/InksentLogo'
 import JsonLd from '@/components/JsonLd'
-import { organizationSchema } from '@/lib/seo'
+import { organizationSchema, faqSchema } from '@/lib/seo'
 import { createClient } from '@/lib/supabase/server'
 import { lookupZip } from '@/lib/coverage'
 import { credentialsEligible } from '@/lib/credentials'
@@ -20,6 +20,15 @@ export const metadata = {
     'refinance signing San Diego', 'purchase signing notary San Diego',
   ],
 }
+
+const FAQ: [string, string][] = [
+  ['How fast can you get a notary signing agent in San Diego?', 'Most signings are confirmed in about 30 minutes. We alert every qualified agent covering the area at once, and the first to accept is assigned — no phone tag or waiting for callbacks.'],
+  ['What does a notary signing typically cost?', 'A flat $185 per signing — no contracts, no minimums, and no surprise trip fees. Pay by card or ACH, with net-30 available for established title and escrow partners.'],
+  ['Are your signing agents vetted and insured?', 'Yes. Every agent is NNA-certified, background-checked, and E&O-insured, and we re-verify credentials before every job. An agent with a lapsed credential is automatically blocked from being assigned.'],
+  ['What happens if the assigned agent cancels?', 'The job instantly re-offers to every other covering agent until one accepts, and your document package re-routes to whoever takes it — so you never have to scramble or re-send anything.'],
+  ['What types of signings do you handle?', 'Purchase, refinance, HELOC, reverse mortgage, loan modification, seller packages, loan applications, and single-document notarizations. Agents are equipped with dual-tray printers for legal + letter packages.'],
+  ['Which areas of San Diego do you cover?', 'San Diego County and surrounding areas, including Chula Vista, Carlsbad, El Cajon, Spring Valley, and into Riverside County. Submit an order and we confirm coverage fast.'],
+]
 
 const POINTS = [
   { icon: <Clock size={20} />, title: '~30-minute confirmation', body: 'We alert every qualified agent in the area at once — first to accept wins. No phone tag, no waiting hours for a callback.' },
@@ -50,7 +59,7 @@ export default async function Page() {
 
   return (
     <main className="bg-white text-gray-900">
-      <JsonLd data={organizationSchema} />
+      <JsonLd data={[organizationSchema, faqSchema(FAQ)]} />
 
       {/* Header */}
       <header className="border-b border-gray-100">
@@ -119,6 +128,19 @@ export default async function Page() {
           <h2 className="text-2xl font-black mb-3">Signings we handle</h2>
           <p className="text-gray-600 mb-4">Purchase · Refinance · HELOC · Reverse Mortgage · Loan Modification · Seller Packages · Loan Applications · Single-document notarizations</p>
           <p className="text-gray-600 leading-relaxed">Every agent is vetted for real loan-signing experience and equipped with a dual-tray printer for legal + letter packages. Bilingual agents (Spanish, Mandarin, Vietnamese, Tagalog, Korean and more) are matched automatically when a signing needs them.</p>
+        </section>
+
+        {/* FAQ */}
+        <section>
+          <h2 className="text-2xl font-black mb-6">San Diego notary signing — FAQ</h2>
+          <div className="space-y-5">
+            {FAQ.map(([q, a]) => (
+              <div key={q} className="border-b border-gray-100 pb-5">
+                <h3 className="font-bold text-gray-900 mb-1.5">{q}</h3>
+                <p className="text-gray-600 leading-relaxed">{a}</p>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* CTA */}
