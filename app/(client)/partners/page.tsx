@@ -3,8 +3,10 @@ import Link from 'next/link'
 import PrintButton from './PrintButton'
 
 export const metadata = {
-  title: 'Inksent for Title Companies — Notary Signing, Done Right',
-  description: 'A faster, more reliable signing service: backup-on-cancel, vetted agents, live tracking, flat $185.',
+  title: 'Notary Signing Service for Title & Escrow Companies | Inksent',
+  description: 'A faster, more reliable notary signing service for title and escrow: vetted NNA-certified agents, 30-minute confirmation, automatic backup on cancel, live tracking, flat $185.',
+  alternates: { canonical: '/partners' },
+  keywords: ['notary signing service', 'title company notary', 'escrow signing service', 'loan signing service', 'signing agent dispatch'],
 }
 
 const EDGES = [

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { CheckCircle, Clock, DollarSign, MapPin, Phone, Shield, ArrowRight, ShieldCheck, FileCheck2, Eye, Building2, UserRoundCheck } from 'lucide-react'
+import { CheckCircle, Clock, DollarSign, MapPin, Phone, Shield, ArrowRight, ShieldCheck, FileCheck2, Eye, Building2, UserRoundCheck, Car, Receipt, LayoutDashboard, Wallet } from 'lucide-react'
 import InksentLogo from '@/components/InksentLogo'
 import HeroStats from '@/components/HeroStats'
 import PhoneMockup from '@/components/PhoneMockup'
@@ -8,6 +8,20 @@ import USMap from '@/components/USMap'
 import ScrollReveal from '@/components/ScrollReveal'
 import AuroraBackground from '@/components/AuroraBackground'
 import NavClient from '@/components/NavClient'
+import JsonLd from '@/components/JsonLd'
+import { organizationSchema, websiteSchema } from '@/lib/seo'
+
+export const metadata = {
+  title: 'Inksent — On-Demand Notary Signing Agents for Title & Escrow',
+  description:
+    'Order vetted, NNA-certified, background-checked, E&O-insured notary signing agents on demand. Confirmed in ~30 minutes with automatic backup if anyone cancels. Serving San Diego and expanding nationwide.',
+  alternates: { canonical: '/' },
+  keywords: [
+    'notary signing agent', 'mobile notary', 'loan signing agent', 'notary signing service',
+    'title company notary', 'escrow signing service', 'San Diego notary signing agent',
+    'NNA certified notary', 'order a notary signing',
+  ],
+}
 
 const FEATURES = [
   { icon: <ShieldCheck size={22} />, title: 'Never Left Scrambling', desc: 'If your notary cancels, the job instantly re-offers to every other covering agent — automatically — until one sticks.' },
@@ -40,6 +54,7 @@ const SIGNING_TYPES = [
 export default function Home() {
   return (
     <div className="min-h-screen bg-[#07070d] text-white antialiased overflow-x-hidden">
+      <JsonLd data={[organizationSchema, websiteSchema]} />
       <NavClient />
 
       {/* Hero */}
@@ -241,10 +256,90 @@ export default function Home() {
             <Link href="/join" className="block h-full group rounded-3xl border border-white/10 bg-gradient-to-br from-fuchsia-600/20 to-transparent p-8 hover:border-fuchsia-400/50 transition-all">
               <UserRoundCheck className="text-fuchsia-300 mb-4" size={28} />
               <h3 className="text-2xl font-black text-white mb-2">For Notaries</h3>
-              <p className="text-slate-400 text-sm mb-5 leading-relaxed">Join free, get jobs by text in your area, and earn $90 per signing — paid automatically to your bank account.</p>
+              <p className="text-slate-400 text-sm mb-5 leading-relaxed">Join free, get jobs by text, and earn $90 per signing — paid automatically. Plus a free Business Hub with earnings, payouts, and tax-ready mileage reports.</p>
               <span className="inline-flex items-center gap-1.5 text-fuchsia-300 font-semibold text-sm group-hover:gap-2.5 transition-all">Join the network <ArrowRight size={15} /></span>
             </Link>
           </ScrollReveal>
+        </div>
+      </section>
+
+      {/* Notary Business Hub */}
+      <section id="notary-hub" className="px-6 py-16 sm:py-24 relative">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+            {/* Copy */}
+            <ScrollReveal>
+              <p className="text-fuchsia-400 font-semibold text-sm uppercase tracking-widest mb-3">Free for our agents</p>
+              <h2 className="text-4xl sm:text-[2.75rem] font-black text-white leading-tight mb-5">
+                Your whole notary business,{' '}
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-fuchsia-400">in one dashboard.</span>
+              </h2>
+              <p className="text-slate-400 text-lg leading-relaxed mb-8">
+                Every Inksent agent gets the Notary Hub — a private portal that tracks your earnings, shows exactly
+                what you&apos;re owed, and turns your signings into tax-ready reports. No spreadsheets, no data entry.
+              </p>
+
+              <div className="space-y-4 mb-9">
+                {[
+                  { icon: <LayoutDashboard size={18} />, title: 'Live earnings dashboard', desc: 'Month-to-date, year-to-date, and per-job earnings with charts — updated automatically.' },
+                  { icon: <Wallet size={18} />, title: 'Know what you’re owed', desc: 'See paid vs. pending payouts and a receivables-aging view. Never lose track of a check again.' },
+                  { icon: <Car size={18} />, title: 'Automatic mileage log', desc: 'We estimate round-trip miles for every signing and tally your deduction at the IRS rate.' },
+                  { icon: <Receipt size={18} />, title: 'One-click tax exports', desc: 'Download mileage and income CSVs for Schedule C at tax time. Hand them straight to your CPA.' },
+                ].map((f) => (
+                  <div key={f.title} className="flex items-start gap-3.5">
+                    <span className="mt-0.5 w-9 h-9 shrink-0 rounded-lg bg-fuchsia-500/15 text-fuchsia-300 flex items-center justify-center">{f.icon}</span>
+                    <div>
+                      <p className="text-white font-bold text-[15px]">{f.title}</p>
+                      <p className="text-slate-400 text-sm leading-relaxed">{f.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link href="/hub/login" className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white px-7 py-3.5 rounded-xl font-bold hover:from-violet-500 hover:to-fuchsia-500 transition-all shadow-[0_0_30px_-8px_rgba(217,70,239,0.8)] hover:-translate-y-0.5">
+                  Open your Hub
+                  <ArrowRight size={17} className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <Link href="/join" className="inline-flex items-center justify-center border border-white/15 bg-white/5 text-white px-7 py-3.5 rounded-xl font-bold hover:bg-white/10 transition-all">
+                  Become an agent
+                </Link>
+              </div>
+            </ScrollReveal>
+
+            {/* Dashboard preview */}
+            <ScrollReveal delay={120}>
+              <div className="relative">
+                <div className="absolute -inset-6 bg-gradient-to-tr from-violet-600/20 to-fuchsia-600/10 blur-3xl rounded-[2rem] pointer-events-none" />
+                <div className="relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm p-5 shadow-2xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-sm font-bold text-white">Welcome back, Maria</p>
+                    <span className="text-[10px] font-semibold text-fuchsia-300 bg-fuchsia-500/15 rounded-full px-2.5 py-1">Notary Hub</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    {[
+                      { l: 'This month', v: '$1,840' },
+                      { l: 'Pending', v: '$360' },
+                      { l: 'YTD miles', v: '1,204' },
+                    ].map((s) => (
+                      <div key={s.l} className="rounded-xl bg-white/[0.04] border border-white/10 p-3">
+                        <p className="text-[9px] uppercase tracking-wider text-slate-400 font-semibold mb-1">{s.l}</p>
+                        <p className="text-lg font-black text-white tabular-nums leading-none">{s.v}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="rounded-xl bg-white/[0.04] border border-white/10 p-4">
+                    <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-3">Earnings — last 6 months</p>
+                    <div className="flex items-end gap-2 h-24">
+                      {[45, 62, 38, 80, 70, 100].map((h, i) => (
+                        <div key={i} className="flex-1 rounded-t bg-gradient-to-t from-violet-500 to-fuchsia-400" style={{ height: `${h}%` }} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
         </div>
       </section>
 
@@ -336,6 +431,8 @@ export default function Home() {
               <a href="mailto:support@inksent.co" className="hover:text-slate-300 transition-colors">support@inksent.co</a>
               <span className="hidden sm:block">·</span>
               <Link href="/join" className="hover:text-slate-300 transition-colors">For Notaries</Link>
+              <span className="hidden sm:block">·</span>
+              <Link href="/hub/login" className="hover:text-slate-300 transition-colors">Notary Login</Link>
               <span className="hidden sm:block">·</span>
               <Link href="/partners" className="hover:text-slate-300 transition-colors">For Title Companies</Link>
             </div>

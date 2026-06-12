@@ -13,5 +13,7 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) return NextResponse.redirect(`${origin}${next}`)
   }
-  return NextResponse.redirect(`${origin}/login?error=link`)
+  // Route failures back to the right login for the destination (notary vs client).
+  const loginPath = next.startsWith('/hub') ? '/hub/login' : '/login'
+  return NextResponse.redirect(`${origin}${loginPath}?error=link`)
 }

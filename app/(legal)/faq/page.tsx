@@ -1,4 +1,12 @@
-export const metadata = { title: 'FAQ — Inksent' }
+import JsonLd from '@/components/JsonLd'
+import { faqSchema } from '@/lib/seo'
+
+export const metadata = {
+  title: 'Notary Signing FAQ — Signing Agents & Title Companies | Inksent',
+  description:
+    'Answers for notary signing agents (how jobs work, $90/signing pay) and title companies (30-minute confirmation, flat $185, live tracking, automatic backup).',
+  alternates: { canonical: '/faq' },
+}
 
 const NOTARY_FAQ = [
   ['How do I get jobs?', 'Once you\'re approved and finish onboarding, we text you whenever a signing opens up in your coverage area. Tap the link to accept — first to respond gets it.'],
@@ -21,6 +29,7 @@ const CLIENT_FAQ = [
 export default function FAQPage() {
   return (
     <div className="text-gray-700 space-y-8">
+      <JsonLd data={faqSchema([...NOTARY_FAQ, ...CLIENT_FAQ] as [string, string][])} />
       <div>
         <h1 className="text-3xl font-black text-gray-900 mb-1">Frequently Asked Questions</h1>
         <p className="text-gray-500 text-sm">Quick answers for signing agents and title companies.</p>

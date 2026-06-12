@@ -1,10 +1,14 @@
 import { Smartphone, DollarSign, MapPin, Landmark, CalendarCheck, Languages, Phone, Mail, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import PrintButton from '../partners/PrintButton'
+import JsonLd from '@/components/JsonLd'
+import { notaryJobPostingSchema } from '@/lib/seo'
 
 export const metadata = {
-  title: 'Join the Inksent Notary Network — $90/Signing, Jobs by Text',
-  description: 'Free to join. Get signing jobs by text in your area, $90 per completed signing, paid automatically to your bank account.',
+  title: 'Notary Signing Agent Jobs — $90/Signing, Jobs by Text | Inksent',
+  description: 'Free to join. Get notary signing agent jobs by text in your area — $90 per completed signing, paid automatically to your bank. Set your own coverage and schedule.',
+  alternates: { canonical: '/join' },
+  keywords: ['notary signing agent jobs', 'loan signing agent jobs', 'mobile notary jobs', 'notary jobs San Diego', 'signing agent work'],
 }
 
 const PERKS = [
@@ -41,8 +45,12 @@ const PERKS = [
 ]
 
 export default function JoinPage() {
+  const now = new Date()
+  const datePosted = now.toISOString().slice(0, 10)
+  const validThrough = new Date(now.getTime() + 180 * 86_400_000).toISOString().slice(0, 10)
   return (
     <main className="bg-white text-gray-900">
+      <JsonLd data={notaryJobPostingSchema({ datePosted, validThrough })} />
       <PrintButton />
 
       <div className="max-w-3xl mx-auto px-8 py-12 print:py-6">

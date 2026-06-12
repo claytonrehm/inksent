@@ -4,8 +4,9 @@ import NotaryApplyForm from './NotaryApplyForm'
 import { DollarSign, Zap, Clock, Star, Shield, CheckCircle } from 'lucide-react'
 
 export const metadata = {
-  title: 'Join Our Notary Network — Inksent',
-  description: 'Join Inksent\'s approved notary network. $90 per completed signing, job offers by text.',
+  title: 'Apply — Notary Signing Agent Network | Inksent',
+  description: 'Apply to Inksent\'s approved notary signing agent network. $90 per completed signing, job offers by text, paid automatically. Free to join.',
+  alternates: { canonical: '/apply' },
 }
 
 const HOW_IT_WORKS = [
