@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { sendSMS } from '@/lib/sms'
 import { Resend } from 'resend'
 import { createClient } from '@/lib/supabase/server'
-import { sendNotaryApplicationEmail } from '@/lib/email'
+import { sendNotaryApplicationEmail, sendNotaryApprovedEmail } from '@/lib/email'
 import { lookupZip } from '@/lib/coverage'
 import { SIGNINGS_LABEL } from '@/lib/notary'
 import { verifyTurnstile } from '@/lib/turnstile'
@@ -55,8 +55,15 @@ export async function POST(req: NextRequest) {
   }
   const radius = d.coverage_radius ? parseInt(d.coverage_radius) : 25
 
+  // Auto-approve self-reported NNA-certified applicants straight into onboarding —
+  // no manual gatekeeping. They still can't be DISPATCHED until all four credentials
+  // are on file and valid (the dispatch gate), and we verify before the first payout,
+  // so quality holds where it matters. Non-NNA applicants go to manual review.
+  // Disable by setting NOTARY_AUTO_APPROVE=false.
+  const autoApprove = process.env.NOTARY_AUTO_APPROVE !== 'false' && d.nna_certified === 'yes'
+
   const supabase = await createClient()
-  const { error: insertError } = await supabase.from('notaries').insert({
+  const { data: inserted, error: insertError } = await supabase.from('notaries').insert({
     name: d.name,
     email: d.email,
     phone: d.phone,
@@ -70,8 +77,8 @@ export async function POST(req: NextRequest) {
     notes: d.notes || null,
     photo_url: d.photo_url || null,
     sms_consent_at: d.sms_consent ? new Date().toISOString() : null,
-    active: false,
-  })
+    active: autoApprove,
+  }).select('id').single()
 
   if (insertError) {
     // Most likely a duplicate email (unique constraint)
@@ -81,6 +88,7 @@ export async function POST(req: NextRequest) {
     console.error('Notary insert failed:', insertError)
     return NextResponse.json({ error: 'Could not save application' }, { status: 500 })
   }
+  const notaryId = inserted?.id as string
 
   // Best-effort: save real-estate competence + credential dates as a follow-up
   // update so the application never fails if a migration hasn't been run yet.
@@ -113,20 +121,36 @@ export async function POST(req: NextRequest) {
       .then(({ error }) => { if (error) console.warn('commission save skipped:', error.message) })
   }
 
-  // Send onboarding email to the applicant
-  sendNotaryApplicationEmail({ name: d.name, email: d.email }).catch(console.error)
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'
+  const firstName = d.name.split(' ')[0]
 
-  // Confirmation text to the applicant — also prompts them to save our number
-  // (will deliver once Twilio A2P is approved)
-  sendSMS(
-    d.phone,
-    `Hi ${d.name.split(' ')[0]}, thanks for applying to Inksent! We got your application and will review it shortly. Please save this number as "Inksent Signing" — it's how we'll text you signing jobs once you're approved. — Clayton`
-  ).catch(console.error)
+  if (autoApprove && notaryId) {
+    // Stamp approved_at (best-effort) for the onboarding-nudge cron.
+    await supabase.from('notaries').update({ approved_at: new Date().toISOString() }).eq('id', notaryId)
+      .then(({ error }) => { if (error) console.warn('approved_at stamp skipped:', error.message) })
+
+    const onboardUrl = `${baseUrl}/onboard/${notaryId}`
+    // Send the "you're approved — finish your profile" email + welcome SMS.
+    sendNotaryApprovedEmail({ name: d.name, email: d.email, onboardUrl }).catch(console.error)
+    sendSMS(
+      d.phone,
+      `Hi ${firstName}! You're approved for the Inksent signing network 🎉 One quick step before your first job — complete your profile here: ${onboardUrl} — Clayton, Inksent`
+    ).catch(console.error)
+  } else {
+    // Manual-review path (e.g. not NNA-certified): acknowledge + queue for review.
+    sendNotaryApplicationEmail({ name: d.name, email: d.email }).catch(console.error)
+    sendSMS(
+      d.phone,
+      `Hi ${firstName}, thanks for applying to Inksent! We got your application and will review it shortly. Please save this number as "Inksent Signing" — it's how we'll text you signing jobs once you're approved. — Clayton`
+    ).catch(console.error)
+  }
 
   if (process.env.ADMIN_PHONE) {
     sendSMS(
       process.env.ADMIN_PHONE,
-      `🖊 New notary application: ${d.name} · ${d.phone} · ${base.city}, ${base.state} (${radius}mi) — approve at inksent.co/notaries`
+      autoApprove
+        ? `✅ Auto-approved notary: ${d.name} · ${base.city}, ${base.state} (${radius}mi) — onboarding link sent. Verify credentials before first payout.`
+        : `🖊 New notary application (manual review — not NNA-certified): ${d.name} · ${d.phone} · ${base.city}, ${base.state} (${radius}mi) — inksent.co/notaries`
     ).catch(console.error)
   }
 

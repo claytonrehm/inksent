@@ -32,6 +32,14 @@ export async function createConnectOnboardingLink(notary: {
       // unused. Can revert to transfers-only once that approval lands.
       capabilities: { transfers: { requested: true }, card_payments: { requested: true } },
       business_type: 'individual',
+      // Requesting card_payments makes Stripe require a reachable business website.
+      // Notaries don't have one, so we attach the platform URL (always reachable) +
+      // a product description — otherwise every connected account gets flagged
+      // "website couldn't be reached" and restricted.
+      business_profile: {
+        url: baseUrl,
+        product_description: 'Independent mobile notary signing agent completing loan-document signings dispatched by Inksent.',
+      },
       metadata: { notary_id: notary.id },
     })
     accountId = account.id
