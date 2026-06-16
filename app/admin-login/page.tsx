@@ -27,7 +27,8 @@ export default async function AdminLogin({ searchParams }: { searchParams: Promi
                 placeholder="••••••" autoFocus required autoComplete="one-time-code"
                 className="w-full bg-white/5 border border-white/10 text-white text-center text-2xl tracking-[0.5em] rounded-lg px-4 py-3 placeholder:text-slate-600 focus:outline-none focus:border-violet-400/50"
               />
-              {error === 'code' && <p className="text-sm text-red-400 bg-red-500/10 rounded-lg px-3 py-2">Invalid or expired code.</p>}
+              {error === 'code' && <p className="text-sm text-red-400 bg-red-500/10 rounded-lg px-3 py-2">That code didn&apos;t match. Use the code from your most recent email, or tap Start over.</p>}
+              {error === 'expired' && <p className="text-sm text-red-400 bg-red-500/10 rounded-lg px-3 py-2">That code expired. Tap Start over to get a fresh one.</p>}
               <button type="submit" className="w-full bg-violet-600 text-white rounded-lg px-4 py-3 text-sm font-bold hover:bg-violet-500 transition-colors">Verify &amp; Sign In</button>
             </form>
             <div className="flex justify-center mt-6">
@@ -45,6 +46,8 @@ export default async function AdminLogin({ searchParams }: { searchParams: Promi
               />
               {error === '1' && <p className="text-sm text-red-400 bg-red-500/10 rounded-lg px-3 py-2">Incorrect password.</p>}
               {error === 'mail' && <p className="text-sm text-red-400 bg-red-500/10 rounded-lg px-3 py-2">Couldn&apos;t send your code. Try again.</p>}
+              {error === 'session' && <p className="text-sm text-red-400 bg-red-500/10 rounded-lg px-3 py-2">Your sign-in timed out before the code was entered. Please log in again.</p>}
+              {error === 'rate' && <p className="text-sm text-red-400 bg-red-500/10 rounded-lg px-3 py-2">Too many attempts. Wait a few minutes and try again.</p>}
               <button type="submit" className="w-full bg-violet-600 text-white rounded-lg px-4 py-3 text-sm font-bold hover:bg-violet-500 transition-colors">Continue</button>
             </form>
             <p className="text-center text-xs text-slate-500 mt-6">Authorized personnel only.</p>

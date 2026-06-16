@@ -20,17 +20,25 @@ export async function POST(req: Request) {
   const store = await cookies()
   const pending = store.get(pendingCookieName())?.value
 
+  // Distinguish failure modes so a dropped cookie can't masquerade as a "wrong
+  // code": no cookie → session lost; past expiry → expired; otherwise → bad code.
+  if (!pending) {
+    logAudit({ action: 'admin_login_failed', actorType: 'admin', entityType: 'auth', ip, success: false, meta: { reason: '2fa_no_pending_cookie' } })
+    return NextResponse.redirect(new URL('/admin-login?error=session', req.url), { status: 303 })
+  }
   if (!verifyPendingToken(code, pending)) {
-    logAudit({ action: 'admin_login_failed', actorType: 'admin', entityType: 'auth', ip, success: false, meta: { reason: 'bad_2fa_code' } })
-    return NextResponse.redirect(new URL('/admin-login?step=code&error=code', req.url), { status: 303 })
+    const exp = Number(pending.split('.')[0])
+    const expired = !exp || Date.now() > exp
+    logAudit({ action: 'admin_login_failed', actorType: 'admin', entityType: 'auth', ip, success: false, meta: { reason: expired ? '2fa_expired' : 'bad_2fa_code' } })
+    return NextResponse.redirect(new URL(`/admin-login?step=code&error=${expired ? 'expired' : 'code'}`, req.url), { status: 303 })
   }
 
   logAudit({ action: 'admin_login_success', actor: adminEmail(), actorType: 'admin', entityType: 'auth', ip, meta: { twofa: true } })
-  const res = NextResponse.redirect(new URL('/dashboard', req.url), { status: 303 })
+  // Next 16: write cookies via the cookies() API, not on NextResponse.redirect().
   // Issue the real session, clear the pending 2FA cookie.
-  res.cookies.set(adminCookieName(), adminTokenValue(), {
+  store.set(adminCookieName(), adminTokenValue(), {
     httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 60 * 60 * 12,
   })
-  res.cookies.set(pendingCookieName(), '', { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 0 })
-  return res
+  store.set(pendingCookieName(), '', { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 0 })
+  return NextResponse.redirect(new URL('/dashboard', req.url), { status: 303 })
 }

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { Resend } from 'resend'
 import {
   checkAdminPassword, adminCookieName, adminTokenValue,
@@ -41,19 +42,22 @@ export async function POST(req: Request) {
       return NextResponse.redirect(new URL('/admin-login?error=mail', req.url), { status: 303 })
     }
 
-    const res = NextResponse.redirect(new URL('/admin-login?step=code', req.url), { status: 303 })
-    res.cookies.set(pendingCookieName(), makePendingToken(code), {
+    // Next 16: cookies must be written via the cookies() API in a Route Handler.
+    // Setting them on NextResponse.redirect() silently drops the Set-Cookie, so
+    // the pending-2FA cookie never reached /verify and every code looked invalid.
+    const jar = await cookies()
+    jar.set(pendingCookieName(), makePendingToken(code), {
       httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 600,
     })
     logAudit({ action: 'admin_login_password_ok', actor: adminEmail(), actorType: 'admin', entityType: 'auth', ip, meta: { step: '2fa_code_sent' } })
-    return res
+    return NextResponse.redirect(new URL('/admin-login?step=code', req.url), { status: 303 })
   }
 
   // 2FA disabled → log in directly.
-  const res = NextResponse.redirect(new URL('/dashboard', req.url), { status: 303 })
-  res.cookies.set(adminCookieName(), adminTokenValue(), {
+  const jar = await cookies()
+  jar.set(adminCookieName(), adminTokenValue(), {
     httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 60 * 60 * 12,
   })
   logAudit({ action: 'admin_login_success', actor: adminEmail(), actorType: 'admin', entityType: 'auth', ip, meta: { twofa: false } })
-  return res
+  return NextResponse.redirect(new URL('/dashboard', req.url), { status: 303 })
 }
