@@ -174,3 +174,34 @@ link you can click through whenever, and I'll follow up Thursday.")*
 - **Goal isn't the sale on call one** — it's the demo, then the first test signing.
 - **The first test signing is the real win.** Once a title company sends one and it goes
   smoothly, they come back. Your job is to get them to that first one.
+
+---
+
+## Appendix — Recruiting reps (for Clayton)
+
+The fastest hire is an experienced **title/escrow account executive** who already has relationships.
+Find them on LinkedIn (search "title account executive" / "escrow business development" + your
+metro) and message directly. Point everyone to **inksent.co/sales-apply**.
+
+**LinkedIn connection request** (≤300 chars):
+> Hi [Name] — I run Inksent, a notary signing platform for title/escrow. Building out a
+> commission sales role (fully remote, residual income) and your title background stood out.
+> Mind if I share details?
+
+**Follow-up DM after they connect:**
+> Thanks for connecting, [Name]! Quick pitch: Inksent is a notary signing platform title
+> companies love — no upfront cost, they just pay per signing. I'm hiring reps to bring on
+> title companies, paid **$15 on every signing your accounts send — for the life of the
+> account** (residual income that compounds), plus a $200 bonus at 25 signings. 100% commission,
+> work from anywhere. With your relationships you could build a real book fast. Worth a quick
+> chat? Or apply here: inksent.co/sales-apply
+
+**InMail / cold (not yet connected):**
+> Hi [Name] — I'm hiring a remote sales rep to bring title companies onto Inksent, our notary
+> signing platform. It's an easy pitch (no upfront cost to the title company) and pays residual:
+> **$15 per signing for the life of every account you land**, uncapped, plus producer bonuses.
+> Your title/escrow relationships are exactly what makes someone great at this. Open to a
+> 15-minute call, or apply at inksent.co/sales-apply.
+
+Run these in parallel with the Indeed post. The "active rolodex" answer on the application is
+flagged ★ in your admin so you can prioritize relationship-rich candidates.
