@@ -19,6 +19,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (Number.isFinite(body.producer_bonus_cents)) patch.producer_bonus_cents = Math.round(body.producer_bonus_cents)
   if (Number.isFinite(body.bonus_threshold)) patch.bonus_threshold = Math.round(body.bonus_threshold)
 
+  // Onboarding fields. Booleans toggle their *_at timestamps where applicable.
+  if (typeof body.agreement_accepted === 'boolean') patch.agreement_accepted_at = body.agreement_accepted ? new Date().toISOString() : null
+  if (typeof body.w9_received === 'boolean') patch.w9_received = body.w9_received
+  if ('payment_method' in body) patch.payment_method = String(body.payment_method ?? '').trim() || null
+  if ('payment_details' in body) patch.payment_details = String(body.payment_details ?? '').trim() || null
+  if (typeof body.onboarded === 'boolean') patch.onboarded_at = body.onboarded ? new Date().toISOString() : null
+
   if (Object.keys(patch).length === 0) return NextResponse.json({ error: 'Nothing to update' }, { status: 400 })
 
   const supabase = await createClient()

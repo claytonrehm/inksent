@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { computeSalesData } from '@/lib/sales'
 import { formatCurrency } from '@/lib/utils'
 import EditRepForm from './EditRepForm'
+import OnboardingChecklist from './OnboardingChecklist'
 import RecordPayoutForm from './RecordPayoutForm'
 import AssignAccountForm from '../AssignAccountForm'
 import DeleteButton from '../DeleteButton'
@@ -146,6 +147,13 @@ export default async function SalesRepPage({ params }: { params: Promise<{ id: s
             </table>
           </div>
         )}
+      </section>
+
+      {/* Onboarding */}
+      <section className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <h2 className="text-lg font-semibold text-gray-900 mb-1">Onboarding</h2>
+        <p className="text-xs text-gray-400 mb-4">Track what&apos;s needed before this rep starts selling.</p>
+        <OnboardingChecklist rep={rep} />
       </section>
 
       {/* Edit rep */}

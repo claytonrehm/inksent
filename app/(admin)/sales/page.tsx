@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { TrendingUp, Users, Building2, FileSignature, DollarSign, ArrowRight } from 'lucide-react'
+import { TrendingUp, Users, Building2, FileSignature, DollarSign, ArrowRight, UserPlus } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { computeSalesData } from '@/lib/sales'
 import { formatCurrency } from '@/lib/utils'
@@ -12,6 +12,10 @@ export const metadata = { title: 'Sales — Inksent Admin' }
 export default async function SalesPage() {
   const supabase = await createClient()
   const { reps, unattributed, totals } = await computeSalesData(supabase)
+  const { count: newApplicants } = await supabase
+    .from('sales_rep_applications')
+    .select('id', { count: 'exact', head: true })
+    .eq('status', 'new')
 
   const repOptions = reps.filter((r) => r.status === 'active').map((r) => ({ id: r.id, name: r.name }))
   const companySuggestions = unattributed.map((u) => u.display).filter(Boolean)
@@ -26,6 +30,14 @@ export default async function SalesPage() {
           Track sales reps, the title-company accounts they land, the signings those accounts send, and the commission you owe.
         </p>
       </div>
+
+      <Link href="/sales/applicants" className={`flex items-center justify-between gap-3 rounded-xl border px-5 py-3.5 transition-colors ${newApplicants ? 'bg-violet-50 border-violet-200 hover:bg-violet-100' : 'bg-white border-gray-200 hover:bg-gray-50'}`}>
+        <span className="flex items-center gap-2 text-sm font-medium text-gray-900">
+          <UserPlus size={16} className="text-violet-600" />
+          {newApplicants ? `${newApplicants} new sales-rep applicant${newApplicants === 1 ? '' : 's'} to review` : 'Sales-rep applicants'}
+        </span>
+        <ArrowRight size={16} className="text-gray-400" />
+      </Link>
 
       {/* Summary */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">

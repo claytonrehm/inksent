@@ -19,6 +19,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   const pendingCount = count ?? 0
 
+  // New sales-rep applicants awaiting review (best-effort; 0 pre-migration).
+  const { count: salesApplicants } = await supabase
+    .from('sales_rep_applications')
+    .select('id', { count: 'exact', head: true })
+    .eq('status', 'new')
+
   return (
     <div className="min-h-screen flex bg-gray-100">
       <aside className="w-56 bg-[#0d0d0d] flex flex-col">
@@ -33,7 +39,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <NavItem href="/coverage" icon={<Map size={16} />} label="Coverage" />
           <NavItem href="/reports" icon={<BarChart3 size={16} />} label="Reports" />
           <NavItem href="/leads" icon={<Building2 size={16} />} label="Partner Leads" />
-          <NavItem href="/sales" icon={<TrendingUp size={16} />} label="Sales" />
+          <NavItem href="/sales" icon={<TrendingUp size={16} />} label="Sales" badge={salesApplicants ?? 0} />
           <NavItem href="/activity" icon={<ShieldCheck size={16} />} label="Activity" />
           <NavItem href="/setup" icon={<Settings size={16} />} label="Setup" />
         </nav>

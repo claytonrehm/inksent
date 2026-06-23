@@ -22,6 +22,13 @@ export interface SalesRepRow {
   producer_bonus_cents: number
   bonus_threshold: number
   notes: string | null
+  // Onboarding (filled after an applicant is approved)
+  application_id?: string | null
+  agreement_accepted_at?: string | null
+  w9_received?: boolean
+  payment_method?: string | null
+  payment_details?: string | null
+  onboarded_at?: string | null
 }
 export interface SalesAccountRow {
   id: string
