@@ -9,7 +9,7 @@ export const metadata = {
   alternates: { canonical: '/resources' },
 }
 
-export const ARTICLES = [
+const ARTICLES = [
   {
     slug: 'how-to-become-a-notary-signing-agent-in-california',
     title: 'How to Become a Notary Signing Agent in California',

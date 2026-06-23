@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { LayoutDashboard, ClipboardList, Users, LogOut, Settings, Map, BarChart3, ShieldCheck, Building2 } from 'lucide-react'
+import { LayoutDashboard, ClipboardList, Users, LogOut, Settings, Map, BarChart3, ShieldCheck, Building2, TrendingUp } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { isAdminAuthed } from '@/lib/admin-auth'
 import InksentLogo from '@/components/InksentLogo'
@@ -33,6 +33,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <NavItem href="/coverage" icon={<Map size={16} />} label="Coverage" />
           <NavItem href="/reports" icon={<BarChart3 size={16} />} label="Reports" />
           <NavItem href="/leads" icon={<Building2 size={16} />} label="Partner Leads" />
+          <NavItem href="/sales" icon={<TrendingUp size={16} />} label="Sales" />
           <NavItem href="/activity" icon={<ShieldCheck size={16} />} label="Activity" />
           <NavItem href="/setup" icon={<Settings size={16} />} label="Setup" />
         </nav>
