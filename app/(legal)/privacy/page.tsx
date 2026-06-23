@@ -26,7 +26,7 @@ export default function PrivacyPage() {
       </ul>
 
       <H>SMS / text messaging</H>
-      <p>If you provide a mobile number, you consent to receive SMS messages from Inksent related to signing jobs, assignments, confirmations, and account notices. Message frequency varies. Message and data rates may apply. Reply <b>STOP</b> to opt out at any time, or <b>HELP</b> for help. Opting out of SMS may limit our ability to offer you signing jobs.</p>
+      <p>If you provide a mobile number, you consent to receive SMS messages from Inksent related to signing jobs, assignments, confirmations, and account notices. Message frequency varies. Message and data rates may apply. Reply <b>STOP</b> to opt out at any time, or <b>HELP</b> for help. Opting out of SMS may limit our ability to offer you signing jobs. <b>We do not share your mobile phone number or SMS opt-in consent with third parties or affiliates for their marketing or promotional purposes</b>; we share it only with the providers that help us deliver these messages (such as Twilio).</p>
 
       <H>How we share information</H>
       <p>We share information only as needed to run the service: signing details are shared with the assigned signing agent; agent contact details are shared with the relevant client; and we use trusted service providers (including Twilio for SMS, Resend for email, Supabase for data storage, and Vercel for hosting). We do not sell your personal information.</p>

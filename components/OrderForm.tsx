@@ -358,7 +358,7 @@ export default function OrderForm({ prefill }: { prefill?: OrderPrefill }) {
         <span className="text-sm text-gray-600">
           I agree to Inksent&apos;s{' '}
           <a href="/terms" target="_blank" className="text-violet-600 underline">Terms of Service</a> and{' '}
-          <a href="/privacy" target="_blank" className="text-violet-600 underline">Privacy Policy</a>, and I&apos;m authorized to place this order on behalf of my company.
+          <a href="/privacy" target="_blank" className="text-violet-600 underline">Privacy Policy</a>, and I&apos;m authorized to place this order on behalf of my company. I consent to receive SMS updates about this signing at the number(s) provided, and confirm the signer has agreed to receive signing-related texts. Message frequency varies; message &amp; data rates may apply. Reply STOP to opt out, HELP for help.
         </span>
       </label>
 

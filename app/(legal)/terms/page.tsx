@@ -58,6 +58,9 @@ export default function TermsPage() {
       <H>12. Contact</H>
       <p>Questions? Email <a href="mailto:support@inksent.co" className="text-violet-600 underline">support@inksent.co</a> or call (619) 949-3361.</p>
 
+      <H>13. SMS / text messaging program</H>
+      <p><b>Program name: Inksent Signing Notifications.</b> By providing a mobile number and opting in — on our order form, our signing-agent application, or otherwise — you consent to receive recurring SMS text messages from Inksent related to signing assignments, appointment confirmations and reminders, status updates, document notices, and payout and account notifications. <b>Message frequency varies</b> based on signing activity. <b>Message and data rates may apply.</b> Reply <b>STOP</b> to unsubscribe at any time; reply <b>HELP</b> for help, or contact <a href="mailto:support@inksent.co" className="text-violet-600 underline">support@inksent.co</a> or (619) 949-3361. Carriers are not liable for delayed or undelivered messages. We do <b>not</b> share mobile opt-in information or consent with third parties or affiliates for their marketing or promotional purposes. See our <a href="/privacy" className="text-violet-600 underline">Privacy Policy</a> for how we handle your data.</p>
+
       <p className="text-xs text-gray-400 pt-4 border-t border-gray-100">This is a general agreement and not legal advice. We may update it periodically.</p>
     </div>
   )
