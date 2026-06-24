@@ -28,6 +28,8 @@ export default function EditRepForm({ rep }: { rep: SalesRepRow }) {
         phone: form.get('phone'),
         status: form.get('status'),
         residual_per_signing_cents: Math.round(parseFloat(form.get('residual') as string) * 100) || undefined,
+        residual_months: parseInt(form.get('months') as string) || undefined,
+        residual_after_cents: Math.round(parseFloat(form.get('residual_after') as string) * 100) || undefined,
         producer_bonus_cents: Math.round(parseFloat(form.get('bonus') as string) * 100) || undefined,
         bonus_threshold: parseInt(form.get('threshold') as string) || undefined,
         notes: form.get('notes'),
@@ -61,7 +63,11 @@ export default function EditRepForm({ rep }: { rep: SalesRepRow }) {
         </div>
       </div>
       <div className="grid grid-cols-3 gap-3">
-        <Input id="residual" name="residual" type="number" step="0.5" label="$/signing" defaultValue={(rep.residual_per_signing_cents / 100).toString()} />
+        <Input id="residual" name="residual" type="number" step="0.5" label="$/signing (first)" defaultValue={(rep.residual_per_signing_cents / 100).toString()} />
+        <Input id="months" name="months" type="number" step="1" label="Full-rate months" defaultValue={(rep.residual_months ?? 24).toString()} />
+        <Input id="residual_after" name="residual_after" type="number" step="0.5" label="$/signing after" defaultValue={((rep.residual_after_cents ?? 800) / 100).toString()} />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
         <Input id="bonus" name="bonus" type="number" step="1" label="Producer bonus $" defaultValue={(rep.producer_bonus_cents / 100).toString()} />
         <Input id="threshold" name="threshold" type="number" step="1" label="Bonus at N signings" defaultValue={rep.bonus_threshold.toString()} />
       </div>

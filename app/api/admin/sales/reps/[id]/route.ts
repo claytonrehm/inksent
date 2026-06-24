@@ -16,6 +16,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (body.status === 'active' || body.status === 'inactive') patch.status = body.status
   if ('notes' in body) patch.notes = String(body.notes ?? '').trim() || null
   if (Number.isFinite(body.residual_per_signing_cents)) patch.residual_per_signing_cents = Math.round(body.residual_per_signing_cents)
+  if (Number.isFinite(body.residual_months)) patch.residual_months = Math.round(body.residual_months)
+  if (Number.isFinite(body.residual_after_cents)) patch.residual_after_cents = Math.round(body.residual_after_cents)
   if (Number.isFinite(body.producer_bonus_cents)) patch.producer_bonus_cents = Math.round(body.producer_bonus_cents)
   if (Number.isFinite(body.bonus_threshold)) patch.bonus_threshold = Math.round(body.bonus_threshold)
 

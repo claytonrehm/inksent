@@ -10,7 +10,7 @@ export const metadata = {
 }
 
 const PERKS = [
-  { icon: <Repeat size={18} />, title: 'Residual income', desc: '$15 on every signing your accounts send — for the life of the account. Your book compounds.' },
+  { icon: <Repeat size={18} />, title: 'Residual income', desc: '$15 on every signing your accounts send for 2 years, then ongoing residual after. Your book compounds as you add accounts.' },
   { icon: <TrendingUp size={18} />, title: 'Uncapped + producer bonuses', desc: 'No ceiling, plus a $200 bonus each time an account hits 25 signings.' },
   { icon: <Globe size={18} />, title: '100% remote', desc: 'Work from anywhere in the U.S. — you sell into the San Diego title market by phone and video.' },
   { icon: <PhoneCall size={18} />, title: 'Easy pitch', desc: 'No upfront cost to the title companies you sell — they only pay per signing they send.' },
@@ -39,16 +39,16 @@ export default function SalesApplyPage() {
           </div>
           <h1 className="text-4xl font-black text-gray-900 mb-3">Build a Residual Income Book</h1>
           <p className="text-gray-500 text-lg max-w-2xl">
-            Sell Inksent to title companies and get paid <strong className="text-gray-700">on every signing they send — for the life of the account.</strong> 100% commission, fully remote.
+            Sell Inksent to title companies and get paid <strong className="text-gray-700">$15 on every signing they send for 2 years, then ongoing residual.</strong> 100% commission, fully remote.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-gradient-to-br from-violet-600 to-violet-800 rounded-2xl p-6 text-white">
-              <p className="text-violet-200 text-xs font-semibold uppercase tracking-widest mb-1">Per Signing, For Life</p>
+              <p className="text-violet-200 text-xs font-semibold uppercase tracking-widest mb-1">Per Signing</p>
               <div className="text-5xl font-black mb-1">$15</div>
-              <p className="text-violet-200 text-sm">on every signing your accounts send</p>
+              <p className="text-violet-200 text-sm">for 2 years per account, then ongoing residual</p>
               <div className="mt-4 pt-4 border-t border-white/20 text-xs text-violet-200">+ $200 producer bonus at 25 signings · uncapped</div>
             </div>
 

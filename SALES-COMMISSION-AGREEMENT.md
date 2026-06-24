@@ -35,9 +35,10 @@ and the Sales Rep Playbook.
 The Contractor is paid solely by commission as follows. **All commissions are earned only
 on Collected Signings** (defined in §3).
 
-2.1 **Residual commission.** **$15.00 USD for every Collected Signing** sent to the Company
-by an Account credited to the Contractor (§4), payable for the life of the Account while
-this Agreement remains in effect (subject to §6).
+2.1 **Residual commission.** For each Account credited to the Contractor (§4): **$15.00 USD
+per Collected Signing for the first 24 months** after that Account's first Collected Signing,
+and **$8.00 USD per Collected Signing thereafter** for the life of the Account — in each case
+while this Agreement remains in effect (subject to §6).
 
 2.2 **Producer bonus.** A one-time **$200.00 USD** bonus per Account, payable the first time
 that Account reaches **25 Collected Signings** (cumulative). The bonus is paid once per

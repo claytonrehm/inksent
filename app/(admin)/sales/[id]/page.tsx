@@ -23,6 +23,8 @@ export default async function SalesRepPage({ params }: { params: Promise<{ id: s
 
   const companySuggestions = unattributed.map((u) => u.display).filter(Boolean)
   const dollarsPerSigning = formatCurrency(rep.residual_per_signing_cents)
+  const after = formatCurrency(rep.residual_after_cents ?? 800)
+  const months = rep.residual_months ?? 24
   const bonus = formatCurrency(rep.producer_bonus_cents)
 
   return (
@@ -46,7 +48,7 @@ export default async function SalesRepPage({ params }: { params: Promise<{ id: s
 
       {/* Terms banner */}
       <div className="bg-violet-50 border border-violet-100 rounded-xl p-4 text-sm text-violet-900">
-        <span className="font-semibold">{dollarsPerSigning}</span> per collected signing, for the life of each account · <span className="font-semibold">{bonus}</span> producer bonus once an account reaches <span className="font-semibold">{rep.bonus_threshold}</span> signings.
+        <span className="font-semibold">{dollarsPerSigning}</span>/signing for the first <span className="font-semibold">{months} months</span> per account, then <span className="font-semibold">{after}/signing</span> ongoing · <span className="font-semibold">{bonus}</span> producer bonus at <span className="font-semibold">{rep.bonus_threshold}</span> signings.
       </div>
 
       {/* Summary */}
@@ -85,7 +87,10 @@ export default async function SalesRepPage({ params }: { params: Promise<{ id: s
                     </td>
                     <td className="px-4 py-3 text-gray-500">{a.landed_at ? format(new Date(a.landed_at), 'MMM d, yyyy') : '—'}</td>
                     <td className="px-4 py-3 text-right text-gray-600">{a.collectedSignings}</td>
-                    <td className="px-4 py-3 text-right text-gray-600">{formatCurrency(a.residualEarnedCents)}</td>
+                    <td className="px-4 py-3 text-right text-gray-600">
+                      {formatCurrency(a.residualEarnedCents)}
+                      {a.tier2Signings > 0 && <div className="text-xs text-gray-400">{a.tier1Signings} full · {a.tier2Signings} reduced</div>}
+                    </td>
                     <td className="px-4 py-3 text-right">
                       {a.bonusReached
                         ? <span className="inline-flex items-center gap-1 text-green-600"><CheckCircle2 size={13} /> {formatCurrency(a.bonusEarnedCents)}</span>

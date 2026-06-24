@@ -1,7 +1,9 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 // Default 1099 commission terms (see SALES-COMMISSION-AGREEMENT.md).
-export const DEFAULT_RESIDUAL_CENTS = 1500 // $15 per collected signing
+export const DEFAULT_RESIDUAL_CENTS = 1500 // $15 per collected signing (first window)
+export const DEFAULT_RESIDUAL_MONTHS = 24 // full rate applies for this many months per account
+export const DEFAULT_RESIDUAL_AFTER_CENTS = 800 // $8 per collected signing after the window
 export const DEFAULT_BONUS_CENTS = 20000 // $200 producer bonus
 export const DEFAULT_BONUS_THRESHOLD = 25 // collected signings to earn the bonus
 
@@ -48,6 +50,8 @@ export interface SalesRepRow {
   phone: string | null
   status: 'active' | 'inactive'
   residual_per_signing_cents: number
+  residual_months: number
+  residual_after_cents: number
   producer_bonus_cents: number
   bonus_threshold: number
   notes: string | null
@@ -86,11 +90,14 @@ export interface CompanyTally {
   collectedSignings: number
   collectedRevenueCents: number
   totalOrders: number
+  signingDates: string[] // client_paid_at of each collected signing (for tiered residual)
 }
 
 export interface AccountComputed extends SalesAccountRow {
   collectedSignings: number
   collectedRevenueCents: number
+  tier1Signings: number // signings within the full-rate window
+  tier2Signings: number // signings after the window (reduced rate)
   residualEarnedCents: number
   bonusEarnedCents: number
   totalEarnedCents: number
@@ -151,13 +158,14 @@ export async function computeSalesData(supabase: SupabaseClient): Promise<SalesD
     if (!key) continue
     let t = tallies.get(key)
     if (!t) {
-      t = { key, display: (o.client_company ?? '').trim(), collectedSignings: 0, collectedRevenueCents: 0, totalOrders: 0 }
+      t = { key, display: (o.client_company ?? '').trim(), collectedSignings: 0, collectedRevenueCents: 0, totalOrders: 0, signingDates: [] }
       tallies.set(key, t)
     }
     t.totalOrders++
     if (isCollected(o)) {
       t.collectedSignings++
       t.collectedRevenueCents += o.client_fee ?? 0
+      if (o.client_paid_at) t.signingDates.push(o.client_paid_at)
     }
   }
 
@@ -178,15 +186,33 @@ export async function computeSalesData(supabase: SupabaseClient): Promise<SalesD
   const repsComputed: RepComputed[] = reps.map((r) => {
     const computedAccounts: AccountComputed[] = (accountsByRep.get(r.id) ?? []).map((a) => {
       const t = tallies.get(a.company_key)
+      const dates = t?.signingDates ?? []
       const signings = t?.collectedSignings ?? 0
       const revenue = t?.collectedRevenueCents ?? 0
-      const residual = signings * r.residual_per_signing_cents
+      const months = r.residual_months ?? DEFAULT_RESIDUAL_MONTHS
+      const rate1 = r.residual_per_signing_cents
+      const rate2 = r.residual_after_cents ?? DEFAULT_RESIDUAL_AFTER_CENTS
+      // The full-rate window starts when the account was landed (if set) or at its
+      // first collected signing. Signings paid within the window earn rate1; later ones rate2.
+      const anchorStr = a.landed_at || (dates.length ? dates.reduce((m, d) => (d < m ? d : m)) : null)
+      let tier1 = 0
+      let tier2 = 0
+      if (anchorStr && dates.length) {
+        const end = new Date(anchorStr)
+        end.setMonth(end.getMonth() + months)
+        for (const d of dates) { if (new Date(d) <= end) tier1++; else tier2++ }
+      } else {
+        tier1 = signings
+      }
+      const residual = tier1 * rate1 + tier2 * rate2
       const bonusReached = signings >= r.bonus_threshold
       const bonus = bonusReached ? r.producer_bonus_cents : 0
       return {
         ...a,
         collectedSignings: signings,
         collectedRevenueCents: revenue,
+        tier1Signings: tier1,
+        tier2Signings: tier2,
         residualEarnedCents: residual,
         bonusEarnedCents: bonus,
         totalEarnedCents: residual + bonus,

@@ -28,6 +28,8 @@ export default function AddRepForm() {
         email: form.get('email'),
         phone,
         residual_per_signing_cents: Math.round(parseFloat(form.get('residual') as string) * 100) || undefined,
+        residual_months: parseInt(form.get('months') as string) || undefined,
+        residual_after_cents: Math.round(parseFloat(form.get('residual_after') as string) * 100) || undefined,
         producer_bonus_cents: Math.round(parseFloat(form.get('bonus') as string) * 100) || undefined,
         bonus_threshold: parseInt(form.get('threshold') as string) || undefined,
         notes: form.get('notes'),
@@ -63,7 +65,11 @@ export default function AddRepForm() {
         <Input id="phone" label="Phone" placeholder="(619) 555-0100" value={phone} onChange={(e) => setPhone(formatPhone(e.target.value))} />
 
         <div className="grid grid-cols-3 gap-3">
-          <Input id="residual" name="residual" type="number" step="0.5" label="$/signing" defaultValue="15" />
+          <Input id="residual" name="residual" type="number" step="0.5" label="$/signing (first)" defaultValue="15" />
+          <Input id="months" name="months" type="number" step="1" label="Full-rate months" defaultValue="24" />
+          <Input id="residual_after" name="residual_after" type="number" step="0.5" label="$/signing after" defaultValue="8" />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
           <Input id="bonus" name="bonus" type="number" step="1" label="Producer bonus $" defaultValue="200" />
           <Input id="threshold" name="threshold" type="number" step="1" label="Bonus at N signings" defaultValue="25" />
         </div>

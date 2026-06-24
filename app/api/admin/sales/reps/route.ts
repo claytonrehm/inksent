@@ -20,6 +20,8 @@ export async function POST(req: NextRequest) {
     notes: String(body.notes ?? '').trim() || null,
   }
   if (Number.isFinite(body.residual_per_signing_cents)) insert.residual_per_signing_cents = Math.round(body.residual_per_signing_cents)
+  if (Number.isFinite(body.residual_months)) insert.residual_months = Math.round(body.residual_months)
+  if (Number.isFinite(body.residual_after_cents)) insert.residual_after_cents = Math.round(body.residual_after_cents)
   if (Number.isFinite(body.producer_bonus_cents)) insert.producer_bonus_cents = Math.round(body.producer_bonus_cents)
   if (Number.isFinite(body.bonus_threshold)) insert.bonus_threshold = Math.round(body.bonus_threshold)
 
