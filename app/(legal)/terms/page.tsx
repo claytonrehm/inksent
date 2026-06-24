@@ -21,6 +21,7 @@ export default function TermsPage() {
         <li>Payment is due within <b>30 days</b> of a completed signing. Past-due amounts may accrue reasonable late fees and collection costs.</li>
         <li>You are responsible for providing accurate, complete, and lawful signing details, documents, and signer information, and for ensuring you have the right to share them.</li>
         <li>You are responsible for reviewing executed documents for completeness. Inksent does not prepare, review, or opine on the substance of your documents.</li>
+        <li><b>Cancellations &amp; refunds:</b> there is no charge for an order cancelled before we dispatch an agent. Once an agent has been dispatched or the signing performed, fees for work completed may apply. Billing errors are corrected promptly — contact support.</li>
       </ul>
 
       <H>3. Best-efforts service; no guarantee</H>

@@ -52,7 +52,7 @@ export default async function OrderPage() {
           <BackLink href="/" label="Back to home" />
           <h1 className="text-3xl font-black text-gray-900 mt-4 mb-2">Place a Signing Order</h1>
           <p className="text-gray-500">
-            Available in all 50 states. Submit your order and we&apos;ll confirm a signing agent within 30 minutes.
+            Serving San Diego &amp; Southern California. Submit your order and we&apos;ll confirm a signing agent fast — we&apos;ll tell you quickly (no charge) if we can&apos;t cover your area yet.
           </p>
         </div>
 

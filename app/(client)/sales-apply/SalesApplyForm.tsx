@@ -21,7 +21,7 @@ const schema = z.object({
   b2b_experience: z.string().min(1, 'Please select'),
   industry_experience: z.string().min(1, 'Please select'),
   title_relationships: z.string().min(1, 'Please select'),
-  linkedin_url: z.string().optional(),
+  linkedin_url: z.string().trim().url('Enter a valid URL (https://…)').or(z.literal('')).optional(),
   pitch: z.string().optional(),
   heard_from: z.string().optional(),
   sms_consent: z.boolean().optional(),
@@ -30,7 +30,6 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 const YEARS = [
-  { value: '', label: 'Select...' },
   { value: 'under_1', label: 'Less than 1 year' },
   { value: '1_3', label: '1–3 years' },
   { value: '3_5', label: '3–5 years' },
@@ -38,19 +37,16 @@ const YEARS = [
   { value: '10_plus', label: '10+ years' },
 ]
 const B2B = [
-  { value: '', label: 'Select...' },
   { value: 'extensive', label: 'Yes — extensive B2B sales' },
   { value: 'some', label: 'Some B2B sales' },
   { value: 'none', label: 'Mostly B2C / none yet' },
 ]
 const INDUSTRY = [
-  { value: '', label: 'Select...' },
   { value: 'current', label: 'Yes — currently in title/escrow/real estate' },
   { value: 'past', label: 'Yes — in the past' },
   { value: 'none', label: 'No industry experience' },
 ]
 const RELATIONSHIPS = [
-  { value: '', label: 'Select...' },
   { value: 'many', label: 'Many — I have an active rolodex' },
   { value: 'some', label: 'A few contacts' },
   { value: 'none', label: 'None yet' },
@@ -145,7 +141,7 @@ export default function SalesApplyForm() {
         <label className="flex items-start gap-3 cursor-pointer">
           <input type="checkbox" className="mt-0.5 h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500" {...register('commission_ack')} />
           <span className="text-sm text-gray-600">
-            I understand this is a <b>100% commission</b>, <b>1099 independent contractor</b> role (no base salary), paid as residual income on the signings my accounts send.
+            I understand this is a <b>100% commission</b>, <b>1099 independent contractor</b> role (no base salary): <b>$15 per signing for the first 24 months</b> on each account I land, then <b>$8 per signing</b> ongoing, plus a <b>$200 bonus</b> when an account reaches 25 signings.
           </span>
         </label>
         {errors.commission_ack && <p className="text-xs text-red-500 mt-2 ml-7">{errors.commission_ack.message}</p>}

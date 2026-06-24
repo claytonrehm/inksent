@@ -70,7 +70,7 @@ export default function Home() {
               <ScrollReveal>
                 <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-violet-300 text-xs font-semibold px-4 py-2 rounded-full mb-8 backdrop-blur-sm">
                   <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-pulse" />
-                  Available Nationwide — All 50 States
+                  Now Serving San Diego &amp; Southern California
                 </div>
               </ScrollReveal>
 
@@ -134,7 +134,7 @@ export default function Home() {
       {/* Trust bar */}
       <div className="border-y border-white/10 bg-white/[0.02] py-4 px-6">
         <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-6 sm:gap-12 text-slate-400 text-sm font-medium">
-          {['NNA Certified Network', 'Background Checked', 'Transparent Pricing', 'All 50 States'].map((item) => (
+          {['NNA Certified Network', 'Background Checked', 'Transparent Pricing', 'Southern California'].map((item) => (
             <span key={item} className="flex items-center gap-2">
               <CheckCircle size={14} className="text-violet-400" /> {item}
             </span>
@@ -395,9 +395,9 @@ export default function Home() {
       <section id="coverage" className="px-6 py-16 sm:py-20">
         <div className="max-w-4xl mx-auto">
           <ScrollReveal className="text-center mb-10">
-            <p className="text-violet-400 font-semibold text-sm uppercase tracking-widest mb-3">Nationwide Coverage</p>
-            <h2 className="text-4xl font-black text-white mb-3">All 50 States</h2>
-            <p className="text-slate-400 max-w-lg mx-auto">We dispatch signing agents coast to coast. Tap any state for details.</p>
+            <p className="text-violet-400 font-semibold text-sm uppercase tracking-widest mb-3">Where We Serve</p>
+            <h2 className="text-4xl font-black text-white mb-3">San Diego &amp; Southern California</h2>
+            <p className="text-slate-400 max-w-lg mx-auto">We&apos;re focused on Southern California today and expanding. Tap your area to check coverage.</p>
           </ScrollReveal>
           <ScrollReveal>
             <USMap />

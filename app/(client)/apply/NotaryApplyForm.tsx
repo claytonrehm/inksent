@@ -43,8 +43,9 @@ const schema = z.object({
   if (d.background_checked !== 'yes') ctx.addIssue({ code: 'custom', path: ['background_checked'], message: 'A current background check is required' })
   else if (!d.bgc_date) ctx.addIssue({ code: 'custom', path: ['bgc_date'], message: 'Enter your background-check date' })
 
-  if (d.eo_insured !== 'yes') ctx.addIssue({ code: 'custom', path: ['eo_insured'], message: 'E&O insurance is required' })
-  else {
+  // E&O is optional at apply — we collect/verify it before the first paid signing.
+  // If they DO carry it, validate the details they entered.
+  if (d.eo_insured === 'yes') {
     if (!d.eo_carrier) ctx.addIssue({ code: 'custom', path: ['eo_carrier'], message: 'Enter your E&O carrier' })
     if (!d.eo_expiry) ctx.addIssue({ code: 'custom', path: ['eo_expiry'], message: 'Enter your E&O expiry date' })
     const amt = parseInt(d.eo_coverage_amount ?? '', 10)
@@ -359,8 +360,8 @@ export default function NotaryApplyForm() {
 
         {/* E&O insurance — title companies require it */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">E&amp;O Insurance? *</label>
-          <p className="text-xs text-gray-400 mb-1">Errors &amp; Omissions coverage — required for loan signings.</p>
+          <label className="block text-sm font-medium text-gray-700 mb-1">E&amp;O Insurance?</label>
+          <p className="text-xs text-gray-400 mb-1">Errors &amp; Omissions coverage. Required before your first paid signing — you can add it after you&apos;re approved.</p>
           <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
             {...register('eo_insured')}>
             <option value="">Select...</option>

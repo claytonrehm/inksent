@@ -41,7 +41,7 @@ function StatItem({ value, suffix, label, color }: { value: number; suffix: stri
 export default function HeroStats() {
   return (
     <div className="grid grid-cols-3 gap-6 sm:gap-12 py-8">
-      <StatItem value={50} suffix="" label="States Covered" color="text-white" />
+      <StatItem value={100} suffix="%" label="Vetted & Insured" color="text-white" />
       <StatItem value={30} suffix=" min" label="Avg. Confirmation" color="text-violet-400" />
       <StatItem value={100} suffix="%" label="NNA Certified" color="text-white" />
     </div>

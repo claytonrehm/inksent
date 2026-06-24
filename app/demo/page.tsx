@@ -143,7 +143,7 @@ export default async function DemoPage({
             {[
               ['NNA-Certified', 'Trained, tested loan-signing agents'],
               ['Background-Checked', 'Current screening on file'],
-              ['E&O-Insured', '$25k+ coverage, verified'],
+              ['E&O-Insured', '$25k+ minimum coverage'],
               ['Auto-Verified', 'Credentials re-checked before every job'],
             ].map(([t, d]) => (
               <div key={t} className="flex flex-col items-center text-center">
