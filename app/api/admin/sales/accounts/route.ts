@@ -22,7 +22,9 @@ export async function POST(req: NextRequest) {
       sales_rep_id: salesRepId,
       company_name: companyName,
       company_key: companyKey,
-      landed_at: String(body.landed_at ?? '').trim() || null,
+      // Default to today so the residual tier window has a stable anchor (don't
+      // rely on the first-signing fallback, which can drift).
+      landed_at: String(body.landed_at ?? '').trim() || new Date().toISOString().slice(0, 10),
       notes: String(body.notes ?? '').trim() || null,
     })
     .select('id')

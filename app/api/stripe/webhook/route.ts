@@ -36,6 +36,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'invalid signature' }, { status: 400 })
   }
 
+  // Idempotency: Stripe delivers events at-least-once and retries on any non-2xx.
+  // Record event.id; if we've already processed it, ack and stop so a replay can
+  // never double-stamp a payment or double-pay a notary. Fails OPEN if the table
+  // doesn't exist yet (pre-migration) so real events are never blocked.
+  try {
+    const dedup = await createClient()
+    const { error: dupErr } = await dedup.from('stripe_events').insert({ id: event.id, type: event.type })
+    if (dupErr && dupErr.code === '23505') {
+      return NextResponse.json({ received: true, duplicate: true })
+    }
+  } catch { /* table missing or transient — proceed */ }
+
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as {
       metadata?: { order_id?: string; kind?: string; hub_user_id?: string; plan?: string }
@@ -79,11 +91,13 @@ export async function POST(req: NextRequest) {
     const orderId = session.metadata?.order_id
     if (orderId) {
       const supabase = await createClient()
-      await supabase.from('orders').update({ client_paid_at: new Date().toISOString() }).eq('id', orderId)
+      // Only stamp once — never move client_paid_at on a replay (keeps the
+      // commission tier anchor stable).
+      await supabase.from('orders').update({ client_paid_at: new Date().toISOString() }).eq('id', orderId).is('client_paid_at', null)
 
       const { data: o } = await supabase
         .from('orders')
-        .select('client_company, confirmation_number, notary_id, notary_fee, notary_paid_at, notaries(name, phone, stripe_account_id, payouts_enabled)')
+        .select('client_company, confirmation_number, notary_id, notary_fee, notary_paid_at, refunded_at, notaries(name, phone, stripe_account_id, payouts_enabled)')
         .eq('id', orderId).single()
 
       if (process.env.ADMIN_PHONE && o) {
@@ -93,14 +107,14 @@ export async function POST(req: NextRequest) {
       // Client paid → auto-pay the notary into their connected account (cash-flow safe)
       const nRaw = o?.notaries as unknown
       const n = (Array.isArray(nRaw) ? nRaw[0] : nRaw) as { name: string; phone: string; stripe_account_id?: string; payouts_enabled?: boolean } | null
-      if (o && o.notary_id && !o.notary_paid_at && n) {
+      if (o && o.notary_id && !o.notary_paid_at && !o.refunded_at && n) {
         if (n.stripe_account_id && n.payouts_enabled) {
-          const ok = await payoutNotary({
+          const pay = await payoutNotary({
             stripeAccountId: n.stripe_account_id, amount: o.notary_fee,
             orderId, confirmationNumber: o.confirmation_number,
           })
-          if (ok) {
-            await supabase.from('orders').update({ notary_paid_at: new Date().toISOString() }).eq('id', orderId)
+          if (pay.ok) {
+            await supabase.from('orders').update({ notary_paid_at: new Date().toISOString(), notary_transfer_id: pay.transferId ?? null }).eq('id', orderId)
             sendSMS(n.phone, `💵 Payment released: $${(o.notary_fee / 100).toFixed(0)} for the ${o.confirmation_number} signing — on its way to your bank account. Thanks! — Inksent`).catch(() => {})
           } else if (process.env.ADMIN_PHONE) {
             sendSMS(process.env.ADMIN_PHONE, `ℹ️ Payout to ${n.name} for ${o.confirmation_number} is queued — card funds usually take ~1–2 days to settle, then it auto-pays. No action needed unless it persists.`).catch(() => {})

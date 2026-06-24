@@ -15,12 +15,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const { data: order } = await supabase
     .from('orders')
-    .select('confirmation_number, notary_fee, notary_paid_at, notaries(name, phone, stripe_account_id, payouts_enabled)')
+    .select('confirmation_number, notary_fee, notary_paid_at, refunded_at, notaries(name, phone, stripe_account_id, payouts_enabled)')
     .eq('id', id)
     .single()
 
   if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 })
   if (order.notary_paid_at) return NextResponse.json({ error: 'This notary has already been paid for this signing.' }, { status: 400 })
+  if (order.refunded_at) return NextResponse.json({ error: 'This order was refunded — do not pay the notary.' }, { status: 400 })
 
   const nRaw = order.notaries as unknown
   const n = (Array.isArray(nRaw) ? nRaw[0] : nRaw) as { name: string; phone: string; stripe_account_id?: string; payouts_enabled?: boolean } | null
@@ -30,17 +31,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   }
 
   // Move the money first. Only on success do we mark paid + notify.
-  const ok = await payoutNotary({
+  const pay = await payoutNotary({
     stripeAccountId: n.stripe_account_id,
     amount: order.notary_fee,
     orderId: id,
     confirmationNumber: order.confirmation_number,
   })
-  if (!ok) {
+  if (!pay.ok) {
     return NextResponse.json({ error: 'Stripe transfer failed — check your available balance and their account. Nothing was marked paid.' }, { status: 400 })
   }
 
-  await supabase.from('orders').update({ notary_paid_at: new Date().toISOString() }).eq('id', id)
+  await supabase.from('orders').update({ notary_paid_at: new Date().toISOString(), notary_transfer_id: pay.transferId ?? null }).eq('id', id)
 
   logAudit({ action: 'pay_notary', actor: adminEmail(), actorType: 'admin', entityType: 'order', entityId: id, ip: reqIp(req), meta: { confirmation_number: order.confirmation_number, amount_cents: order.notary_fee, notary: n.name } })
 

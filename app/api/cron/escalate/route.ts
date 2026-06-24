@@ -176,15 +176,16 @@ export async function GET(req: NextRequest) {
       .select('id, confirmation_number, notary_id, notary_fee, notary_paid_at, notaries(name, phone, stripe_account_id, payouts_enabled)')
       .not('client_paid_at', 'is', null)
       .is('notary_paid_at', null)
+      .is('refunded_at', null) // never auto-pay a notary for a refunded order
       .not('notary_id', 'is', null)
     for (const o of toPay ?? []) {
       const nRaw = o.notaries as unknown
       const n = (Array.isArray(nRaw) ? nRaw[0] : nRaw) as { name: string; phone: string; stripe_account_id?: string; payouts_enabled?: boolean } | null
       if (!n) continue
       if (n.stripe_account_id && n.payouts_enabled) {
-        const ok = await payoutNotary({ stripeAccountId: n.stripe_account_id, amount: o.notary_fee, orderId: o.id, confirmationNumber: o.confirmation_number })
-        if (ok) {
-          await supabase.from('orders').update({ notary_paid_at: new Date().toISOString() }).eq('id', o.id)
+        const pay = await payoutNotary({ stripeAccountId: n.stripe_account_id, amount: o.notary_fee, orderId: o.id, confirmationNumber: o.confirmation_number })
+        if (pay.ok) {
+          await supabase.from('orders').update({ notary_paid_at: new Date().toISOString(), notary_transfer_id: pay.transferId ?? null }).eq('id', o.id)
           if (n.phone) await sendSMS(n.phone, `💵 Payment released: $${(o.notary_fee / 100).toFixed(0)} for the ${o.confirmation_number} signing — on its way to your bank account. Thanks! — Inksent`).catch(() => {})
         } else if (process.env.ADMIN_PHONE) {
           await sendSMS(process.env.ADMIN_PHONE, `⚠️ Payout to ${n.name} for ${o.confirmation_number} is still failing — check your Stripe balance/their account. Auto-retries daily.`).catch(() => {})

@@ -80,6 +80,9 @@ export async function payReferralBounty(params: {
       destination: params.stripeAccountId,
       description: `Inksent referral bonus — referred ${params.referredName}`,
       metadata: { type: 'referral_bounty', referred: params.referredName },
+    }, {
+      // Idempotency: a cron overlap / retry can't double-pay the same bounty.
+      idempotencyKey: `referral_${params.stripeAccountId}_${params.referredName}`,
     })
     return true
   } catch (e) {
@@ -94,20 +97,36 @@ export async function payoutNotary(params: {
   amount: number
   orderId: string
   confirmationNumber: string
-}): Promise<boolean> {
-  if (!hasStripe()) return false
+}): Promise<{ ok: boolean; transferId?: string }> {
+  if (!hasStripe()) return { ok: false }
   try {
     const stripe = getStripe()
-    await stripe.transfers.create({
+    const transfer = await stripe.transfers.create({
       amount: params.amount,
       currency: 'usd',
       destination: params.stripeAccountId,
       metadata: { order_id: params.orderId, confirmation_number: params.confirmationNumber },
+    }, {
+      // Idempotency key tied to the order: if the webhook + cron both fire, or
+      // Stripe retries, this collapses to a SINGLE transfer (no double-pay).
+      idempotencyKey: `payout_${params.orderId}`,
     })
-    return true
+    return { ok: true, transferId: transfer.id }
   } catch (e) {
     console.error('Notary payout failed:', e)
-    return false
+    return { ok: false }
+  }
+}
+
+// Reverse a notary payout transfer (used when refunding an order the notary was
+// already paid for). Returns ok:false with a message if it can't be reversed.
+export async function reverseTransfer(transferId: string): Promise<{ ok: boolean; error?: string }> {
+  if (!hasStripe()) return { ok: false, error: 'Stripe not configured' }
+  try {
+    await getStripe().transfers.createReversal(transferId, {})
+    return { ok: true }
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Reversal failed' }
   }
 }
 
@@ -117,13 +136,15 @@ export async function refundOrder(orderId: string): Promise<{ ok: boolean; error
   if (!hasStripe()) return { ok: false, error: 'Stripe not configured' }
   try {
     const stripe = getStripe()
+    // No limit: refund EVERY succeeded PaymentIntent for this order (covers a
+    // client who paid an invoice link more than once — don't leave an overpayment).
     const res = await stripe.paymentIntents.search({
       query: `metadata['order_id']:'${orderId}' AND status:'succeeded'`,
-      limit: 1,
     })
-    const pi = res.data[0]
-    if (!pi) return { ok: false, error: 'No completed payment found for this order to refund.' }
-    await stripe.refunds.create({ payment_intent: pi.id })
+    if (!res.data.length) return { ok: false, error: 'No completed payment found for this order to refund.' }
+    for (const pi of res.data) {
+      await stripe.refunds.create({ payment_intent: pi.id })
+    }
     return { ok: true }
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : 'Refund failed' }
