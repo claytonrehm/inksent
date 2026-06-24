@@ -92,6 +92,23 @@ export async function GET(req: NextRequest) {
     await supabase.from('orders').update({ overdue_alerted_at: new Date().toISOString() }).eq('id', o.id)
   }
 
+  // 2c. Past-due AND still unassigned — the worst case: the signing time passed
+  //     with NO notary assigned at all (would otherwise fall through the cracks
+  //     once it's older than the 48h "upcoming" window). Alert once.
+  const { data: pastUnassigned } = await supabase
+    .from('orders')
+    .select('id, confirmation_number, signer_name, signing_date')
+    .in('status', ['pending', 'dispatching'])
+    .is('notary_id', null)
+    .lt('signing_date', today)
+    .is('overdue_alerted_at', null)
+  for (const o of pastUnassigned ?? []) {
+    if (process.env.ADMIN_PHONE) {
+      await sendSMS(process.env.ADMIN_PHONE, `🚨 MISSED: ${o.signer_name}'s signing (${o.confirmation_number}) on ${format(new Date(o.signing_date), 'MMM d')} passed with NO notary assigned. Urgent — contact the client.`).catch(() => {})
+    }
+    await supabase.from('orders').update({ overdue_alerted_at: new Date().toISOString() }).eq('id', o.id)
+  }
+
   // 2b-2. ONBOARDING NUDGE — approved notaries who never finished their profile are
   //   the biggest mid-funnel leak (they sit "approved" but undispatchable). Re-send the
   //   approval SMS + email a few times, spaced out: first ~1 day after approval, then

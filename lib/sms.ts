@@ -53,7 +53,7 @@ Time: ${timeStr}
 Address: ${propertyAddress}, ${propertyCity} ${propertyZip}
 Your pay: $${(fee / 100).toFixed(0)}
 
-Reply YES to accept or tap: ${acceptUrl}
+Tap to accept (first to respond wins): ${acceptUrl}
 
-First to accept wins — please reply fast. Title companies count on us confirming within ~30 min, so a quick yes keeps us reliable. Expires in 30 min.`
+Title companies count on us confirming within ~30 min, so a quick tap keeps us reliable. Expires in 30 min.`
 }

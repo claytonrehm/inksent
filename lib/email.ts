@@ -6,6 +6,15 @@ function getResend() {
   return new Resend(process.env.RESEND_API_KEY ?? 're_placeholder')
 }
 
+// Send an email and THROW on Resend API errors. Resend RESOLVES (doesn't reject)
+// on failure, returning { error }. Without this, a failed send looks successful —
+// so dispatch would count a notary as "reached" when the email actually bounced.
+// Throwing makes the dispatch "did any channel succeed?" check honest.
+async function sendVia(payload: Parameters<Resend['emails']['send']>[0]) {
+  const { error } = await getResend().emails.send(payload)
+  if (error) throw new Error((error as { message?: string })?.message ?? 'Email send failed')
+}
+
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'clayton.rehm@gmail.com'
 
 // Email-safe two-column row (label left, value right) — uses a table, not flexbox
@@ -41,7 +50,7 @@ export async function sendNotaryApprovedEmail(data: { name: string; email: strin
     ${FOOTER}
   </div></body></html>`
 
-  return getResend().emails.send({
+  return sendVia({
     from: 'Clayton at Inksent <orders@inksent.co>',
     to: data.email,
     subject: `You're approved — one quick step to finish, ${firstName}`,
@@ -83,7 +92,7 @@ export async function sendNotaryHubAnnouncementEmail(data: { name: string; email
     ${FOOTER}
   </div></body></html>`
 
-  return getResend().emails.send({
+  return sendVia({
     from: 'Clayton at Inksent <orders@inksent.co>',
     to: data.email,
     subject: `${firstName}, your free Notary Hub is live`,
@@ -115,7 +124,7 @@ export async function sendCredentialRenewalEmail(data: {
     </div>
     ${FOOTER}
   </div></body></html>`
-  return getResend().emails.send({
+  return sendVia({
     from: 'Clayton at Inksent <orders@inksent.co>',
     to: data.email,
     subject: 'Quick update to keep your signings coming',
@@ -147,7 +156,7 @@ export async function sendNotaryDocsEmail(data: { notaryName: string; notaryEmai
     ${FOOTER}
   </div></body></html>`
 
-  return getResend().emails.send({
+  return sendVia({
     from: 'Inksent <orders@inksent.co>',
     to: data.notaryEmail,
     subject: data.updated ? `⚠️ Updated documents — ${data.signerName} signing` : `Documents ready — ${data.signerName} signing`,
@@ -200,7 +209,7 @@ export async function sendAdminOrderAlert(data: {
     </div>
   </body></html>`
 
-  return getResend().emails.send({
+  return sendVia({
     from: 'Inksent Orders <orders@inksent.co>',
     to: ADMIN_EMAIL,
     subject: `📋 New order: ${typeLabel} in ${data.propertyCity} — ${data.signingDate}`,
@@ -277,7 +286,7 @@ export async function sendNotaryAssignmentEmail(data: {
     ${FOOTER}
   </div></body></html>`
 
-  return getResend().emails.send({
+  return sendVia({
     from: 'Clayton at Inksent <orders@inksent.co>',
     to: data.notaryEmail,
     subject: `Signing confirmed — ${typeLabel} on ${data.signingDate} at ${data.signingTime}`,
@@ -345,7 +354,7 @@ export async function sendClientAssignmentEmail(data: {
     ${FOOTER}
   </div></body></html>`
 
-  return getResend().emails.send({
+  return sendVia({
     from: 'Inksent <orders@inksent.co>',
     to: data.clientEmail,
     subject: `Agent confirmed — ${data.notaryName} for your ${typeLabel} on ${data.signingDate}`,
@@ -400,7 +409,7 @@ export async function sendSigningCompleteEmail(data: {
     ${FOOTER}
   </div></body></html>`
 
-  return getResend().emails.send({
+  return sendVia({
     from: 'Clayton at Inksent <orders@inksent.co>',
     to: data.clientEmail,
     subject: `🎉 Signing complete — ${data.signerName}'s ${typeLabel}`,
@@ -431,7 +440,7 @@ export async function sendNotaryDeniedEmail(data: { name: string; email: string 
     ${FOOTER}
   </div></body></html>`
 
-  return getResend().emails.send({
+  return sendVia({
     from: 'Clayton at Inksent <orders@inksent.co>',
     to: data.email,
     subject: 'Your Inksent application',
@@ -483,7 +492,7 @@ export async function sendNotaryJobOfferEmail(data: {
     ${FOOTER}
   </div></body></html>`
 
-  return getResend().emails.send({
+  return sendVia({
     from: 'Inksent Dispatch <orders@inksent.co>',
     to: data.notaryEmail,
     subject: `New signing — ${feeStr} · ${typeLabel} · ${data.signingDate}`,
@@ -549,12 +558,12 @@ export async function sendNotaryApplicationEmail(notary: {
           Time: 10:00 AM<br/>
           Address: 123 Main St, San Diego 92101<br/>
           Your pay: $90<br/><br/>
-          Reply YES to accept or tap:<br/>
+          Tap to accept (first to respond wins):<br/>
           <span style="color:#7c3aed;font-weight:600;text-decoration:underline;">inksent.co/accept/&hellip;</span><br/><br/>
           This offer expires in 30 min.
         </div>`)}
 
-      ${step(2, 'One tap to accept — first one wins', `We may send the same job to a few agents in your area at the same time. Tap the link or reply YES — first to respond gets the signing. If you can&rsquo;t make it, tap &ldquo;Can&rsquo;t make it&rdquo; so we know to move on quickly.`)}
+      ${step(2, 'One tap to accept — first one wins', `We may send the same job to a few agents in your area at the same time. Tap the link — first to respond gets the signing. If you can&rsquo;t make it, tap &ldquo;Can&rsquo;t make it&rdquo; so we know to move on quickly.`)}
 
       ${step(3, 'Show up, execute, confirm', `Arrive on time, complete the signing professionally, and let us know when you&rsquo;re done. We handle the client — you focus on the table.`)}
 
@@ -573,7 +582,7 @@ export async function sendNotaryApplicationEmail(notary: {
   </div>
   </body></html>`
 
-  return getResend().emails.send({
+  return sendVia({
     from: 'Clayton at Inksent <orders@inksent.co>',
     to: notary.email,
     subject: `Application received — here's how Inksent works`,
@@ -661,7 +670,7 @@ export async function sendOrderConfirmationEmail(order: {
   </div>
   </body></html>`
 
-  return getResend().emails.send({
+  return sendVia({
     from: 'Inksent <orders@inksent.co>',
     to: order.client_email,
     subject: `Signing order confirmed — ${typeLabel} on ${format(new Date(order.signing_date), 'MMM d')} [${order.confirmation_number}]`,

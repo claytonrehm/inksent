@@ -123,6 +123,12 @@ export async function blastOrderToCoveringNotaries(
       .from('orders')
       .update({ status: 'dispatching', notary_id: null, dispatched_to: covering.map((n) => n.id), dispatched_at: new Date().toISOString() })
       .eq('id', order.id)
+
+    // Safety alert: we had eligible agents but reached NONE of them (every email +
+    // SMS failed). Without this, a job silently sits unaccepted with no signal.
+    if (blastCount === 0 && process.env.ADMIN_PHONE) {
+      sendSMS(process.env.ADMIN_PHONE, `⚠️ Dispatch reached NO agents for ${order.signer_name}'s signing in ${order.property_zip} — ${covering.length} were eligible but all email/SMS failed. Check delivery + dispatch manually.`).catch(() => {})
+    }
   }
 
   return { blastCount, recipients: covering.map((n) => n.id), totalActive: active.length, notOnboarded }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { isAdminAuthed } from '@/lib/admin-auth'
 import { sendSMS, buildDispatchMessage } from '@/lib/sms'
+import { sendNotaryJobOfferEmail } from '@/lib/email'
 import { format } from 'date-fns'
 
 export async function POST(req: NextRequest) {
@@ -29,16 +30,17 @@ export async function POST(req: NextRequest) {
   const order = orderResult.data
   const notary = notaryResult.data
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'
   const acceptUrl = `${baseUrl}/accept/${order_id}?notary=${notary_id}`
   const [dh, dm] = order.signing_time.split(':')
   const timeLabel = `${parseInt(dh) % 12 || 12}:${dm} ${parseInt(dh) < 12 ? 'AM' : 'PM'}`
+  const dateLabel = format(new Date(order.signing_date), 'EEEE, MMM d')
 
   const message = buildDispatchMessage({
     notaryName: notary.name.split(' ')[0],
     signerName: order.signer_name,
     signingType: order.signing_type,
-    signingDate: format(new Date(order.signing_date), 'EEEE, MMM d'),
+    signingDate: dateLabel,
     signingTime: timeLabel,
     propertyAddress: order.property_address,
     propertyCity: order.property_city,
@@ -47,16 +49,28 @@ export async function POST(req: NextRequest) {
     acceptUrl,
   })
 
-  try {
-    await sendSMS(notary.phone, message)
-  } catch (err) {
-    console.error('SMS send failed:', err)
-    return NextResponse.json({ error: 'SMS delivery failed' }, { status: 500 })
+  // Reach the notary by email AND SMS — succeeds if either lands (works pre-A2P).
+  const channels = await Promise.allSettled([
+    notary.email
+      ? sendNotaryJobOfferEmail({
+          notaryName: notary.name.split(' ')[0], notaryEmail: notary.email,
+          signerName: order.signer_name, signingType: order.signing_type,
+          signingDate: dateLabel, signingTime: timeLabel,
+          propertyAddress: order.property_address, propertyCity: order.property_city,
+          propertyZip: order.property_zip, fee: order.notary_fee, acceptUrl,
+        })
+      : Promise.reject(new Error('no email')),
+    notary.phone ? sendSMS(notary.phone, message) : Promise.reject(new Error('no phone')),
+  ])
+  if (channels.every((c) => c.status === 'rejected')) {
+    return NextResponse.json({ error: 'Could not reach this notary by email or SMS.' }, { status: 502 })
   }
 
+  // Offer it (don't pre-assign): they claim it via the accept link, so it escalates
+  // if unaccepted and the atomic claim still applies.
   const { error } = await supabase
     .from('orders')
-    .update({ notary_id, status: 'dispatching' })
+    .update({ status: 'dispatching', notary_id: null, dispatched_to: [notary_id], dispatched_at: new Date().toISOString() })
     .eq('id', order_id)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

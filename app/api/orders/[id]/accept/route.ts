@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendSMS } from '@/lib/sms'
 import { sendNotaryAssignmentEmail, sendClientAssignmentEmail, sendNotaryDocsEmail } from '@/lib/email'
+import { credentialsEligible } from '@/lib/credentials'
 import { format } from 'date-fns'
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -12,7 +13,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const [orderResult, notaryResult] = await Promise.all([
     supabase.from('orders').select('*').eq('id', id).single(),
-    supabase.from('notaries').select('name, phone, email, active, onboarded_at, photo_url').eq('id', notary_id).single(),
+    supabase.from('notaries').select('name, phone, email, active, onboarded_at, photo_url, nna_certified, nna_cert_expiry, background_checked, bgc_date, eo_carrier, eo_expiry, commission_expiry').eq('id', notary_id).single(),
   ])
 
   if (orderResult.error || !orderResult.data) {
@@ -37,6 +38,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   // The notary must be a real, active, onboarded agent
   if (!notary || notaryResult.error || !notary.active || !notary.onboarded_at) {
     return NextResponse.json({ error: 'Your account isn’t active yet — please finish onboarding first.' }, { status: 403 })
+  }
+  // Re-check credentials at claim time — a credential can lapse between the blast
+  // and the tap. Keeps the "every agent vetted & insured" promise true at the
+  // moment of assignment, not just at dispatch.
+  if (!credentialsEligible(notary)) {
+    return NextResponse.json({ error: 'Your credentials need updating before you can accept jobs — please update them from your dashboard.' }, { status: 403 })
   }
   // The notary must have actually been offered this job, and not have declined it
   const dispatchedTo: string[] = order.dispatched_to ?? []
