@@ -1,10 +1,11 @@
 # Independent Contractor Sales Commission Agreement
 
-> **⚠️ Template — not legal advice.** This is a starting draft built around the comp
-> structure you chose ($15/collected signing, lifetime residual, $200 producer bonus at 25
-> signings). Have a licensed attorney review it before signing — especially the worker-
-> classification language, since a commission-only salesperson in California can trigger
-> AB5 / contractor-misclassification scrutiny. Fill in every **[bracketed]** field.
+> **⚠️ Template — not legal advice.** Pre-filled with Inksent / Clayton Rehm / California and
+> your comp ($15/collected signing for the first 24 months per account, then $8/signing ongoing;
+> $200 producer bonus at 25 signings). Still fill in the remaining **[bracketed]** fields (date,
+> business address, and each rep's legal name/address) and have a **licensed attorney review it
+> before signing** — especially the worker-classification language, since a commission-only
+> salesperson in California can trigger AB5 / contractor-misclassification scrutiny.
 
 ---
 
@@ -73,32 +74,29 @@ record of attribution and Collected Signing counts.
 
 ## 5. Payment Terms
 
-5.1 Commissions are calculated and paid **monthly**, by the **[15th]** of each month, for
+5.1 Commissions are calculated and paid **monthly**, by the **15th** of each month, for
 Collected Signings recorded in the prior calendar month, less any clawbacks.
 
 5.2 The Company will provide a statement showing Accounts, Collected Signings, and amounts.
 
-5.3 Payment is made via **[ACH / Zelle / check]** to the account the Contractor designates.
+5.3 Payment is made via **ACH or Zelle** to the account the Contractor designates.
 
 ## 6. Term, Termination & Effect on Residuals
 
 6.1 This Agreement begins on the date above and continues until terminated. Either party may
-terminate **with or without cause on [14] days' written notice.**
+terminate **with or without cause on 14 days' written notice.**
 
 6.2 **Residuals require an active engagement.** The residual commission in §2.1 is
 consideration for the Contractor's ongoing role in maintaining the relationship with their
 Accounts. **Upon termination of this Agreement for any reason, the Contractor's right to
 future residual commissions ends**, except that the Contractor will be paid all commission
 earned on Collected Signings recorded **through the effective date of termination.**
-*(Optional alternative — choose one and delete the other: "Upon termination without cause by
-the Company, the Contractor will continue to receive residual commission on then-existing
-credited Accounts at a reduced rate of $[__]/Collected Signing for [__] months.")*
 
 6.3 The Company may immediately terminate and forfeit unpaid commissions for cause,
 including: misrepresentation to an Account, breach of §1.3 (unauthorized promises), fraud,
 or material breach of this Agreement.
 
-6.4 **Dormant Accounts.** An Account that sends no Collected Signing for **[6] consecutive
+6.4 **Dormant Accounts.** An Account that sends no Collected Signing for **6 consecutive
 months** may be reclassified by the Company as a house account, ending residual accrual on
 that Account.
 
@@ -112,7 +110,7 @@ the Company's approved materials.
 Account lists, borrower data, and pricing, during and after the engagement, and will comply
 with applicable privacy laws (e.g., GLBA/CCPA) regarding any borrower information.
 
-7.3 During the engagement and for **[12] months** after, the Contractor will not solicit the
+7.3 During the engagement and for **12 months** after, the Contractor will not solicit the
 Company's Accounts or notaries on behalf of a competing signing service.
 
 7.4 The Contractor will not make false, misleading, or non-compliant solicitations and will
@@ -123,7 +121,7 @@ comply with all applicable telemarketing and email laws (e.g., TCPA, CAN-SPAM).
 8.1 **Indemnification.** The Contractor will indemnify the Company for losses arising from
 the Contractor's misrepresentations, unauthorized commitments, or violations of law.
 
-8.2 **Governing law.** This Agreement is governed by the laws of the State of **[STATE]**.
+8.2 **Governing law.** This Agreement is governed by the laws of the State of **California**, and any dispute will be brought in the state or federal courts located in San Diego County, California.
 
 8.3 **Entire agreement.** This is the entire agreement on its subject and may be amended only
 in a writing signed by both parties.
