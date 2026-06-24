@@ -5,6 +5,35 @@ export const DEFAULT_RESIDUAL_CENTS = 1500 // $15 per collected signing
 export const DEFAULT_BONUS_CENTS = 20000 // $200 producer bonus
 export const DEFAULT_BONUS_THRESHOLD = 25 // collected signings to earn the bonus
 
+// Rank a sales-rep applicant by likely fit. Existing title relationships are the
+// strongest predictor of fast wins, then industry experience, then B2B chops,
+// then tenure. Returns a 0–100 score, an A/B/C tier, and the standout signals.
+export interface ApplicantLike {
+  title_relationships?: string | null
+  industry_experience?: string | null
+  b2b_experience?: string | null
+  years_sales?: string | null
+}
+export function scoreApplicant(a: ApplicantLike): { score: number; tier: 'A' | 'B' | 'C'; signals: string[] } {
+  let score = 0
+  const signals: string[] = []
+
+  if (a.title_relationships === 'many') { score += 40; signals.push('Active title rolodex') }
+  else if (a.title_relationships === 'some') { score += 20; signals.push('Some title contacts') }
+
+  if (a.industry_experience === 'current') { score += 25; signals.push('In title/escrow/RE now') }
+  else if (a.industry_experience === 'past') { score += 15; signals.push('Past title/escrow/RE') }
+
+  if (a.b2b_experience === 'extensive') { score += 20; signals.push('Extensive B2B') }
+  else if (a.b2b_experience === 'some') { score += 10 }
+
+  const yrs: Record<string, number> = { '10_plus': 15, '5_10': 12, '3_5': 9, '1_3': 5, under_1: 2 }
+  score += yrs[a.years_sales ?? ''] ?? 0
+
+  const tier = score >= 70 ? 'A' : score >= 40 ? 'B' : 'C'
+  return { score, tier, signals }
+}
+
 // Orders store the title company as free text. Normalize so "ABC Title",
 // " abc  title " and "ABC TITLE" all match the same account.
 export function normalizeCompany(name: string): string {
