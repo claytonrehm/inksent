@@ -183,6 +183,9 @@ export async function sendAdminOrderAlert(data: {
   blastInfo: string
 }) {
   const typeLabel = data.signingType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  // Escape all public order-form input — this email lands in the admin inbox and
+  // the order form is fully public/unauthenticated (stored-XSS vector otherwise).
+  const esc = (s: unknown) => String(s ?? '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/></head>
   <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9f9f9;margin:0;padding:24px;">
@@ -198,11 +201,11 @@ export async function sendAdminOrderAlert(data: {
         <table style="width:100%;font-size:14px;border-collapse:collapse;">
           <tr><td style="color:#888;padding:6px 0;">Type</td><td style="text-align:right;font-weight:600;">${typeLabel}</td></tr>
           <tr><td style="color:#888;padding:6px 0;">Date</td><td style="text-align:right;font-weight:600;">${data.signingDate} at ${data.signingTime}</td></tr>
-          <tr><td style="color:#888;padding:6px 0;">Signer</td><td style="text-align:right;">${data.signerName}</td></tr>
-          <tr><td style="color:#888;padding:6px 0;">Address</td><td style="text-align:right;">${data.propertyAddress}, ${data.propertyCity}, ${data.propertyState} ${data.propertyZip}</td></tr>
-          <tr><td style="color:#888;padding:6px 0;border-top:1px solid #eee;">Client</td><td style="text-align:right;border-top:1px solid #eee;font-weight:600;">${data.clientCompany}</td></tr>
-          <tr><td style="color:#888;padding:6px 0;">Contact</td><td style="text-align:right;">${data.clientName}</td></tr>
-          <tr><td style="color:#888;padding:6px 0;">Phone</td><td style="text-align:right;"><a href="tel:${data.clientPhone}" style="color:#5B4FCF;">${data.clientPhone}</a></td></tr>
+          <tr><td style="color:#888;padding:6px 0;">Signer</td><td style="text-align:right;">${esc(data.signerName)}</td></tr>
+          <tr><td style="color:#888;padding:6px 0;">Address</td><td style="text-align:right;">${esc(data.propertyAddress)}, ${esc(data.propertyCity)}, ${esc(data.propertyState)} ${esc(data.propertyZip)}</td></tr>
+          <tr><td style="color:#888;padding:6px 0;border-top:1px solid #eee;">Client</td><td style="text-align:right;border-top:1px solid #eee;font-weight:600;">${esc(data.clientCompany)}</td></tr>
+          <tr><td style="color:#888;padding:6px 0;">Contact</td><td style="text-align:right;">${esc(data.clientName)}</td></tr>
+          <tr><td style="color:#888;padding:6px 0;">Phone</td><td style="text-align:right;"><a href="tel:${esc(data.clientPhone)}" style="color:#5B4FCF;">${esc(data.clientPhone)}</a></td></tr>
         </table>
         <a href="https://inksent.co/orders/" style="display:block;text-align:center;background:#5B4FCF;color:white;text-decoration:none;font-weight:700;padding:12px;border-radius:8px;margin-top:20px;">Manage Order →</a>
       </div>

@@ -15,7 +15,14 @@ const PENDING = 'inksent_admin_2fa'
 const PAYLOAD = 'admin-v1'
 
 function secret() {
-  return process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD || 'dev-secret'
+  const s = process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD
+  if (s) return s
+  // Never sign admin/2FA cookies with a public constant in production — that would
+  // make the session cookie forgeable. Fail closed instead. (Dev keeps a fallback.)
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('ADMIN_SESSION_SECRET (or ADMIN_PASSWORD) must be set in production')
+  }
+  return 'dev-secret'
 }
 
 /** 2FA is on whenever an admin email is configured (default: always). */

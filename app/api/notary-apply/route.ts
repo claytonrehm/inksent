@@ -28,6 +28,9 @@ const schema = z.object({
 export async function POST(req: NextRequest) {
   const body = await req.json()
 
+  // Honeypot — bots fill this hidden field; silently accept so they don't retry.
+  if (body?.company_url) return NextResponse.json({ ok: true })
+
   // Bot protection (no-op until Turnstile keys are configured)
   const okHuman = await verifyTurnstile(body?.turnstileToken, req.headers.get('x-forwarded-for') ?? undefined)
   if (!okHuman) return NextResponse.json({ error: 'Verification failed. Please try again.' }, { status: 400 })
