@@ -9,10 +9,12 @@ const money = (cents: number) => (cents / 100).toFixed(2)
 
 export default async function ReportsPage() {
   const supabase = await createClient()
-  const [{ data: orders }, { data: notaries }, { data: cancellations }] = await Promise.all([
+  const [{ data: orders }, { data: notaries }, { data: cancellations }, { data: salesReps }, { data: salesPayouts }] = await Promise.all([
     supabase.from('orders').select('id, confirmation_number, status, signing_type, signing_date, signer_name, property_city, property_state, base_zip, client_company, client_email, client_fee, notary_fee, notary_id, created_at, dispatched_at, accepted_at, completed_at, client_paid_at, notary_paid_at, issue_reported_at, client_satisfaction'),
     supabase.from('notaries').select('id, name, email'),
     supabase.from('notary_cancellations').select('id'),
+    supabase.from('sales_reps').select('id, name, email'),
+    supabase.from('sales_payouts').select('sales_rep_id, amount_cents, paid_at, created_at'),
   ])
 
   const O = orders ?? []
@@ -62,6 +64,20 @@ export default async function ReportsPage() {
   }
   const notaryRows = Object.values(notaryMap).sort((a, b) => b.earned - a.earned)
 
+  // ─── Sales rep commissions (tax-ready, 1099-NEC) ────────
+  const repName = Object.fromEntries((salesReps ?? []).map((r) => [r.id, r.name]))
+  const repEmail = Object.fromEntries((salesReps ?? []).map((r) => [r.id, r.email]))
+  const taxYear = new Date().getFullYear()
+  const repPayMap: Record<string, { name: string; email: string; total: number; thisYear: number }> = {}
+  for (const p of salesPayouts ?? []) {
+    const r = (repPayMap[p.sales_rep_id] ??= { name: repName[p.sales_rep_id] ?? '—', email: repEmail[p.sales_rep_id] ?? '', total: 0, thisYear: 0 })
+    r.total += p.amount_cents
+    const d = p.paid_at ?? p.created_at
+    if (d && new Date(d).getFullYear() === taxYear) r.thisYear += p.amount_cents
+  }
+  const repRows = Object.values(repPayMap).sort((a, b) => b.total - a.total)
+  const commissionsPaid = (salesPayouts ?? []).reduce((s, p) => s + p.amount_cents, 0)
+
   return (
     <div className="p-6 lg:p-8 max-w-6xl space-y-8">
       <div>
@@ -78,6 +94,7 @@ export default async function ReportsPage() {
         <Stat label="Outstanding (unpaid)" value={formatCurrency(outstanding)} warn={outstanding > 0} />
         <Stat label="Paid to notaries" value={formatCurrency(paidOut)} />
         <Stat label="Owed to notaries" value={formatCurrency(owedOut)} warn={owedOut > 0} />
+        <Stat label="Commissions paid" value={formatCurrency(commissionsPaid)} />
         <Stat label="Avg confirm time" value={avgConfirm != null ? `${avgConfirm} min` : '—'} />
         <Stat label="Completed (billed)" value={formatCurrency(billedCompleted)} />
         <Stat label="Issues reported" value={String(issues)} warn={issues > 0} />
@@ -133,6 +150,30 @@ export default async function ReportsPage() {
             </tr>
           ))}
         </Table>
+      </section>
+
+      {/* Sales rep commissions (tax) */}
+      <section>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Sales Rep Commissions <span className="text-gray-400 normal-case font-normal">(1099 / tax)</span></h2>
+          <DownloadCsv
+            label="Export commissions CSV"
+            filename={`inksent-sales-commissions-${taxYear}.csv`}
+            headers={['Rep', 'Email', 'Total paid ($)', `Paid ${taxYear} ($)`, '1099-NEC?']}
+            rows={repRows.map((r) => [r.name, r.email, money(r.total), money(r.thisYear), r.thisYear >= 60000 ? 'YES (>=$600)' : 'no'])}
+          />
+        </div>
+        <Table head={['Rep', 'Total paid', `Paid ${taxYear}`, '1099-NEC?']}>
+          {repRows.length === 0 ? <Empty cols={4} /> : repRows.map((r) => (
+            <tr key={r.email || r.name} className="border-t border-gray-100">
+              <td className="px-4 py-2.5 font-medium text-gray-900">{r.name}</td>
+              <td className="px-4 py-2.5 text-gray-700">{formatCurrency(r.total)}</td>
+              <td className="px-4 py-2.5 text-gray-700">{formatCurrency(r.thisYear)}</td>
+              <td className="px-4 py-2.5">{r.thisYear >= 60000 ? <span className="text-violet-700 font-medium">File 1099-NEC</span> : <span className="text-gray-400">—</span>}</td>
+            </tr>
+          ))}
+        </Table>
+        <p className="text-xs text-gray-400 mt-2">Reps paid $600+ in a calendar year need a 1099-NEC. Collect each rep&apos;s W-9 before their first payout (tracked on their rep page).</p>
       </section>
 
       {/* Full order export */}
