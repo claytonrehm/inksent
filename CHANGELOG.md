@@ -4,6 +4,12 @@ A running record of what the platform does and what was added. Use this for your
 
 ---
 
+## Recent changes (2026-06-24) — pre-launch hardening (4 packs)
+- **Money-safety:** Stripe idempotency keys on all notary transfers + referral bounties (no double-pay on webhook/cron overlap or retries); webhook event-id dedup (`stripe_events`); refunds never auto-pay a notary and auto-reverse the payout if already paid (`notary_transfer_id`); state guards on pay-client/refund; `client_paid_at`/`landed_at` give the commission tier a stable anchor. Migration `20260624120000_money_safety.sql`.
+- **Reliability:** email helpers throw on Resend errors (a failed send is no longer counted as a delivered dispatch — critical while SMS/A2P is pending); dispatch alerts when it reaches zero agents; manual dispatch + blast now reach by email AND SMS and stamp `dispatched_at` so they escalate; accept re-checks credentials at claim time; new "missed signing" cron alert; dead "Reply YES" instruction removed.
+- **Security:** admin session/2FA secret fails closed in prod (no `dev-secret` fallback); admin order email escapes public input (stored-XSS); honeypot on notary-apply; force RLS + revoke on every table + lock the rate-limit RPC to service_role. Migration `20260624130000_security_hardening.sql`.
+- **Website honesty:** "all 50 states / nationwide" → honest "San Diego & Southern California, expanding" (homepage, order, FAQ, coverage map, hero stats); E&O optional at notary apply; sales-apply polish; cancellation/refund clause in Terms. Full review in `PRELAUNCH-AUDIT.md`.
+
 ## Recent changes (2026-06-24)
 - **Tiered residual commission + applicant ranking/filters.** Sales-rep residual is now **$15/collected signing for the first 24 months per account, then $8/signing ongoing** (per-rep editable: `residual_months`, `residual_after_cents`; migration `20260624000000_sales_residual_tiers.sql`). Commission math is time-based per signing (window anchored at the account's landed date or first collected signing); rep detail shows the full/reduced split per account. $200 producer bonus at 25 signings is unchanged (once per account). Job post, `/sales-apply`, playbook, and `SALES-COMMISSION-AGREEMENT.md` updated to match. Applicants page (`/sales/applicants`) gained a **fit score + A/B/C tier** (weights title relationships > industry > B2B > tenure), a **metrics row**, and **filters** (status/tier/relationships/industry/B2B + search) with sort by fit/newest/name.
 
