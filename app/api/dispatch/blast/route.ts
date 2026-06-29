@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
               propertyZip: order.property_zip, fee: order.notary_fee, acceptUrl,
             })
           : Promise.reject(new Error('no email')),
-        notary.phone ? sendSMS(notary.phone, message) : Promise.reject(new Error('no phone')),
+        notary.phone && notary.sms_consent_at ? sendSMS(notary.phone, message) : Promise.reject(new Error('no phone/SMS consent')),
       ])
       if (channels.every((c) => c.status === 'rejected')) throw new Error('unreachable')
       return true

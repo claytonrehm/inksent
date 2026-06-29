@@ -16,7 +16,7 @@ export async function GET() {
   const supabase = await createClient()
   const { data: notaries } = await supabase
     .from('notaries')
-    .select('id, name, phone, email, approved_at')
+    .select('id, name, phone, email, approved_at, sms_consent_at')
     .eq('active', true)
     .is('onboarded_at', null)
 
@@ -24,7 +24,7 @@ export async function GET() {
   for (const n of notaries ?? []) {
     const onboardUrl = `${baseUrl}/onboard/${n.id}`
     const firstName = (n.name ?? '').split(' ')[0]
-    if (n.phone) {
+    if (n.phone && n.sms_consent_at) {
       await sendSMS(
         n.phone,
         `Hi ${firstName}, you're approved with Inksent! One quick step before we can text you $90 signing jobs — finish your profile (~3 min): ${onboardUrl} — Clayton`

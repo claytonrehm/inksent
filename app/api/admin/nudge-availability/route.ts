@@ -16,7 +16,7 @@ export async function GET() {
   const supabase = await createClient()
   const { data: notaries } = await supabase
     .from('notaries')
-    .select('id, name, phone, email, availability, active, denied_at')
+    .select('id, name, phone, email, availability, active, denied_at, sms_consent_at')
     .eq('active', true)
     .is('denied_at', null)
 
@@ -28,7 +28,7 @@ export async function GET() {
   for (const n of missing) {
     const url = `${baseUrl}/availability/${n.id}`
     const firstName = (n.name ?? '').split(' ')[0]
-    if (n.phone) {
+    if (n.phone && n.sms_consent_at) {
       await sendSMS(
         n.phone,
         `Hi ${firstName}, it's Clayton at Inksent. We don't have your availability on file yet, so you may be getting skipped for $90 signings you'd take. Tap the windows that fit you (30 sec, no login): ${url}`

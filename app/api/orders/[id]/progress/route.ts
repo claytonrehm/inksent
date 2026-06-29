@@ -14,7 +14,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const supabase = await createClient()
   const { data: order } = await supabase
     .from('orders')
-    .select('notary_id, client_phone, signer_name, confirmation_number, notaries(name)')
+    .select('notary_id, client_phone, signer_name, confirmation_number, sms_consent_at, notaries(name)')
     .eq('id', id)
     .single()
   if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 })
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const nRaw = order.notaries as unknown
   const notary = (Array.isArray(nRaw) ? nRaw[0] : nRaw) as { name: string } | null
   const agent = notary?.name ?? 'Your signing agent'
-  if (order.client_phone) {
+  if (order.client_phone && order.sms_consent_at) {
     const msg = milestone === 'en_route'
       ? `🚗 ${agent} is on the way to ${order.signer_name}'s signing (${order.confirmation_number}). — Inksent`
       : `📍 ${agent} has arrived for ${order.signer_name}'s signing (${order.confirmation_number}). — Inksent`

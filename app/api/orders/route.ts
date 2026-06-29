@@ -69,6 +69,14 @@ export async function POST(req: NextRequest) {
         .then(({ error }) => { if (error) console.warn('client_reference save skipped:', error.message) })
     }
 
+    // Record the client's (optional, A2P-compliant) SMS opt-in. Best-effort so a
+    // pre-migration DB never blocks order placement. Null = no opt-in → client/signer
+    // status texts are suppressed (we use email + the live tracker instead).
+    if (body?.sms_consent === true) {
+      await supabase.from('orders').update({ sms_consent_at: new Date().toISOString() }).eq('id', data.id)
+        .then(({ error }) => { if (error) console.warn('sms_consent_at save skipped:', error.message) })
+    }
+
     const h = parseInt(data.signing_time.split(':')[0])
     const m = data.signing_time.split(':')[1]
     const timeStr = `${h % 12 || 12}:${m} ${h < 12 ? 'AM' : 'PM'}`

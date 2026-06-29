@@ -31,7 +31,7 @@ export async function blastOrderToCoveringNotaries(
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://inksent.co'
   const { data: notaries } = await supabase
     .from('notaries')
-    .select('id, name, phone, email, base_zip, coverage_radius, onboarded_at, payouts_enabled, languages, nna_certified, nna_cert_expiry, background_checked, bgc_date, eo_carrier, eo_expiry, commission_expiry')
+    .select('id, name, phone, email, sms_consent_at, base_zip, coverage_radius, onboarded_at, payouts_enabled, languages, nna_certified, nna_cert_expiry, background_checked, bgc_date, eo_carrier, eo_expiry, commission_expiry')
     .eq('active', true)
 
   const exclude = new Set(opts.exclude ?? [])
@@ -94,7 +94,7 @@ export async function blastOrderToCoveringNotaries(
                 acceptUrl,
               })
             : Promise.reject(new Error('no email')),
-          n.phone
+          n.phone && n.sms_consent_at
             ? sendSMS(
                 n.phone,
                 buildDispatchMessage({

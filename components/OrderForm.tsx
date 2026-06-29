@@ -68,6 +68,7 @@ export default function OrderForm({ prefill }: { prefill?: OrderPrefill }) {
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [captchaToken, setCaptchaToken] = useState('')
   const [agreed, setAgreed] = useState(false)
+  const [smsConsent, setSmsConsent] = useState(false)
   const [coverage, setCoverage] = useState<{ covered: boolean; city?: string; state?: string; agentCount?: number; sameDay?: boolean } | null>(null)
 
   async function checkCoverage(zip: string) {
@@ -100,7 +101,7 @@ export default function OrderForm({ prefill }: { prefill?: OrderPrefill }) {
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, turnstileToken: captchaToken, terms_accepted: agreed }),
+        body: JSON.stringify({ ...data, turnstileToken: captchaToken, terms_accepted: agreed, sms_consent: smsConsent }),
       })
 
       if (!res.ok) {
@@ -351,14 +352,25 @@ export default function OrderForm({ prefill }: { prefill?: OrderPrefill }) {
         />
       </section>
 
-      {/* Terms acceptance (clickwrap) */}
+      {/* Terms acceptance (clickwrap) — required, but does NOT bundle SMS consent.
+          A2P 10DLC (error 30923): consent to texts must not be a condition of the order. */}
       <label className="flex items-start gap-3 cursor-pointer bg-gray-50 border border-gray-200 rounded-xl p-4">
         <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)}
           className="mt-0.5 h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500" />
         <span className="text-sm text-gray-600">
           I agree to Inksent&apos;s{' '}
           <a href="/terms" target="_blank" className="text-violet-600 underline">Terms of Service</a> and{' '}
-          <a href="/privacy" target="_blank" className="text-violet-600 underline">Privacy Policy</a>, and I&apos;m authorized to place this order on behalf of my company. I consent to receive SMS updates about this signing at the number(s) provided, and confirm the signer has agreed to receive signing-related texts. Message frequency varies; message &amp; data rates may apply. Reply STOP to opt out, HELP for help.
+          <a href="/privacy" target="_blank" className="text-violet-600 underline">Privacy Policy</a>, and I&apos;m authorized to place this order on behalf of my company.
+        </span>
+      </label>
+
+      {/* SMS consent — OPTIONAL. Order goes through whether or not this is checked;
+          if unchecked we send updates by email and the live tracking page instead. */}
+      <label className="flex items-start gap-3 cursor-pointer bg-gray-50 border border-gray-200 rounded-xl p-4">
+        <input type="checkbox" checked={smsConsent} onChange={(e) => setSmsConsent(e.target.checked)}
+          className="mt-0.5 h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500" />
+        <span className="text-sm text-gray-600">
+          <strong>Optional:</strong> Text me (and the signer, who has agreed) status updates about this signing at the number(s) provided. Consent isn&apos;t required to place this order. Message frequency varies; message &amp; data rates may apply. Reply STOP to opt out, HELP for help.
         </span>
       </label>
 

@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
   const supabase = await createClient()
   const { data: notaries } = await supabase
     .from('notaries')
-    .select('id, name, phone, email')
+    .select('id, name, phone, email, sms_consent_at')
     .eq('active', true)
 
   const emailed: string[] = []
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
       await sendNotaryHubAnnouncementEmail({ name: n.name, email: n.email, hubUrl }).catch(() => {})
       emailed.push((n.name ?? '').trim())
     }
-    if (alsoSms && n.phone) {
+    if (alsoSms && n.phone && n.sms_consent_at) {
       await sendSMS(
         n.phone,
         `Hi ${firstName} — your free Inksent Notary Hub is live: earnings, payouts & tax-ready mileage in one place. Sign in (one-tap link, no password): ${hubUrl} — Clayton`

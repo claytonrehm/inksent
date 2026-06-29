@@ -48,8 +48,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       await sendSMS(n.phone, `⏰ Time change: the ${order.signer_name} signing (${order.confirmation_number}) is now ${dateStr} at ${timeStr}. Please update your calendar. Reply or call (619) 949-3361 if that doesn’t work. — Inksent`).catch(() => {})
     }
   }
-  // Let the signer know too, if we have their cell.
-  if (order.signer_phone) {
+  // Let the signer know too, if we have their cell AND the client opted into texts.
+  if (order.signer_phone && order.sms_consent_at) {
     await sendSMS(order.signer_phone, `Hi ${order.signer_name.split(' ')[0]}, your signing has been rescheduled to ${dateStr} at ${timeStr}. — Inksent Signing Services`).catch(() => {})
   }
   if (process.env.ADMIN_PHONE) {
