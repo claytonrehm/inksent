@@ -33,7 +33,10 @@ const schema = z.object({
   commission_state_code: z.string().min(2, 'Required'),
   commission_expiry: z.string().min(1, 'Required'),
   notes: z.string().optional(),
-  sms_consent: z.literal(true, { message: 'Required to receive job offers' }),
+  // Carrier compliance (A2P 10DLC error 30923): SMS consent must be VOLUNTARY —
+  // the application must submit whether or not this box is checked. We store the
+  // opt-in (sms_consent_at) only when it's ticked, and never SMS those who didn't.
+  sms_consent: z.boolean().optional(),
   ic_agreement: z.literal(true, { message: 'You must accept the Independent Contractor Agreement to join' }),
 }).superRefine((d, ctx) => {
   // These are the minimum requirements to join — all required.
@@ -417,18 +420,19 @@ export default function NotaryApplyForm() {
           {...register('notes')} />
       </section>
 
-      {/* SMS consent */}
+      {/* SMS consent — OPTIONAL (A2P 10DLC compliant). You can submit this
+          application without checking it; it just turns on faster job-offer texts. */}
       <section className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+        <p className="text-xs font-semibold text-gray-500 mb-2">Optional — you can apply without this</p>
         <label className="flex items-start gap-3 cursor-pointer">
           <input type="checkbox" className="mt-0.5 h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
             {...register('sms_consent')} />
           <span className="text-sm text-gray-600">
-            I agree to receive SMS text messages from Inksent about signing jobs and my account. Message frequency varies; message &amp; data rates may apply. Reply STOP to opt out. See our{' '}
+            <strong>Optional:</strong> I agree to receive SMS text messages from Inksent about signing jobs and my account. Consent is not a condition of applying or working with us — leave this unchecked and we&apos;ll reach you by email instead. Message frequency varies; message &amp; data rates may apply. Reply STOP to opt out, HELP for help. See our{' '}
             <a href="/privacy" target="_blank" className="text-violet-600 underline">Privacy Policy</a> and{' '}
             <a href="/terms" target="_blank" className="text-violet-600 underline">Terms</a>.
           </span>
         </label>
-        {errors.sms_consent && <p className="text-xs text-red-500 mt-2 ml-7">{errors.sms_consent.message}</p>}
       </section>
 
       {/* Independent Contractor Agreement */}
