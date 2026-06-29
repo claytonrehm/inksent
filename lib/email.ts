@@ -58,6 +58,34 @@ export async function sendNotaryApprovedEmail(data: { name: string; email: strin
   })
 }
 
+// ─── Availability Request (notary) ───────────────────────────────────────────
+
+export async function sendAvailabilityRequestEmail(data: { name: string; email: string; availabilityUrl: string }) {
+  const firstName = (data.name || '').split(' ')[0] || 'there'
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/>${META}</head>
+  <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111111;margin:0;padding:0;background:#f4f4f5;">
+  <div style="max-width:560px;margin:32px auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+    ${HEADER}
+    <div style="padding:32px;">
+      <div style="display:inline-block;background:#ede9fe;color:#5b21b6;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;">&#9201; 30-second tap</div>
+      <p style="font-size:18px;font-weight:700;color:#111111;margin:0 0 8px;">${firstName}, when are you generally free for signings?</p>
+      <p style="font-size:14px;color:#555555;line-height:1.6;margin:0 0 8px;">We don&rsquo;t have your availability on file yet — so when title companies ask us to cover a slot, you might be getting skipped for jobs you&rsquo;d actually take.</p>
+      <p style="font-size:14px;color:#555555;line-height:1.6;margin:0 0 24px;">Tap the windows that fit you (you can change them anytime). No login, no form — it&rsquo;s one tap each:</p>
+      <a href="${data.availabilityUrl}" style="display:block;text-align:center;background:#7c3aed;color:#ffffff;text-decoration:none;font-weight:700;padding:14px;border-radius:10px;font-size:15px;">Set My Availability →</a>
+      <p style="font-size:13px;color:#888888;line-height:1.6;margin:20px 0 0;">The more windows you mark, the more $90 signings we can send your way.</p>
+      <p style="font-size:13px;color:#888888;margin:12px 0 0;">— Clayton<br/>Inksent Signing Services</p>
+    </div>
+    ${FOOTER}
+  </div></body></html>`
+
+  return sendVia({
+    from: 'Clayton at Inksent <orders@inksent.co>',
+    to: data.email,
+    subject: `${firstName}, when are you free for signings? (30 sec)`,
+    html,
+  })
+}
+
 // ─── Notary Hub Announcement (bench-wide) ─────────────────────────────────────
 
 export async function sendNotaryHubAnnouncementEmail(data: { name: string; email: string; hubUrl: string }) {
