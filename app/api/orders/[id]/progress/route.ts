@@ -14,7 +14,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const supabase = await createClient()
   const { data: order } = await supabase
     .from('orders')
-    .select('notary_id, client_phone, signer_name, confirmation_number, sms_consent_at, notaries(name)')
+    // select('*') (not a named list) so this can't error if sms_consent_at hasn't
+    // been migrated yet — the gating below just treats a missing value as "no consent".
+    .select('*, notaries(name)')
     .eq('id', id)
     .single()
   if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 })
