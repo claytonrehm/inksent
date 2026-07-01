@@ -5,6 +5,21 @@ function getClient() {
 }
 
 export async function sendSMS(to: string, body: string) {
+  // ── Global SMS kill-switch ──────────────────────────────────────────────
+  // SMS stays completely OFF — no Twilio API call is made, so ZERO Twilio cost
+  // is incurred — until SMS_ENABLED is explicitly set to 'true' in the env.
+  // This keeps every SMS code path wired and the A2P campaign registered while
+  // we wait for paying title-company volume. Go live = set SMS_ENABLED=true and
+  // redeploy; nothing else changes.
+  //
+  // We THROW (rather than silently succeed) so callers that count a notary as
+  // "reached if any channel succeeds" correctly treat SMS as unavailable and
+  // fall back to email. Every caller already tolerates a rejected sendSMS
+  // (real Twilio calls can reject too), so this is safe.
+  if (process.env.SMS_ENABLED !== 'true') {
+    throw new Error('SMS disabled (set SMS_ENABLED=true to send)')
+  }
+
   // A2P-ready: if a Messaging Service SID is set (the usual A2P setup), send
   // through it; otherwise fall back to the raw number. Lets you go live the
   // moment A2P clears by just adding TWILIO_MESSAGING_SERVICE_SID — no code change.

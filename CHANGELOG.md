@@ -4,6 +4,9 @@ A running record of what the platform does and what was added. Use this for your
 
 ---
 
+## Recent changes (2026-07-01)
+- **Global SMS kill-switch (`SMS_ENABLED`).** A2P 10DLC campaign is approved, but SMS stays fully OFF until we have paying title-company volume — so we incur **zero Twilio cost** while everything sits staged and ready. `lib/sms.ts` now short-circuits (throws, no Twilio API call) unless `SMS_ENABLED === 'true'`. Callers already tolerate a rejected `sendSMS` and fall back to email, so dispatch/nudges/alerts all keep working by email. **Go-live is one env change:** set `SMS_ENABLED=true` and redeploy. `TWILIO_MESSAGING_SERVICE_SID` (the approved campaign's Messaging Service `MG6dda…86cd`) is staged in prod so sends route through the registered campaign the moment it's flipped on.
+
 ## Recent changes (2026-06-29)
 - **A2P 10DLC fix — voluntary SMS opt-in + consent gating (Twilio error 30923).** The carrier rejected the messaging campaign because `/apply` couldn't be submitted without checking the SMS-consent box (forced consent). Fixed across both opt-in pages and the send paths so consent is genuinely voluntary AND honored:
   - **`/apply` (notary):** `sms_consent` relaxed from `literal(true)` to `boolean().optional()`; box clearly labeled optional, form submits unchecked.
